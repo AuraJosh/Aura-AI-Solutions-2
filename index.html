@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura AI Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1', // Indigo for AI tech vibe
+            accent: '#8B5CF6', // Purple accent
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+<!-- Navbar -->
+<header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
+  <div class="container mx-auto flex justify-between items-center p-4">
+    <div class="text-2xl font-bold text-primary">Aura AI</div>
+    <nav class="hidden md:flex space-x-6">
+      <a href="#home" class="hover:text-primary">Home</a>
+      <a href="#services" class="hover:text-primary">Services</a>
+      <a href="#about" class="hover:text-primary">About</a>
+      <a href="#case-studies" class="hover:text-primary">Case Studies</a>
+      <a href="#blog" class="hover:text-primary">Blog</a>
+      <a href="#contact" class="hover:text-primary">Contact</a>
+    </nav>
+    <button id="menu-btn" class="md:hidden text-3xl">&#9776;</button>
+  </div>
+</header>
+
+<!-- Mobile Menu -->
+<div id="menu" class="hidden md:hidden bg-white dark:bg-gray-900 p-4">
+  <nav class="flex flex-col space-y-2">
+    <a href="#home" class="hover:text-primary">Home</a>
+    <a href="#services" class="hover:text-primary">Services</a>
+    <a href="#about" class="hover:text-primary">About</a>
+    <a href="#case-studies" class="hover:text-primary">Case Studies</a>
+    <a href="#blog" class="hover:text-primary">Blog</a>
+    <a href="#contact" class="hover:text-primary">Contact</a>
+  </nav>
+</div>
+
+<!-- Hero Section -->
+<section id="home" class="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-primary to-accent text-center text-white">
+  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">Transforming Businesses with AI-Powered Solutions</h1>
+  <p class="text-xl mb-8 animate-fade-in delay-300">Empowering innovation through state-of-the-art AI technologies.</p>
+  <div class="flex space-x-4 animate-fade-in delay-500">
+    <a href="#contact" class="bg-white text-primary font-semibold px-6 py-3 rounded hover:bg-gray-200">Get Started</a>
+    <a href="#services" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="container mx-auto py-20 px-4">
+  <h2 class="text-4xl font-bold text-center mb-12">Our Services</h2>
+  <div class="grid md:grid-cols-4 gap-8">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <div class="text-5xl mb-4">🤖</div>
+      <h3 class="font-semibold text-xl mb-2">Machine Learning</h3>
+      <p>Custom ML models tailored to your business needs.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <div class="text-5xl mb-4">🧠</div>
+      <h3 class="font-semibold text-xl mb-2">Natural Language Processing</h3>
+      <p>Empower applications to understand human language.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <div class="text-5xl mb-4">👁️</div>
+      <h3 class="font-semibold text-xl mb-2">Computer Vision</h3>
+      <p>Vision-based AI for enhanced recognition and automation.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow text-center">
+      <div class="text-5xl mb-4">📊</div>
+      <h3 class="font-semibold text-xl mb-2">AI Consulting</h3>
+      <p>Strategize and implement AI across your organization.</p>
+    </div>
+  </div>
+</section>
+
+<!-- About Us -->
+<section id="about" class="bg-gray-100 dark:bg-gray-800 py-20 px-4">
+  <div class="container mx-auto text-center">
+    <h2 class="text-4xl font-bold mb-6">About Us</h2>
+    <p class="max-w-2xl mx-auto mb-8">Aura AI Solutions is committed to driving transformation with cutting-edge AI technologies. We help businesses unlock new potentials and achieve sustainable growth through innovation.</p>
+    <div class="flex justify-center space-x-12">
+      <div>
+        <h3 class="text-3xl font-bold">10+</h3>
+        <p>Years in AI</p>
+      </div>
+      <div>
+        <h3 class="text-3xl font-bold">50+</h3>
+        <p>Clients Served</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Case Studies -->
+<section id="case-studies" class="container mx-auto py-20 px-4">
+  <h2 class="text-4xl font-bold text-center mb-12">Case Studies</h2>
+  <div class="grid md:grid-cols-3 gap-8">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <img src="https://via.placeholder.com/300x200" alt="Case Study 1" class="rounded mb-4">
+      <h3 class="font-semibold text-xl mb-2">Retail AI Boost</h3>
+      <p>Increased customer engagement by 40% with personalized AI recommendations.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <img src="https://via.placeholder.com/300x200" alt="Case Study 2" class="rounded mb-4">
+      <h3 class="font-semibold text-xl mb-2">Healthcare Diagnostics</h3>
+      <p>Reduced diagnosis time by 30% with advanced computer vision models.</p>
+    </div>
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+      <img src="https://via.placeholder.com/300x200" alt="Case Study 3" class="rounded mb-4">
+      <h3 class="font-semibold text-xl mb-2">Financial Forecasting</h3>
+      <p>Boosted forecasting accuracy by 25% for leading financial institutions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Blog Section -->
+<section id="blog" class="bg-gray-100 dark:bg-gray-800 py-20 px-4">
+  <div class="container mx-auto">
+    <h2 class="text-4xl font-bold text-center mb-12">Latest Insights</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
+        <h3 class="font-semibold text-xl mb-2">The Future of AI in Business</h3>
+        <p class="mb-4">How AI technologies are reshaping industries across the globe.</p>
+        <a href="#" class="text-primary hover:underline">Read More →</a>
+      </div>
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
+        <h3 class="font-semibold text-xl mb-2">Understanding Computer Vision</h3>
+        <p class="mb-4">A beginner-friendly guide to how machines interpret visual data.</p>
+        <a href="#" class="text-primary hover:underline">Read More →</a>
+      </div>
+      <div class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow">
+        <h3 class="font-semibold text-xl mb-2">Natural Language Processing Trends</h3>
+        <p class="mb-4">The latest advancements in human-computer language interaction.</p>
+        <a href="#" class="text-primary hover:underline">Read More →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Form -->
+<section id="contact" class="container mx-auto py-20 px-4">
+  <h2 class="text-4xl font-bold text-center mb-8">Get In Touch</h2>
+  <form class="max-w-2xl mx-auto space-y-6">
+    <input type="text" placeholder="Name" class="w-full p-3 border rounded" required>
+    <input type="email" placeholder="Email" class="w-full p-3 border rounded" required>
+    <textarea placeholder="Message" class="w-full p-3 border rounded" rows="5" required></textarea>
+    <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700">Send Message</button>
+  </form>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+  <div class="mb-4">
+    <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
+    <a href="#" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  const menuBtn = document.getElementById('menu-btn');
+  const menu = document.getElementById('menu');
+  menuBtn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+  });
+</script>
+
+<!-- Business Chatbot Widget CSS and JS -->
+<link rel="stylesheet" href="path/to/widget.css">
+<script src="path/to/widget.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatWidget = new BusinessChatWidget({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2'
+    });
+  });
+</script>
+
+</body>
+</html>
