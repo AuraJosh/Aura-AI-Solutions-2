@@ -91,30 +91,33 @@
       menu.classList.toggle('hidden');
     });
 
-    // Contact form AJAX submission
-    const form = document.getElementById('contact-form');
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      const formData = new FormData(form);
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
 
-      fetch(form.action, {
-        method: "POST",
-        body: formData,
-        headers: { "Accept": "application/json" }
-      }).then(response => {
-        if (response.ok) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          document.getElementById('thank-you-banner').classList.remove('hidden');
-          form.reset();
-        } else {
-          alert("Error submitting the form. Please try again.");
-        }
-      }).catch(() => {
-        alert("There was a problem sending your message.");
+    // Load and apply saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+    if (useDark) {
+      html.classList.add('dark');
+      if (themeToggle) themeToggle.textContent = '☀️';
+    } else {
+      html.classList.remove('dark');
+      if (themeToggle) themeToggle.textContent = '🌙';
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const isDark = html.classList.contains('dark');
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
       });
-    });
+    }
 
-    // Chat widget init
+    // Chatbot
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
@@ -123,6 +126,7 @@
     });
   });
 </script>
+
 
 </body>
 </html>
