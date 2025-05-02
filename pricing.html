@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pricing | Aura AI Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+
+<!-- Header -->
+<header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
+  <div class="container mx-auto flex justify-between items-center p-4">
+    <a href="index.html" class="flex items-center space-x-2">
+      <img src="Aura Logo V2 Close Up.png" alt="Aura AI Logo" class="h-20 w-auto md:h-24">
+    </a>
+    <nav class="hidden md:flex space-x-6">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="about.html" class="hover:text-primary">About</a>
+      <a href="case-studies.html" class="hover:text-primary">Case Studies</a>
+      <a href="blog.html" class="hover:text-primary">Blog</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
+  </div>
+</header>
+
+<!-- Mobile Menu -->
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
+  <nav class="flex flex-col space-y-2">
+    <a href="index.html" class="hover:text-primary">Home</a>
+    <a href="services.html" class="hover:text-primary">Services</a>
+    <a href="about.html" class="hover:text-primary">About</a>
+    <a href="case-studies.html" class="hover:text-primary">Case Studies</a>
+    <a href="blog.html" class="hover:text-primary">Blog</a>
+    <a href="contact.html" class="hover:text-primary">Contact</a>
+  </nav>
+</div>
+
+<!-- Page Content -->
+<main class="pt-32 container mx-auto px-4 py-20">
+  <h1 class="text-4xl font-bold mb-4">Our Services</h1>
+  <p class="text-lg text-gray-600 dark:text-gray-300">Replace this with your services content.</p>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+  <div class="mb-4">
+    <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
+    <a href="#" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  });
+</script>
+</body>
+</html>
