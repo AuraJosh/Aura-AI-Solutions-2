@@ -31,14 +31,13 @@
       <a href="review.html">Review</a>
       <a href="contact.html">Contact Us</a>
       <a href="pricing.html">Pricing</a>
-     
-    </nav>
-    <button id="menu-btn" class="md:hidden text-3xl">&#9776;</button>
+     </nav>
+    <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
   </div>
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden md:hidden bg-white dark:bg-gray-900 p-4">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="#home" class="hover:text-primary">Home</a>
     <a href="#services" class="hover:text-primary">Services</a>
@@ -153,10 +152,10 @@
 <!-- Contact Form -->
 <section id="contact" class="container mx-auto py-20 px-4">
   <h2 class="text-4xl font-bold text-center mb-8">Get In Touch</h2>
-  <form class="max-w-2xl mx-auto space-y-6">
-    <input type="text" placeholder="Name" class="w-full p-3 border rounded" required>
-    <input type="email" placeholder="Email" class="w-full p-3 border rounded" required>
-    <textarea placeholder="Message" class="w-full p-3 border rounded" rows="5" required></textarea>
+  <form id="contact-form" action="https://formspree.io/f/mkgrovkp" method="POST" class="max-w-2xl mx-auto space-y-6">
+    <input type="text" name="name" placeholder="Name" class="w-full p-3 border rounded" required>
+    <input type="email" name="email" placeholder="Email" class="w-full p-3 border rounded" required>
+    <textarea name="message" placeholder="Message" class="w-full p-3 border rounded" rows="5" required></textarea>
     <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700">Send Message</button>
   </form>
 </section>
@@ -172,18 +171,38 @@
 
 <!-- Scripts -->
 <script>
-  const menuBtn = document.getElementById('menu-btn');
-  const menu = document.getElementById('menu');
-  menuBtn.addEventListener('click', () => {
-    menu.classList.toggle('hidden');
-  });
-</script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Mobile menu
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
 
-<!-- Business Chatbot Widget CSS and JS -->
-<link rel="stylesheet" href="path/to/widget.css">
-<script src="path/to/widget.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
+    // AJAX contact form
+    const form = document.getElementById('contact-form');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: { "Accept": "application/json" }
+      }).then(response => {
+        if (response.ok) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          document.getElementById('thank-you-banner').classList.remove('hidden');
+          form.reset();
+        } else {
+          alert("Error submitting the form. Please try again.");
+        }
+      }).catch(() => {
+        alert("There was a problem sending your message.");
+      });
+    });
+
+    // Chat widget
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
@@ -192,6 +211,9 @@
     });
   });
 </script>
+
+<link rel="stylesheet" href="widget.css">
+<script src="widget.js"></script>
 
 </body>
 </html>
