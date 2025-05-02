@@ -18,10 +18,8 @@
       }
     }
   </script>
-
-<link rel="stylesheet" href="widget.css">
-<script src="widget.js"></script>
-  
+  <link rel="stylesheet" href="widget.css">
+  <script src="widget.js"></script>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
@@ -35,6 +33,7 @@
   </div>
 </div>
 
+<!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
   <div class="container mx-auto flex justify-between items-center p-4">
     <a href="index.html" class="flex items-center space-x-2">
@@ -51,6 +50,7 @@
   </div>
 </header>
 
+<!-- Mobile Menu -->
 <div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
@@ -61,6 +61,7 @@
   </nav>
 </div>
 
+<!-- Contact Form Section -->
 <main class="pt-32 container mx-auto px-4 py-20">
   <h1 class="text-4xl font-bold mb-8 text-center">Get In Touch</h1>
   <form id="contact-form" action="https://formspree.io/f/mkgrovkp" method="POST" class="max-w-2xl mx-auto space-y-6">
@@ -71,6 +72,7 @@
   </form>
 </main>
 
+<!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
   <div class="mb-4">
     <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
@@ -79,14 +81,17 @@
   <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
 
+<!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
+    // Contact form AJAX submission
     const form = document.getElementById('contact-form');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -107,9 +112,9 @@
       }).catch(() => {
         alert("There was a problem sending your message.");
       });
-  
+    });
 
-  // Chat widget
+    // Chat widget init
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
@@ -118,5 +123,6 @@
     });
   });
 </script>
+
 </body>
 </html>
