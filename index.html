@@ -21,15 +21,24 @@
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
 
-  <!-- Three.js and OBJLoader -->
+  <!-- Three.js + OBJLoader -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/OBJLoader.js"></script>
 
   <style>
+    #coin-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 50; /* Above hero text */
+      pointer-events: none;
+    }
+
     #coin-canvas {
-      pointer-events: auto;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       display: block;
     }
   </style>
@@ -75,19 +84,19 @@
   dark:from-gray-800 dark:to-gray-900 
   text-center text-white relative overflow-hidden">
 
-  <!-- 3D Coin Canvas -->
-  <div id="coin-container" class="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
-    <canvas id="coin-canvas" class="pointer-events-auto"></canvas>
+  <!-- 3D Coin Canvas (above text) -->
+  <div id="coin-container">
+    <canvas id="coin-canvas"></canvas>
   </div>
 
   <!-- Hero Text -->
-  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in relative z-50">
+  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in relative z-10">
     Transforming Businesses with AI-Powered Solutions
   </h1>
-  <p class="text-xl mb-8 animate-fade-in delay-300 relative z-50">
+  <p class="text-xl mb-8 animate-fade-in delay-300 relative z-10">
     Empowering innovation through state-of-the-art AI technologies.
   </p>
-  <div class="flex space-x-4 animate-fade-in delay-500 relative z-50">
+  <div class="flex space-x-4 animate-fade-in delay-500 relative z-10">
     <a href="contact.html" class="bg-white text-primary font-semibold px-6 py-3 rounded hover:bg-gray-200">Get Started</a>
     <a href="services.html" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
   </div>
@@ -135,23 +144,25 @@
   });
 </script>
 
-<!-- Three.js Coin Load & Spin -->
+<!-- 3D Coin Render -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('coin-canvas');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
-    camera.position.z = 5;
 
     const light = new THREE.AmbientLight(0xffffff, 1);
     scene.add(light);
 
     const loader = new THREE.OBJLoader();
     loader.load('coin.obj', (object) => {
-      object.scale.set(1.5, 1.5, 1.5); // adjust to your model size
+      object.scale.set(1.5, 1.5, 1.5);
+      object.position.y = 0;
       scene.add(object);
 
       object.traverse(child => {
@@ -159,7 +170,7 @@
           child.material = new THREE.MeshStandardMaterial({
             color: 0xd4af37,
             metalness: 1,
-            roughness: 0.4
+            roughness: 0.3
           });
         }
       });
@@ -173,7 +184,7 @@
       }
       animate();
 
-      // Click & Scroll for extra spin
+      // Click & Scroll spin boost
       canvas.addEventListener('click', () => rotation += 0.3);
       window.addEventListener('scroll', () => rotation += 0.1);
     });
