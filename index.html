@@ -20,6 +20,18 @@
   </script>
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
+
+<style>
+  @keyframes spin-once {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+  }
+  .animate-spin-once {
+    animation: spin-once 1s ease-in-out;
+  }
+</style>
+
+
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
@@ -64,6 +76,16 @@
   bg-gradient-to-br from-primary to-accent 
   dark:from-gray-800 dark:to-gray-900 
   text-center text-white">
+
+  <!-- Animated Logo -->
+  <div id="logo-container" class="mb-8 cursor-pointer transition-transform duration-700">
+    <!-- Light mode logo -->
+    <img src="logo-light.png" alt="Aura Logo" class="h-24 w-auto block dark:hidden" />
+    <!-- Dark mode logo -->
+    <img src="logo-dark.png" alt="Aura Logo Dark" class="h-24 w-auto hidden dark:block" />
+  </div>
+
+  <!-- Hero Text -->
   <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
     Transforming Businesses with AI-Powered Solutions
   </h1>
@@ -75,6 +97,7 @@
     <a href="services.html" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
   </div>
 </section>
+
 
 <!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
@@ -118,6 +141,27 @@
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
       widgetTitle: 'Business Assistant',
       primaryColor: '#4a90e2'
+    });
+  });
+</script>
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const logo = document.getElementById('logo-container');
+
+    // Spin on click
+    logo.addEventListener('click', () => {
+      logo.classList.add('animate-spin-once');
+      setTimeout(() => logo.classList.remove('animate-spin-once'), 1000);
+    });
+
+    // Spin on scroll
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 100) {
+        logo.classList.add('animate-spin-once');
+        setTimeout(() => logo.classList.remove('animate-spin-once'), 1000);
+      }
     });
   });
 </script>
