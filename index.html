@@ -21,15 +21,16 @@
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
 
-  <!-- 3D Spin CSS -->
+  <!-- Three.js and OBJLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/OBJLoader.js"></script>
+
   <style>
-    @keyframes spin3D {
-      0% { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
-    }
-    .animate-spin-token {
-      animation: spin3D 1s ease-in-out;
-      transform-style: preserve-3d;
+    #coin-canvas {
+      pointer-events: auto;
+      width: 100vw;
+      height: 100vh;
+      display: block;
     }
   </style>
 </head>
@@ -72,24 +73,21 @@
 <section id="home" class="min-h-screen flex flex-col justify-center items-center 
   bg-gradient-to-br from-primary to-accent 
   dark:from-gray-800 dark:to-gray-900 
-  text-center text-white">
+  text-center text-white relative overflow-hidden">
 
-  <!-- 3D Token Logo -->
-  <div class="mb-8 cursor-pointer" style="perspective: 1000px;">
-    <div id="logo-inner" class="inline-block transition-transform duration-700">
-      <img src="logo-light.png" alt="Aura Logo" class="h-24 w-auto block dark:hidden" />
-      <img src="logo-dark.png" alt="Aura Logo Dark" class="h-24 w-auto hidden dark:block" />
-    </div>
+  <!-- 3D Coin Canvas -->
+  <div id="coin-container" class="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+    <canvas id="coin-canvas" class="pointer-events-auto"></canvas>
   </div>
 
   <!-- Hero Text -->
-  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
+  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in relative z-50">
     Transforming Businesses with AI-Powered Solutions
   </h1>
-  <p class="text-xl mb-8 animate-fade-in delay-300">
+  <p class="text-xl mb-8 animate-fade-in delay-300 relative z-50">
     Empowering innovation through state-of-the-art AI technologies.
   </p>
-  <div class="flex space-x-4 animate-fade-in delay-500">
+  <div class="flex space-x-4 animate-fade-in delay-500 relative z-50">
     <a href="contact.html" class="bg-white text-primary font-semibold px-6 py-3 rounded hover:bg-gray-200">Get Started</a>
     <a href="services.html" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
   </div>
@@ -137,21 +135,54 @@
   });
 </script>
 
-<!-- 3D Logo Spin Script -->
+<!-- Three.js Coin Load & Spin -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const logo = document.getElementById('logo-inner');
+    const canvas = document.getElementById('coin-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    camera.position.z = 5;
 
-    logo.addEventListener('click', () => {
-      logo.classList.add('animate-spin-token');
-      setTimeout(() => logo.classList.remove('animate-spin-token'), 1000);
+    const light = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(light);
+
+    const loader = new THREE.OBJLoader();
+    loader.load('coin.obj', (object) => {
+      object.scale.set(1.5, 1.5, 1.5); // adjust to your model size
+      scene.add(object);
+
+      object.traverse(child => {
+        if (child instanceof THREE.Mesh && !child.material) {
+          child.material = new THREE.MeshStandardMaterial({
+            color: 0xd4af37,
+            metalness: 1,
+            roughness: 0.4
+          });
+        }
+      });
+
+      let rotation = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        object.rotation.y = rotation;
+        rotation += 0.01;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Click & Scroll for extra spin
+      canvas.addEventListener('click', () => rotation += 0.3);
+      window.addEventListener('scroll', () => rotation += 0.1);
     });
 
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 100) {
-        logo.classList.add('animate-spin-token');
-        setTimeout(() => logo.classList.remove('animate-spin-token'), 1000);
-      }
+    // Resize handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
     });
   });
 </script>
