@@ -20,15 +20,35 @@
   </script>
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
+
+  <style>
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.4s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+  </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 <!-- Thank You Banner -->
 <div id="thank-you-banner" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-  <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto">
+  <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
     ✅ Thank you! Your form has been submitted.<br>The Aura team will contact you shortly.
     <div class="mt-4">
-      <button onclick="document.getElementById('thank-you-banner').classList.add('hidden')" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
+      <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
     </div>
   </div>
 </div>
@@ -141,7 +161,21 @@
         }).then(response => {
           if (response.ok) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            document.getElementById('thank-you-banner').classList.remove('hidden');
+            const banner = document.getElementById('thank-you-banner');
+            const content = document.getElementById('thank-you-content');
+
+            banner.classList.remove('hidden');
+            content.classList.remove('fade-out');
+            content.classList.add('fade-in');
+
+            setTimeout(() => {
+              content.classList.remove('fade-in');
+              content.classList.add('fade-out');
+              setTimeout(() => {
+                banner.classList.add('hidden');
+              }, 400);
+            }, 4000);
+
             form.reset();
           } else {
             alert("There was a problem submitting the form. Please try again.");
@@ -152,6 +186,18 @@
       });
     }
   });
+
+  function closeBanner() {
+    const banner = document.getElementById('thank-you-banner');
+    const content = document.getElementById('thank-you-content');
+
+    content.classList.remove('fade-in');
+    content.classList.add('fade-out');
+
+    setTimeout(() => {
+      banner.classList.add('hidden');
+    }, 400);
+  }
 </script>
 </body>
 </html>
