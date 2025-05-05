@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Aura AI Solutions</title>
-
-  <!-- Tailwind (fine for dev or GitHub Pages) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -20,33 +18,10 @@
       }
     }
   </script>
-
-  <link rel="stylesheet" href="widget.css">
-  <script src="widget.js"></script>
-
-  <!-- Three.js & OBJLoader (non-module for GitHub Pages) -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/OBJLoader.js"></script>
-
-  <style>
-    #coin-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 50;
-      pointer-events: none;
-    }
-
-    #coin-canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-  </style>
+  <!-- Three.js and GLTFLoader -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.1/examples/js/loaders/GLTFLoader.js"></script>
 </head>
-
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 <!-- Header -->
@@ -85,24 +60,22 @@
 <section id="home" class="min-h-screen flex flex-col justify-center items-center 
   bg-gradient-to-br from-primary to-accent 
   dark:from-gray-800 dark:to-gray-900 
-  text-center text-white relative overflow-hidden">
-
-  <!-- 3D Coin Canvas -->
-  <div id="coin-container">
-    <canvas id="coin-canvas"></canvas>
-  </div>
-
-  <!-- Hero Text -->
-  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in relative z-10">
+  text-center text-white">
+  <h1 class="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
     Transforming Businesses with AI-Powered Solutions
   </h1>
-  <p class="text-xl mb-8 animate-fade-in delay-300 relative z-10">
+  <p class="text-xl mb-8 animate-fade-in delay-300">
     Empowering innovation through state-of-the-art AI technologies.
   </p>
-  <div class="flex space-x-4 animate-fade-in delay-500 relative z-10">
+  <div class="flex space-x-4 animate-fade-in delay-500">
     <a href="contact.html" class="bg-white text-primary font-semibold px-6 py-3 rounded hover:bg-gray-200">Get Started</a>
     <a href="services.html" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
   </div>
+</section>
+
+<!-- 3D Model Section -->
+<section class="w-full flex justify-center items-center bg-white dark:bg-gray-900 py-12">
+  <div id="token-3d" class="w-full max-w-3xl h-[500px] cursor-pointer"></div>
 </section>
 
 <!-- Footer -->
@@ -117,6 +90,7 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
@@ -126,77 +100,69 @@
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
+
     if (localStorage.getItem('theme') === 'dark') {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
     }
+
     themeToggle.addEventListener('click', () => {
       html.classList.toggle('dark');
       const isDark = html.classList.contains('dark');
       themeToggle.textContent = isDark ? '☀️' : '🌙';
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
-
-    // Chatbot
-    const chatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
-    });
   });
-</script>
 
-<!-- Coin Loader using OBJLoader and non-module script -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const canvas = document.getElementById('coin-canvas');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+  // 3D Model Viewer
+  let model;
+  let spinning = false;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+  const container = document.getElementById('token-3d');
+  const resizeRenderer = () => {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  };
+
+  resizeRenderer();
+  container.appendChild(renderer.domElement);
+
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(1, 1, 1);
+  scene.add(light);
+
+  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambient);
+
+  const loader = new THREE.GLTFLoader();
+  loader.load('token.glb', function (gltf) {
+    model = gltf.scene;
+    model.scale.set(2, 2, 2);
+    scene.add(model);
     camera.position.z = 5;
-
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    const light = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(light);
-
-    const loader = new THREE.OBJLoader();
-    loader.load('coin.obj', (object) => {
-      object.scale.set(1.5, 1.5, 1.5);
-      object.position.y = 0;
-      scene.add(object);
-
-      object.traverse(child => {
-        if (child instanceof THREE.Mesh) {
-          child.material = new THREE.MeshStandardMaterial({
-            color: 0xd4af37,
-            metalness: 1,
-            roughness: 0.3
-          });
-        }
-      });
-
-      let rotation = 0;
-      function animate() {
-        requestAnimationFrame(animate);
-        object.rotation.y = rotation;
-        rotation += 0.01;
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      canvas.addEventListener('click', () => rotation += 0.3);
-      window.addEventListener('scroll', () => rotation += 0.1);
-    });
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    animate();
   });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (spinning && model) {
+      model.rotation.y += 0.02;
+    }
+    renderer.render(scene, camera);
+  }
+
+  container.addEventListener('click', () => {
+    spinning = !spinning;
+  });
+
+  window.addEventListener('resize', resizeRenderer);
 </script>
 
 </body>
