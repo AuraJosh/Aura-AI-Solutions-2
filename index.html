@@ -21,31 +21,28 @@
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
 
-<style>
-  @keyframes spin-once {
-    0% { transform: rotateY(0deg); }
-    100% { transform: rotateY(360deg); }
-  }
-  .animate-spin-once {
-    animation: spin-once 1s ease-in-out;
-  }
-</style>
-
-
+  <!-- 3D Spin CSS -->
+  <style>
+    @keyframes spin3D {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    .animate-spin-token {
+      animation: spin3D 1s ease-in-out;
+      transform-style: preserve-3d;
+    }
+  </style>
 </head>
+
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
   <div class="container mx-auto flex justify-between items-center p-4">
     <a href="index.html" class="flex items-center space-x-2">
-      <!-- Light mode logo -->
       <img src="logo-light.png" alt="Aura AI Logo" class="h-20 w-auto block dark:hidden">
-    
-      <!-- Dark mode logo -->
       <img src="logo-dark.png" alt="Aura AI Logo Dark" class="h-20 w-auto hidden dark:block">
     </a>
-
     <nav class="hidden md:flex space-x-6">
       <a href="index.html" class="hover:text-primary">Home</a>
       <a href="services.html" class="hover:text-primary">Services</a>
@@ -77,12 +74,12 @@
   dark:from-gray-800 dark:to-gray-900 
   text-center text-white">
 
-  <!-- Animated Logo -->
-  <div id="logo-container" class="mb-8 cursor-pointer transition-transform duration-700">
-    <!-- Light mode logo -->
-    <img src="logo-light.png" alt="Aura Logo" class="h-24 w-auto block dark:hidden" />
-    <!-- Dark mode logo -->
-    <img src="logo-dark.png" alt="Aura Logo Dark" class="h-24 w-auto hidden dark:block" />
+  <!-- 3D Token Logo -->
+  <div class="mb-8 cursor-pointer" style="perspective: 1000px;">
+    <div id="logo-inner" class="inline-block transition-transform duration-700">
+      <img src="logo-light.png" alt="Aura Logo" class="h-24 w-auto block dark:hidden" />
+      <img src="logo-dark.png" alt="Aura Logo Dark" class="h-24 w-auto hidden dark:block" />
+    </div>
   </div>
 
   <!-- Hero Text -->
@@ -98,7 +95,6 @@
   </div>
 </section>
 
-
 <!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
   <div class="mb-4">
@@ -111,7 +107,6 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
@@ -121,13 +116,10 @@
     // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
-
-    // Load saved theme
     if (localStorage.getItem('theme') === 'dark') {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
     }
-
     themeToggle.addEventListener('click', () => {
       html.classList.toggle('dark');
       const isDark = html.classList.contains('dark');
@@ -145,22 +137,20 @@
   });
 </script>
 
-
+<!-- 3D Logo Spin Script -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const logo = document.getElementById('logo-container');
+    const logo = document.getElementById('logo-inner');
 
-    // Spin on click
     logo.addEventListener('click', () => {
-      logo.classList.add('animate-spin-once');
-      setTimeout(() => logo.classList.remove('animate-spin-once'), 1000);
+      logo.classList.add('animate-spin-token');
+      setTimeout(() => logo.classList.remove('animate-spin-token'), 1000);
     });
 
-    // Spin on scroll
     window.addEventListener('scroll', () => {
       if (window.scrollY > 100) {
-        logo.classList.add('animate-spin-once');
-        setTimeout(() => logo.classList.remove('animate-spin-once'), 1000);
+        logo.classList.add('animate-spin-token');
+        setTimeout(() => logo.classList.remove('animate-spin-token'), 1000);
       }
     });
   });
