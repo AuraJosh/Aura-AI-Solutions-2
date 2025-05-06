@@ -18,6 +18,13 @@
       }
     }
   </script>
+  <style>
+    #token-3d canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
@@ -53,6 +60,11 @@
   </nav>
 </div>
 
+<!-- 3D Model Section ABOVE Hero Text -->
+<section class="w-full flex justify-center items-center bg-white dark:bg-gray-900 pt-36 pb-8">
+  <div id="token-3d" class="w-full max-w-4xl h-[400px] md:h-[500px] cursor-pointer"></div>
+</section>
+
 <!-- Hero Section -->
 <section id="home" class="min-h-screen flex flex-col justify-center items-center 
   bg-gradient-to-br from-primary to-accent 
@@ -68,11 +80,6 @@
     <a href="contact.html" class="bg-white text-primary font-semibold px-6 py-3 rounded hover:bg-gray-200">Get Started</a>
     <a href="services.html" class="border border-white px-6 py-3 rounded hover:bg-white hover:text-primary">Learn More</a>
   </div>
-</section>
-
-<!-- 3D Model Section -->
-<section class="w-full flex justify-center items-center bg-white dark:bg-gray-900 py-12">
-  <div id="token-3d" class="w-full max-w-3xl h-[500px] cursor-pointer"></div>
 </section>
 
 <!-- Footer -->
@@ -109,7 +116,7 @@
   });
 </script>
 
-<!-- Three.js + GLTFLoader (Module) -->
+<!-- Three.js + GLTFLoader -->
 <script type="module">
   import * as THREE from 'https://cdn.skypack.dev/three';
   import { GLTFLoader } from 'https://cdn.skypack.dev/three/examples/jsm/loaders/GLTFLoader.js';
@@ -143,7 +150,8 @@
   const loader = new GLTFLoader();
   loader.load('token.glb', function (gltf) {
     model = gltf.scene;
-    model.scale.set(2, 2, 2);
+    model.scale.set(20, 20, 20);
+    model.position.set(0, -0.5, 0);
     scene.add(model);
     camera.position.z = 5;
     animate();
