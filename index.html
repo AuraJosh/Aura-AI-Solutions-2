@@ -50,9 +50,12 @@
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
   <div class="container mx-auto flex justify-between items-center p-4">
-    <a href="index.html" class="flex items-center space-x-2">
-      <img src="logo-light.png" alt="Aura AI Logo" class="h-20 w-auto block dark:hidden">
-      <img src="logo-dark.png" alt="Aura AI Logo Dark" class="h-20 w-auto hidden dark:block">
+    <a href="index.html" class="flex items-center space-x-2 h-20 w-auto relative">
+      <!-- Fixed logo container to prevent shifting -->
+      <div class="relative h-20 w-auto">
+        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-20 w-auto object-contain block dark:hidden">
+        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-20 w-auto object-contain hidden dark:block">
+      </div>
     </a>
     <nav class="hidden md:flex space-x-6">
       <a href="index.html" class="hover:text-primary">Home</a>
@@ -127,9 +130,17 @@
 
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
-    if (localStorage.getItem('theme') === 'dark') {
+
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+
+    if (useDark) {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
+    } else {
+      html.classList.remove('dark');
+      themeToggle.textContent = '🌙';
     }
 
     themeToggle.addEventListener('click', () => {
@@ -160,7 +171,9 @@
   const height = container.offsetHeight;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x8B5CF6); // Purple background
+  const darkColor = new THREE.Color("#1a1a1a");
+  const lightColor = new THREE.Color("#8B5CF6");
+  scene.background = document.documentElement.classList.contains('dark') ? darkColor : lightColor;
 
   const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
   camera.position.z = 10;
@@ -185,29 +198,24 @@
   scene.add(pointLight);
 
   let model;
-  const modelGroup = new THREE.Group(); // Group to control rotation
+  const modelGroup = new THREE.Group();
   scene.add(modelGroup);
 
   const loader = new GLTFLoader();
-  loader.load(
-    'token.glb',
-    function (gltf) {
-      model = gltf.scene;
+  loader.load('token.glb', function (gltf) {
+    model = gltf.scene;
+    model.rotation.x = Math.PI / 2;
+    model.position.set(0, -1.2, 0);
+    model.scale.set(50, 50, 50);
+    modelGroup.add(model);
+  });
 
-      // Stand the model upright
-      model.rotation.x = Math.PI / 2;
+  // Listen for theme changes and update background color
+  const observer = new MutationObserver(() => {
+    scene.background = document.documentElement.classList.contains('dark') ? darkColor : lightColor;
+  });
 
-      // Optional positioning and scaling
-      model.position.set(0, -1.2, 0);
-      model.scale.set(50, 50, 50);
-
-      modelGroup.add(model);
-    },
-    undefined,
-    function (error) {
-      console.error('An error happened while loading the model:', error);
-    }
-  );
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
   window.addEventListener("resize", () => {
     const width = container.offsetWidth;
