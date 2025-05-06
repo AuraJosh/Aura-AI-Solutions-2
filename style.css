@@ -1,17 +1,20 @@
+/* Apply a clean default font stack (optional, as Tailwind can handle this) */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-  }
-  header, footer {
-    background: #333;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-  }
-  main {
-    padding: 2rem;
-    text-align: center;
-  }
-  
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure canvas fits inside the 3D container */
+#token-3d canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/* Optional: fallback background if Tailwind fails */
+body {
+  background-color: #f9fafb;
+}
+
+/* Do NOT style header/footer directly here — Tailwind handles that */
