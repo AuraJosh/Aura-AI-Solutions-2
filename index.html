@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Aura AI Solutions</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="data:,">
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -116,10 +117,10 @@
   });
 </script>
 
-<!-- Three.js + GLTFLoader -->
+<!-- 3D Model Loader (from working setup) -->
 <script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
-  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/GLTFLoader.js';
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.129.0/build/three.module.js';
+  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
 
   let model;
   let spinning = false;
@@ -171,7 +172,6 @@
 
   window.addEventListener('resize', resizeRenderer);
 </script>
-
 
 </body>
 </html>
