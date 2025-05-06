@@ -168,18 +168,27 @@
   let model;
   const loader = new GLTFLoader();
   loader.load(
-    'token.glb',
-    function (gltf) {
-      model = gltf.scene;
-      model.position.set(0, 0, 0);
-      model.scale.set(50, 50, 50);
-      scene.add(model);
-    },
-    undefined,
-    function (error) {
-      console.error('An error happened while loading the model:', error);
-    }
-  );
+  'token.glb',
+  function (gltf) {
+    model = gltf.scene;
+
+    // Stand the model upright by rotating it -90 degrees on X
+    model.rotation.set(-Math.PI / 2, 0, 0); // or try X = Math.PI / 2 if flipped the wrong way
+
+    // Optional: Adjust position if it’s not visually centered
+    model.position.set(0, -1, 0);
+
+    // Scale the model
+    model.scale.set(50, 50, 50);
+
+    scene.add(model);
+  },
+  undefined,
+  function (error) {
+    console.error('An error happened while loading the model:', error);
+  }
+);
+
 
   window.addEventListener("resize", () => {
     const width = container.offsetWidth;
