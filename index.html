@@ -19,6 +19,9 @@
       }
     }
   </script>
+  <!-- Chatbot Widget -->
+  <link rel="stylesheet" href="widget.css">
+  <script src="widget.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -104,7 +107,6 @@
   </div>
 </section>
 
-
 <!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
   <div class="mb-4">
@@ -114,7 +116,7 @@
   <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
 
-<!-- Theme & Menu Toggle -->
+<!-- Theme & Menu Toggle + Chatbot -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const menuBtn = document.getElementById('menu-btn');
@@ -135,6 +137,14 @@
       const isDark = html.classList.contains('dark');
       themeToggle.textContent = isDark ? '☀️' : '🌙';
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+
+    // Chatbot Initialization
+    const chatWidget = new BusinessChatWidget({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2'
     });
   });
 </script>
@@ -209,10 +219,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-
-    // Rotate the group (not the model directly)
     modelGroup.rotation.y += 0.003;
-
     controls.update();
     renderer.render(scene, camera);
   }
