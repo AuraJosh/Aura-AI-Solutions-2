@@ -22,7 +22,7 @@ loader.load(
   "token.glb", // Ensure this path is correct relative to your HTML file
   function (gltf) {
     model = gltf.scene;
-    model.scale.set(150, 150, 150); // Adjust scale as needed
+    model.scale.set(50, 50, 50); // Adjust scale as needed
     scene.add(model);
   },
   undefined,
