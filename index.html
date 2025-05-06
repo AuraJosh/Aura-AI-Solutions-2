@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Aura AI Solutions</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="icon" href="data:,">
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -20,10 +20,21 @@
     }
   </script>
   <style>
-    #token-3d canvas {
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #container3D {
+      width: 100vw;
+      height: 500px;
       display: block;
+    }
+
+    #container3D canvas {
       width: 100% !important;
       height: 100% !important;
+      display: block;
     }
   </style>
 </head>
@@ -61,9 +72,9 @@
   </nav>
 </div>
 
-<!-- 3D Model Section ABOVE Hero Text -->
-<section class="w-full flex justify-center items-center bg-white dark:bg-gray-900 pt-36 pb-8">
-  <div id="token-3d" class="w-full max-w-4xl h-[400px] md:h-[500px] cursor-pointer"></div>
+<!-- 3D Viewer Section (JUST ABOVE Hero) -->
+<section class="w-full bg-white dark:bg-gray-900 pt-36">
+  <div id="container3D"></div>
 </section>
 
 <!-- Hero Section -->
@@ -117,60 +128,70 @@
   });
 </script>
 
-<!-- 3D Model Loader (from working setup) -->
+<!-- Full Working Viewer Inline Script -->
 <script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.129.0/build/three.module.js';
-  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.129.0/examples/jsm/loaders/GLTFLoader.js';
+  import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
+  import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
+  import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
 
-  let model;
-  let spinning = false;
-
-  const container = document.getElementById('token-3d');
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+  scene.background = new THREE.Color(0x222222);
+
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / 500, 0.1, 1000);
+  camera.position.z = 10;
+
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, 500);
+  document.getElementById("container3D").appendChild(renderer.domElement);
 
-  const resizeRenderer = () => {
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-  };
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
 
-  resizeRenderer();
-  container.appendChild(renderer.domElement);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  directionalLight.position.set(5, 10, 7.5);
+  scene.add(directionalLight);
 
-  const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(1, 1, 1);
-  scene.add(light);
-
-  const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambient);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
 
   const loader = new GLTFLoader();
-  loader.load('token.glb', function (gltf) {
-    model = gltf.scene;
-    model.scale.set(20, 20, 20);
-    model.position.set(0, -0.5, 0);
-    scene.add(model);
-    camera.position.z = 5;
-    animate();
+  loader.load(
+    'token.glb',
+    function (gltf) {
+      const object = gltf.scene;
+      object.position.set(0, 0, 0);
+      object.rotation.set(0, 0, 0);
+      object.scale.set(50, 50, 50);
+      scene.add(object);
+      console.log('Model loaded:', object);
+    },
+    function (xhr) {
+      if (xhr.lengthComputable) {
+        console.log((xhr.loaded / xhr.total * 100).toFixed(2) + '% loaded');
+      } else {
+        console.log('Loading...');
+      }
+    },
+    function (error) {
+      console.error('An error happened while loading the model:', error);
+    }
+  );
+
+  window.addEventListener("resize", () => {
+    const width = window.innerWidth;
+    const height = 500;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
   });
 
   function animate() {
     requestAnimationFrame(animate);
-    if (spinning && model) {
-      model.rotation.y += 0.02;
-    }
+    controls.update();
     renderer.render(scene, camera);
   }
-
-  container.addEventListener('click', () => {
-    spinning = !spinning;
-  });
-
-  window.addEventListener('resize', resizeRenderer);
+  animate();
 </script>
 
 </body>
