@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Services | Aura AI Solutions</title>
+  <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -18,26 +19,21 @@
       }
     }
   </script>
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="widget.css">
-<script src="widget.js"></script>
-
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
-  <div class="container mx-auto flex justify-between items-center p-4">
-    <a href="index.html" class="flex items-center space-x-2">
-      <!-- Light mode logo -->
-      <img src="logo-light.png" alt="Aura AI Logo" class="h-20 w-auto block dark:hidden">
-    
-      <!-- Dark mode logo -->
-      <img src="logo-dark.png" alt="Aura AI Logo Dark" class="h-20 w-auto hidden dark:block">
+  <div class="relative max-w-7xl mx-auto w-full flex justify-between items-center px-6">
+    <a href="index.html" class="flex items-center space-x-2 h-20">
+      <div class="relative h-20 w-[150px]">
+        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block dark:hidden">
+        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
+      </div>
     </a>
-    <nav class="hidden md:flex space-x-6">
+    <nav class="hidden md:flex space-x-6 absolute left-1/2 transform -translate-x-1/2">
       <a href="index.html" class="hover:text-primary">Home</a>
-      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="services.html" class="hover:text-primary font-semibold">Services</a>
       <a href="pricing.html" class="hover:text-primary">Pricing</a>
       <a href="review.html" class="hover:text-primary">Review</a>
       <a href="contact.html" class="hover:text-primary">Contact</a>
@@ -49,68 +45,49 @@
   </div>
 </header>
 
+<!-- Mobile Menu -->
 <div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
-    <a href="services.html" class="hover:text-primary">Services</a>
+    <a href="services.html" class="hover:text-primary font-semibold">Services</a>
     <a href="pricing.html" class="hover:text-primary">Pricing</a>
     <a href="review.html" class="hover:text-primary">Review</a>
     <a href="contact.html" class="hover:text-primary">Contact</a>
   </nav>
 </div>
 
-<main class="pt-32 container mx-auto px-4 py-20">
-  <h1 class="text-4xl font-bold mb-4 text-center text-gray-900 dark:text-white">Our Services</h1>
-  <p class="text-lg text-gray-600 dark:text-gray-300 text-center mb-12">We provide cutting-edge AI solutions tailored to your business needs. Explore our core offerings below.</p>
+<!-- Services Section -->
+<main class="pt-32 container mx-auto px-4 py-16">
+  <h1 class="text-4xl font-bold mb-6 text-center">Our Services</h1>
+  <p class="text-lg text-gray-600 dark:text-gray-300 text-center max-w-2xl mx-auto mb-12">
+    Aura AI Solutions is focused on helping businesses thrive with intelligent automation. Explore what we offer.
+  </p>
 
-  <div class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-    
-    <!-- Machine Learning -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">🤖</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Machine Learning</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Custom-built ML models that automate and optimize decision-making at scale.</p>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+
+    <!-- Chatbot Service -->
+    <div class="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-xl shadow transition hover:-translate-y-1 hover:shadow-lg duration-300">
+      <h2 class="text-2xl font-bold mb-2 text-primary">💬 AI Chatbot Widget</h2>
+      <p class="text-gray-700 dark:text-gray-300">
+        Boost customer engagement and automate support 24/7 with our AI-powered chatbot widget. 
+        Designed to integrate seamlessly into your site, it handles inquiries, solves problems, and collects valuable insights 
+        — all while reducing workload and increasing conversions.
+      </p>
     </div>
 
-    <!-- Natural Language Processing -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">🧠</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Natural Language Processing</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Empower applications to understand and process human language using advanced NLP.</p>
-    </div>
-
-    <!-- Computer Vision -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">👁️</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Computer Vision</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Vision systems that interpret and analyze visual content in real-time.</p>
-    </div>
-
-    <!-- AI Analytics -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">📊</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">AI Analytics</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Extract powerful insights from your data using predictive and prescriptive analytics.</p>
-    </div>
-
-    <!-- AI Security -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">🔒</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">AI Security & Monitoring</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Smart surveillance and threat detection powered by real-time AI.</p>
-    </div>
-
-    <!-- Custom AI Consulting -->
-    <div class="bg-blue-50 dark:bg-blue-900/40 rounded-xl p-6 shadow-lg hover:-translate-y-2 transition duration-300 border border-blue-100 dark:border-blue-800">
-      <div class="text-4xl mb-4">🧩</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Custom AI Consulting</h3>
-      <p class="text-gray-700 dark:text-gray-300 text-sm">Tailored strategy and integration support for adopting AI within your business.</p>
+    <!-- Coming Soon -->
+    <div class="bg-gray-100 dark:bg-gray-800/60 p-6 rounded-xl shadow transition hover:-translate-y-1 hover:shadow-lg duration-300">
+      <h2 class="text-2xl font-bold mb-2 text-pink-600 dark:text-pink-400">🚀 Coming Soon</h2>
+      <p class="text-gray-700 dark:text-gray-300">
+        We're expanding our services! Soon, you'll be able to access even more AI-driven tools to scale your business and 
+        improve operational efficiency. Stay tuned!
+      </p>
     </div>
 
   </div>
 </main>
 
-
+<!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
   <div class="mb-4">
     <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
@@ -122,38 +99,33 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
-    // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
 
-    // Load and apply saved theme preference
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
 
     if (useDark) {
       html.classList.add('dark');
-      if (themeToggle) themeToggle.textContent = '☀️';
+      themeToggle.textContent = '☀️';
     } else {
       html.classList.remove('dark');
-      if (themeToggle) themeToggle.textContent = '🌙';
+      themeToggle.textContent = '🌙';
     }
 
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        const isDark = html.classList.contains('dark');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
-    }
+    themeToggle.addEventListener('click', () => {
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      themeToggle.textContent = isDark ? '☀️' : '🌙';
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
 
     // Chatbot
     const chatWidget = new BusinessChatWidget({
