@@ -1,9 +1,28 @@
 /* Apply a clean default font stack (optional, as Tailwind can handle this) */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  margin: 0;
-  padding: 0;
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('SFProDisplay-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
+
+@font-face {
+  font-family: 'SF Pro Text';
+  src: url('SFProText-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+body {
+  font-family: 'SF Pro Text', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'SF Pro Display', sans-serif;
+}
+
 
 /* Ensure canvas fits inside the 3D container */
 #token-3d canvas {
