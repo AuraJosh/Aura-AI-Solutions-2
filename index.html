@@ -270,6 +270,38 @@
     dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
   });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const trailLength = 12;
+    const trail = [];
+
+    for (let i = 0; i < trailLength; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cursor-trail-dot';
+      document.body.appendChild(dot);
+      trail.push(dot);
+    }
+
+    let mouseX = 0, mouseY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animate() {
+      trail.forEach((dot, index) => {
+        const dx = mouseX - dot.offsetLeft;
+        const dy = mouseY - dot.offsetTop;
+        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) scale(${(trailLength - index) / trailLength})`;
+        dot.style.opacity = `${(trailLength - index) / trailLength}`;
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  });
+</script>
 
 </body>
 </html>
