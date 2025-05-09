@@ -146,6 +146,14 @@ class BusinessChatWidget {
     }
   }
 
+    /**
+   * Programmatically open the widget
+   */
+  open() {
+    this.toggleWidget(true);
+  }
+
+
   /**
    * Send user message to API
    */
