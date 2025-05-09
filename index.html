@@ -135,22 +135,22 @@
   <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
 
-<!-- Theme & Menu Toggle + Chatbot -->
+<!-- Essential Scripts -->
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Mobile Menu Toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
+    // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
-
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-
     if (useDark) {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
@@ -158,164 +158,24 @@
       html.classList.remove('dark');
       themeToggle.textContent = '🌙';
     }
-
     themeToggle.addEventListener('click', () => {
       html.classList.toggle('dark');
       const isDark = html.classList.contains('dark');
       themeToggle.textContent = isDark ? '☀️' : '🌙';
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
-    // Chatbot Initialization
+
+    // Chatbot Widget Initialization
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
       widgetTitle: 'Business Assistant',
       primaryColor: '#4a90e2'
     });
-  });
-</script>
 
-<!-- 3D Viewer Script -->
-<script type="module">
-  import * as THREE from "https://cdn.skypack.dev/three@0.129.0/build/three.module.js";
-  import { OrbitControls } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js";
-  import { GLTFLoader } from "https://cdn.skypack.dev/three@0.129.0/examples/jsm/loaders/GLTFLoader.js";
-
-  const container = document.getElementById("container3D");
-  const width = container.offsetWidth;
-  const height = container.offsetHeight;
-
-  const scene = new THREE.Scene();
-  const darkColor = new THREE.Color("#1a1a1a");
-  const lightColor = new THREE.Color("#8B5CF6");
-  scene.background = document.documentElement.classList.contains('dark') ? darkColor : lightColor;
-
-  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-  camera.position.z = 10;
-
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(width, height);
-  container.appendChild(renderer.domElement);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-  directionalLight.position.set(5, 10, 7.5);
-  scene.add(directionalLight);
-
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
-  scene.add(ambientLight);
-
-  const pointLight = new THREE.PointLight(0xffffff, 1.5);
-  pointLight.position.set(0, 5, 10);
-  scene.add(pointLight);
-
-  let model;
-  const modelGroup = new THREE.Group();
-  scene.add(modelGroup);
-
-  const loader = new GLTFLoader();
-  loader.load('token.glb', function (gltf) {
-    model = gltf.scene;
-    model.rotation.x = Math.PI / 2;
-    model.position.set(0, -1.2, 0);
-    model.scale.set(50, 50, 50);
-    modelGroup.add(model);
-  });
-
-  // Listen for theme changes and update background color
-  const observer = new MutationObserver(() => {
-    scene.background = document.documentElement.classList.contains('dark') ? darkColor : lightColor;
-  });
-
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-  window.addEventListener("resize", () => {
-    const width = container.offsetWidth;
-    const height = container.offsetHeight;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-  });
-
-  function animate() {
-    requestAnimationFrame(animate);
-    modelGroup.rotation.y += 0.003;
-    controls.update();
-    renderer.render(scene, camera);
-  }
-
-  animate();
-</script>
-<script>
-  // Button triggers chatbot preview
-  const tryBtn = document.getElementById("try-bot-btn");
-  const chatbot = document.getElementById("chatbot-preview");
-
-  tryBtn.addEventListener("click", () => {
-    chatbot.classList.remove("hidden");
-    chatbot.classList.add("animate-fade-in");
-    setTimeout(() => chatbot.classList.remove("animate-fade-in"), 1000);
-  });
-
-  // Cursor Follower
-  const dot = document.getElementById("cursor-dot");
-  document.addEventListener("mousemove", (e) => {
-    dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-  });
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const trailLength = 12;
-    const trail = [];
-
-    for (let i = 0; i < trailLength; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'cursor-trail-dot';
-      document.body.appendChild(dot);
-      trail.push(dot);
-    }
-
-    let mouseX = 0, mouseY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    function animate() {
-      trail.forEach((dot, index) => {
-        const dx = mouseX - dot.offsetLeft;
-        const dy = mouseY - dot.offsetTop;
-        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) scale(${(trailLength - index) / trailLength})`;
-        dot.style.opacity = `${(trailLength - index) / trailLength}`;
-      });
-      requestAnimationFrame(animate);
-    }
-
-    animate();
-  });
-</script>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const tryBotButton = document.getElementById('try-bot-btn');
-    tryBotButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (window.BusinessChatWidget) {
-        window.BusinessChatWidget.maximize();
-      }
-    });
-  });
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
+    // Button Animation & Chatbot Reveal
     const button = document.getElementById('try-bot-btn');
-
     button.addEventListener('click', () => {
-      // Animate button to bottom-right corner
       button.style.position = 'fixed';
       button.style.bottom = '24px';
       button.style.right = '24px';
@@ -323,84 +183,43 @@
       button.style.top = 'auto';
       button.style.zIndex = '9998';
       button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
-
-      // Shrink & transform
       button.style.transform = 'scale(0.7)';
-
-      // Replace text after a short delay (to simulate morphing into bot)
       setTimeout(() => {
         button.innerHTML = '💬';
         button.classList.remove('bg-white', 'text-primary');
         button.classList.add('bg-primary', 'text-white');
       }, 500);
-
-      // Show chatbot
       setTimeout(() => {
-        const widget = document.querySelector('.business-chat-widget');
-        if (widget) {
-          widget.style.display = 'block';
-        }
-
-        // If your widget has a JS API to open:
         if (window.BusinessChatWidget && window.BusinessChatWidget.open) {
           window.BusinessChatWidget.open();
         }
       }, 900);
     });
+
+    // Glowing Cursor Trail
+    const trailLength = 12;
+    const trail = [];
+    for (let i = 0; i < trailLength; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cursor-trail-dot';
+      document.body.appendChild(dot);
+      trail.push(dot);
+    }
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    function animateTrail() {
+      trail.forEach((dot, index) => {
+        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) scale(${(trailLength - index) / trailLength})`;
+        dot.style.opacity = `${(trailLength - index) / trailLength}`;
+      });
+      requestAnimationFrame(animateTrail);
+    }
+    animateTrail();
   });
 </script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const button = document.getElementById('try-bot-btn');
-
-    button.addEventListener('click', () => {
-      // Animate button to bottom-right
-      button.style.position = 'fixed';
-      button.style.bottom = '24px';
-      button.style.right = '24px';
-      button.style.left = 'auto';
-      button.style.top = 'auto';
-      button.style.zIndex = '9999';
-      button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
-      button.style.transform = 'scale(0.7)';
-
-      // Replace text/icon
-      setTimeout(() => {
-        button.innerHTML = '💬';
-        button.classList.remove('bg-white', 'text-primary');
-        button.classList.add('bg-primary', 'text-white');
-      }, 500);
-
-      // Open actual chatbot widget
-      setTimeout(() => {
-        if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
-          BusinessChatWidget.open();
-        }
-      }, 900);
-    });
-  });
-</script>
-document.getElementById("try-bot-btn").addEventListener("click", () => {
-  const btn = document.getElementById("try-bot-btn");
-
-  // Animate button to corner
-  btn.classList.add("fixed", "bottom-6", "right-6", "rounded-full", "z-50", "w-16", "h-16", "p-0", "text-2xl", "bg-primary", "text-white");
-  btn.innerHTML = "💬";
-  btn.style.transition = "all 0.4s ease";
-
-  // Load and show widget
-  if (!window.myChatWidget) {
-    window.initBusinessChat({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2',
-      autoLoad: false // prevents auto creation
-    });
-  }
-
-  window.myChatWidget.toggleWidget(true); // open the chat
-});
 
 </body>
 </html>
