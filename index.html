@@ -5,12 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Aura AI Solutions</title>
   <link rel="icon" href="data:,">
-  
-  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="style.css">
   <!-- Chatbot Widget -->
   <link rel="stylesheet" href="widget.css">
-  
+  <script src="widget.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -125,18 +137,16 @@
 </footer>
 
 <!-- Essential Scripts -->
-
-
-
-
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Mobile Menu Toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
+    // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
     const savedTheme = localStorage.getItem('theme');
@@ -156,6 +166,7 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
+    // ✅ Chatbot Initialization (this is the correct one!)
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
@@ -163,6 +174,7 @@
       primaryColor: '#4a90e2'
     });
 
+    // ✅ Try Our Bot Now Button Logic
     const tryBtn = document.getElementById('try-bot-btn');
     let chatbotLaunched = false;
     tryBtn.addEventListener('click', () => {
@@ -191,6 +203,7 @@
       }, 800);
     });
 
+    // ✨ Glowing Cursor Trail
     const trailLength = 12;
     const trail = [];
     for (let i = 0; i < trailLength; i++) {
@@ -215,6 +228,7 @@
   });
 </script>
 <script src="widget.js"></script>
+
 
 </body>
 </html>
