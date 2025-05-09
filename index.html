@@ -345,6 +345,45 @@
     });
   });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const button = document.getElementById('try-bot-btn');
+
+    button.addEventListener('click', () => {
+      // Animate button to bottom-right corner
+      button.style.position = 'fixed';
+      button.style.bottom = '24px';
+      button.style.right = '24px';
+      button.style.left = 'auto';
+      button.style.top = 'auto';
+      button.style.zIndex = '9998';
+      button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
+
+      // Shrink & transform
+      button.style.transform = 'scale(0.7)';
+
+      // Replace text after a short delay (to simulate morphing into bot)
+      setTimeout(() => {
+        button.innerHTML = '💬';
+        button.classList.remove('bg-white', 'text-primary');
+        button.classList.add('bg-primary', 'text-white');
+      }, 500);
+
+      // Show chatbot
+      setTimeout(() => {
+        const widget = document.querySelector('.business-chat-widget');
+        if (widget) {
+          widget.style.display = 'block';
+        }
+
+        // If your widget has a JS API to open:
+        if (window.BusinessChatWidget && window.BusinessChatWidget.open) {
+          window.BusinessChatWidget.open();
+        }
+      }, 900);
+    });
+  });
+</script>
 
 </body>
 </html>
