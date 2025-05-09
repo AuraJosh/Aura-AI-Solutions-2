@@ -138,7 +138,7 @@
 
 <!-- Essential Scripts -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', function () {
     // Mobile Menu Toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
@@ -166,7 +166,7 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    // Chatbot Widget Initialization
+    // ✅ Chatbot Initialization (this is the correct one!)
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
@@ -174,47 +174,36 @@
       primaryColor: '#4a90e2'
     });
 
-    // Button Animation & Chatbot Reveal
-    const button = document.getElementById('try-bot-btn');
-let botOpened = false;
+    // ✅ Try Our Bot Now Button Logic
+    const tryBtn = document.getElementById('try-bot-btn');
+    let chatbotLaunched = false;
+    tryBtn.addEventListener('click', () => {
+      if (chatbotLaunched) return;
+      chatbotLaunched = true;
 
-    button.addEventListener('click', () => {
-      if (botOpened) return;
-      botOpened = true;
-    
-      // Animate to bottom right
-      button.style.position = 'fixed';
-      button.style.bottom = '24px';
-      button.style.right = '24px';
-      button.style.left = 'auto';
-      button.style.top = 'auto';
-      button.style.zIndex = '9998';
-      button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
-      button.style.transform = 'scale(0.7)';
-    
-      // Change button content and color
+      tryBtn.style.position = 'fixed';
+      tryBtn.style.bottom = '24px';
+      tryBtn.style.right = '24px';
+      tryBtn.style.left = 'auto';
+      tryBtn.style.top = 'auto';
+      tryBtn.style.zIndex = '9999';
+      tryBtn.style.transition = 'all 0.6s ease-in-out, transform 0.3s';
+      tryBtn.style.transform = 'scale(0.7)';
+
       setTimeout(() => {
-        button.innerHTML = '';
-        button.classList.remove('bg-white', 'text-primary');
-        button.classList.add('bg-primary');
-    
-        const icon = document.createElement('img');
-        icon.src = 'chat-icon.svg'; // OPTIONAL: use your chatbot button icon
-        icon.alt = 'Chatbot';
-        icon.className = 'h-6 w-6';
-        button.appendChild(icon);
-      }, 500);
-    
-      // Show existing chatbot widget
+        tryBtn.innerHTML = '💬';
+        tryBtn.classList.remove('bg-white', 'text-primary');
+        tryBtn.classList.add('bg-primary', 'text-white');
+      }, 300);
+
       setTimeout(() => {
-        if (window.BusinessChatWidget && typeof window.BusinessChatWidget.open === 'function') {
-          window.BusinessChatWidget.open();
+        if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
+          BusinessChatWidget.open();
         }
-      }, 900);
+      }, 800);
     });
 
-
-    // Glowing Cursor Trail
+    // ✨ Glowing Cursor Trail
     const trailLength = 12;
     const trail = [];
     for (let i = 0; i < trailLength; i++) {
@@ -237,44 +226,9 @@ let botOpened = false;
     }
     animateTrail();
   });
-  
-  document.addEventListener('DOMContentLoaded', function () {
-  const chatWidget = new BusinessChatWidget({
-    apiKey: 'your-api-key-here',
-    apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-    widgetTitle: 'Business Assistant',
-    primaryColor: '#4a90e2'
-  });
-
-  // "Try Our Bot Now" button logic
-  const tryBtn = document.getElementById('try-bot-btn');
-  tryBtn.addEventListener('click', () => {
-    // Animate the button
-    tryBtn.style.position = 'fixed';
-    tryBtn.style.bottom = '24px';
-    tryBtn.style.right = '24px';
-    tryBtn.style.left = 'auto';
-    tryBtn.style.top = 'auto';
-    tryBtn.style.zIndex = '9999';
-    tryBtn.style.transition = 'all 0.6s ease-in-out, transform 0.3s';
-    tryBtn.style.transform = 'scale(0.7)';
-
-    setTimeout(() => {
-      tryBtn.innerHTML = '💬';
-      tryBtn.classList.remove('bg-white', 'text-primary');
-      tryBtn.classList.add('bg-primary', 'text-white');
-    }, 300);
-
-    setTimeout(() => {
-      if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
-        BusinessChatWidget.open();
-      }
-    }, 800);
-  });
-});
-
 </script>
 <script src="widget.js"></script>
+
 
 </body>
 </html>
