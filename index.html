@@ -107,8 +107,9 @@
 
     <!-- CTA Button -->
     <button id="try-bot-btn" class="bg-white text-primary font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition transform duration-300">
-    👉 Try Our Bot Now
+  👉 Try Our Bot Now
     </button>
+
 
 
     <!-- Scroll Cue -->
@@ -236,7 +237,44 @@ let botOpened = false;
     }
     animateTrail();
   });
+  
+  document.addEventListener('DOMContentLoaded', function () {
+  const chatWidget = new BusinessChatWidget({
+    apiKey: 'your-api-key-here',
+    apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+    widgetTitle: 'Business Assistant',
+    primaryColor: '#4a90e2'
+  });
+
+  // "Try Our Bot Now" button logic
+  const tryBtn = document.getElementById('try-bot-btn');
+  tryBtn.addEventListener('click', () => {
+    // Animate the button
+    tryBtn.style.position = 'fixed';
+    tryBtn.style.bottom = '24px';
+    tryBtn.style.right = '24px';
+    tryBtn.style.left = 'auto';
+    tryBtn.style.top = 'auto';
+    tryBtn.style.zIndex = '9999';
+    tryBtn.style.transition = 'all 0.6s ease-in-out, transform 0.3s';
+    tryBtn.style.transform = 'scale(0.7)';
+
+    setTimeout(() => {
+      tryBtn.innerHTML = '💬';
+      tryBtn.classList.remove('bg-white', 'text-primary');
+      tryBtn.classList.add('bg-primary', 'text-white');
+    }, 300);
+
+    setTimeout(() => {
+      if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
+        BusinessChatWidget.open();
+      }
+    }, 800);
+  });
+});
+
 </script>
+<script src="widget.js"></script>
 
 </body>
 </html>
