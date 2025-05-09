@@ -150,13 +150,40 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    // Chatbot Widget Initialization
-    window.myChatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
+    // Button Behavior: Lazy-load Chatbot Widget
+    const tryBtn = document.getElementById('try-bot-btn');
+    let chatbotLaunched = false;
+    
+    tryBtn.addEventListener('click', () => {
+      if (chatbotLaunched) {
+        // Widget already exists, just open it
+        if (window.myChatWidget && typeof window.myChatWidget.open === 'function') {
+          window.myChatWidget.open();
+        }
+        return;
+      }
+    
+      chatbotLaunched = true;
+    
+      // Optional: fade out button
+      tryBtn.style.transition = 'opacity 0.4s ease';
+      tryBtn.style.opacity = '0';
+    
+      setTimeout(() => {
+        tryBtn.style.display = 'none';
+    
+        // Initialize and open the chatbot widget
+        window.myChatWidget = new BusinessChatWidget({
+          apiKey: 'your-api-key-here',
+          apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+          widgetTitle: 'Business Assistant',
+          primaryColor: '#4a90e2'
+        });
+    
+        window.myChatWidget.open();
+      }, 400);
     });
+
 
     // Button Behavior: Fade Out CTA, Show Real Widget
     const tryBtn = document.getElementById('try-bot-btn');
