@@ -28,9 +28,11 @@ class BusinessChatWidget {
     this.isOpen = false;
     this.isLoading = false;
 
-    // Initialize the widget
-    this.init();
-  }
+    // Initialize only if autoLoad is not explicitly false
+    if (this.config.autoLoad !== false) {
+      this.init();
+    }
+
 
   /**
    * Initialize the widget
@@ -428,4 +430,15 @@ if (typeof window !== 'undefined') {
 // For module environments
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = BusinessChatWidget;
+}
+
+// Optional: Global init trigger
+if (typeof window !== 'undefined') {
+  window.BusinessChatWidget = BusinessChatWidget;
+  window.initBusinessChat = (config) => {
+    if (!window.myChatWidget) {
+      window.myChatWidget = new BusinessChatWidget(config);
+    }
+    return window.myChatWidget;
+  };
 }
