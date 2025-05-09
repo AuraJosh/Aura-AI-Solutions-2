@@ -175,7 +175,13 @@
 
     // Button Animation & Chatbot Reveal
     const button = document.getElementById('try-bot-btn');
+let botOpened = false;
+
     button.addEventListener('click', () => {
+      if (botOpened) return;
+      botOpened = true;
+    
+      // Animate to bottom right
       button.style.position = 'fixed';
       button.style.bottom = '24px';
       button.style.right = '24px';
@@ -184,17 +190,28 @@
       button.style.zIndex = '9998';
       button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
       button.style.transform = 'scale(0.7)';
+    
+      // Change button content and color
       setTimeout(() => {
-        button.innerHTML = '💬';
+        button.innerHTML = '';
         button.classList.remove('bg-white', 'text-primary');
-        button.classList.add('bg-primary', 'text-white');
+        button.classList.add('bg-primary');
+    
+        const icon = document.createElement('img');
+        icon.src = 'chat-icon.svg'; // OPTIONAL: use your chatbot button icon
+        icon.alt = 'Chatbot';
+        icon.className = 'h-6 w-6';
+        button.appendChild(icon);
       }, 500);
+    
+      // Show existing chatbot widget
       setTimeout(() => {
-        if (window.BusinessChatWidget && window.BusinessChatWidget.open) {
+        if (window.BusinessChatWidget && typeof window.BusinessChatWidget.open === 'function') {
           window.BusinessChatWidget.open();
         }
       }, 900);
     });
+
 
     // Glowing Cursor Trail
     const trailLength = 12;
