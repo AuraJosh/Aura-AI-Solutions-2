@@ -21,6 +21,20 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="widget.css">
   <script src="widget.js"></script>
+  <style>
+    .discount-badge {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .discount-badge.hidden {
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+    .discount-badge.visible {
+      opacity: 1;
+      transform: scale(1);
+    }
+  </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
@@ -79,9 +93,10 @@
         <!-- Essential Plan -->
         <div class="bg-blue-50 dark:bg-blue-900/40 text-gray-800 dark:text-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl duration-300 border border-blue-100 dark:border-blue-800">
           <h3 class="text-2xl font-bold mb-1">Essential</h3>
-          <div class="mb-4">
+          <div class="mb-4 relative inline-block">
             <span id="price-essential" class="text-4xl font-extrabold text-gray-900 dark:text-white">£50</span>
             <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+            <span id="discount-essential" class="discount-badge hidden absolute -top-3 -right-4 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">15% off</span>
           </div>
           <button class="w-full bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-white font-semibold py-2 rounded hover:bg-blue-200 dark:hover:bg-blue-600 transition">Get Started</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
@@ -97,9 +112,10 @@
         <div class="relative bg-gradient-to-br from-primary to-accent text-white rounded-2xl shadow-2xl p-8 transform hover:-translate-y-2 duration-300 border-4 border-white/10">
           <div class="absolute top-2 right-4 bg-white/10 text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
           <h3 class="text-2xl font-bold mb-1">Elite</h3>
-          <div class="mb-4">
+          <div class="mb-4 relative inline-block">
             <span id="price-elite" class="text-4xl font-extrabold text-white">£150</span>
             <span class="block text-sm text-white/80">per month</span>
+            <span id="discount-elite" class="discount-badge hidden absolute -top-3 -right-4 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">18% off</span>
           </div>
           <button class="w-full bg-white text-primary font-semibold py-2 rounded hover:bg-gray-200 transition">Start Elite</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-white">
@@ -118,9 +134,10 @@
         <!-- Executive Plan -->
         <div class="bg-gray-100 dark:bg-gray-800/60 text-gray-900 dark:text-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl duration-300 border border-gray-200 dark:border-gray-700">
           <h3 class="text-2xl font-bold mb-1 text-pink-600 dark:text-pink-400">Executive</h3>
-          <div class="mb-4">
+          <div class="mb-4 relative inline-block">
             <span id="price-executive" class="text-4xl font-extrabold text-pink-600 dark:text-pink-400">£500</span>
             <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+            <span id="discount-executive" class="discount-badge hidden absolute -top-3 -right-4 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">20% off</span>
           </div>
           <button class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 rounded transition">Contact Sales</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
@@ -153,20 +170,17 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
-    // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    if (useDark) {
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
     } else {
@@ -180,7 +194,6 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    // Billing toggle animation
     const toggle = document.getElementById('billing-toggle');
     const prices = {
       essential: { monthly: 50, discounted: 50 * 0.85 },
@@ -191,6 +204,11 @@
       essential: document.getElementById('price-essential'),
       elite: document.getElementById('price-elite'),
       executive: document.getElementById('price-executive')
+    };
+    const discountEls = {
+      essential: document.getElementById('discount-essential'),
+      elite: document.getElementById('discount-elite'),
+      executive: document.getElementById('discount-executive')
     };
 
     function animatePrice(el, from, to, duration = 300) {
@@ -204,14 +222,23 @@
       requestAnimationFrame(update);
     }
 
+    function updateDiscountBadges(show) {
+      Object.values(discountEls).forEach(el => {
+        el.classList.toggle('hidden', !show);
+        el.classList.toggle('visible', show);
+      });
+    }
+
     toggle.addEventListener('change', () => {
       const isYearly = toggle.checked;
       animatePrice(priceEls.essential, parseInt(priceEls.essential.textContent.slice(1)), isYearly ? prices.essential.discounted : prices.essential.monthly);
       animatePrice(priceEls.elite, parseInt(priceEls.elite.textContent.slice(1)), isYearly ? prices.elite.discounted : prices.elite.monthly);
       animatePrice(priceEls.executive, parseInt(priceEls.executive.textContent.slice(1)), isYearly ? prices.executive.discounted : prices.executive.monthly);
+      updateDiscountBadges(isYearly);
     });
 
-    // Chatbot
+    updateDiscountBadges(toggle.checked);
+
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
