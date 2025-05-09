@@ -4,6 +4,7 @@
  */
 
 .business-chat-widget {
+  display: none;
   position: fixed;
   bottom: 20px;
   z-index: 9999;
