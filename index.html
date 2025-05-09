@@ -381,6 +381,27 @@
     });
   });
 </script>
+document.getElementById("try-bot-btn").addEventListener("click", () => {
+  const btn = document.getElementById("try-bot-btn");
+
+  // Animate button to corner
+  btn.classList.add("fixed", "bottom-6", "right-6", "rounded-full", "z-50", "w-16", "h-16", "p-0", "text-2xl", "bg-primary", "text-white");
+  btn.innerHTML = "💬";
+  btn.style.transition = "all 0.4s ease";
+
+  // Load and show widget
+  if (!window.myChatWidget) {
+    window.initBusinessChat({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2',
+      autoLoad: false // prevents auto creation
+    });
+  }
+
+  window.myChatWidget.toggleWidget(true); // open the chat
+});
 
 </body>
 </html>
