@@ -32,7 +32,7 @@ class BusinessChatWidget {
     if (this.config.autoLoad !== false) {
       this.init();
     }
-
+  }
 
   /**
    * Initialize the widget
