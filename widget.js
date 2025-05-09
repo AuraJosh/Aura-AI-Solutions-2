@@ -32,7 +32,8 @@ class BusinessChatWidget {
     if (this.config.autoLoad !== false) {
       this.init();
     }
-  }
+  } // ← THIS CLOSING BRACE WAS MISSING
+
 
   /**
    * Initialize the widget
