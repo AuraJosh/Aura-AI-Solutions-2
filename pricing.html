@@ -57,12 +57,12 @@
 </div>
 
 <!-- Page Content -->
-<main class="pt-32 container mx-auto px-4 py-20">
+<main class="pt-32 container mx-auto px-4 py-20 text-center">
   <h1 class="text-4xl font-bold mb-4">Our Pricing</h1>
-  <p class="text-lg text-gray-600 dark:text-gray-300">Flexible plans designed to meet your business needs and scale as you grow.</p>
+  <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">Flexible plans designed to meet your business needs and scale as you grow.</p>
 
   <!-- Toggle Switch -->
-  <div class="flex items-center justify-center mb-12 mt-4 space-x-4">
+  <div class="flex items-center justify-center mb-12 space-x-4">
     <span class="text-sm font-medium">Billed Monthly</span>
     <label class="inline-flex relative items-center cursor-pointer">
       <input type="checkbox" id="billing-toggle" class="sr-only peer">
@@ -72,7 +72,6 @@
     <span class="text-sm font-medium">Billed Annually</span>
   </div>
 
-  <!-- Pricing Section -->
   <section class="relative bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-900 py-20">
     <div class="container mx-auto px-4 text-center">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -82,7 +81,7 @@
           <h3 class="text-2xl font-bold mb-1">Essential</h3>
           <div class="mb-4">
             <span id="price-essential" class="text-4xl font-extrabold text-gray-900 dark:text-white">£50</span>
-            <span id="label-essential" class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+            <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
           </div>
           <button class="w-full bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-white font-semibold py-2 rounded hover:bg-blue-200 dark:hover:bg-blue-600 transition">Get Started</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
@@ -100,7 +99,7 @@
           <h3 class="text-2xl font-bold mb-1">Elite</h3>
           <div class="mb-4">
             <span id="price-elite" class="text-4xl font-extrabold text-white">£150</span>
-            <span id="label-elite" class="block text-sm text-white/80">per month</span>
+            <span class="block text-sm text-white/80">per month</span>
           </div>
           <button class="w-full bg-white text-primary font-semibold py-2 rounded hover:bg-gray-200 transition">Start Elite</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-white">
@@ -121,7 +120,7 @@
           <h3 class="text-2xl font-bold mb-1 text-pink-600 dark:text-pink-400">Executive</h3>
           <div class="mb-4">
             <span id="price-executive" class="text-4xl font-extrabold text-pink-600 dark:text-pink-400">£500</span>
-            <span id="label-executive" class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+            <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
           </div>
           <button class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-2 rounded transition">Contact Sales</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
@@ -138,7 +137,6 @@
 
       </div>
     </div>
-
     <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white dark:to-gray-900 pointer-events-none"></div>
   </section>
 </main>
@@ -155,18 +153,19 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // Mobile menu
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
+    // Theme toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-
     if (useDark) {
       html.classList.add('dark');
       themeToggle.textContent = '☀️';
@@ -174,7 +173,6 @@
       html.classList.remove('dark');
       themeToggle.textContent = '🌙';
     }
-
     themeToggle.addEventListener('click', () => {
       html.classList.toggle('dark');
       const isDark = html.classList.contains('dark');
@@ -182,48 +180,26 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
+    // Billing toggle
     const toggle = document.getElementById('billing-toggle');
-
     const prices = {
-      essential: { monthly: 50, yearly: 50 * 12 * 0.85 },
-      elite: { monthly: 150, yearly: 150 * 12 * 0.82 },
-      executive: { monthly: 500, yearly: 500 * 12 * 0.80 }
+      essential: { monthly: 50, discounted: 50 * 0.85 },
+      elite: { monthly: 150, discounted: 150 * 0.82 },
+      executive: { monthly: 500, discounted: 500 * 0.80 }
     };
-
     const priceEls = {
       essential: document.getElementById('price-essential'),
       elite: document.getElementById('price-elite'),
       executive: document.getElementById('price-executive')
     };
-
-    const labelEls = {
-      essential: document.getElementById('label-essential'),
-      elite: document.getElementById('label-elite'),
-      executive: document.getElementById('label-executive')
-    };
-
-    const formatPrice = (value) => `£${Math.round(value)}`;
-
-    toggle.addEventListener('change', function () {
+    toggle.addEventListener('change', () => {
       const isYearly = toggle.checked;
-
-      priceEls.essential.textContent = isYearly
-        ? formatPrice(prices.essential.yearly)
-        : formatPrice(prices.essential.monthly);
-      labelEls.essential.textContent = isYearly ? 'per annum' : 'per month';
-
-      priceEls.elite.textContent = isYearly
-        ? formatPrice(prices.elite.yearly)
-        : formatPrice(prices.elite.monthly);
-      labelEls.elite.textContent = isYearly ? 'per annum' : 'per month';
-
-      priceEls.executive.textContent = isYearly
-        ? formatPrice(prices.executive.yearly)
-        : formatPrice(prices.executive.monthly);
-      labelEls.executive.textContent = isYearly ? 'per annum' : 'per month';
+      priceEls.essential.textContent = `£${Math.round(isYearly ? prices.essential.discounted : prices.essential.monthly)}`;
+      priceEls.elite.textContent = `£${Math.round(isYearly ? prices.elite.discounted : prices.elite.monthly)}`;
+      priceEls.executive.textContent = `£${Math.round(isYearly ? prices.executive.discounted : prices.executive.monthly)}`;
     });
 
-    // Chatbot
+    // Chatbot widget
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
