@@ -334,6 +334,17 @@
     animate();
   });
 </script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const tryBotButton = document.getElementById('try-bot-button');
+    tryBotButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.BusinessChatWidget) {
+        window.BusinessChatWidget.maximize();
+      }
+    });
+  });
+</script>
 
 </body>
 </html>
