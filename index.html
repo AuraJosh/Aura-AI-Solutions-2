@@ -107,8 +107,9 @@
 
     <!-- CTA Button -->
     <button id="try-bot-btn" class="bg-white text-primary font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition transform duration-300">
-      👉 Try Our Bot Now
+    👉 Try Our Bot Now
     </button>
+
 
     <!-- Scroll Cue -->
     <div class="mt-16">
@@ -118,11 +119,7 @@
     </div>
   </div>
 
-  <!-- Simulated Chatbot (Hidden Initially) -->
-  <div id="chatbot-preview" class="hidden absolute bottom-12 right-6 md:right-12 z-30 max-w-sm bg-white text-gray-900 dark:bg-gray-800 dark:text-white p-4 rounded-xl shadow-2xl">
-    <div class="text-sm font-semibold mb-2">Aura Chat Assistant</div>
-    <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded text-sm">Hi there! 👋 How can I help you today?</div>
-  </div>
+  
 
   <!-- Cursor Follower -->
   <div id="cursor-dot" class="fixed top-0 left-0 w-3 h-3 bg-white rounded-full pointer-events-none z-50 opacity-70"></div>
@@ -348,6 +345,37 @@
         // If your widget has a JS API to open:
         if (window.BusinessChatWidget && window.BusinessChatWidget.open) {
           window.BusinessChatWidget.open();
+        }
+      }, 900);
+    });
+  });
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const button = document.getElementById('try-bot-btn');
+
+    button.addEventListener('click', () => {
+      // Animate button to bottom-right
+      button.style.position = 'fixed';
+      button.style.bottom = '24px';
+      button.style.right = '24px';
+      button.style.left = 'auto';
+      button.style.top = 'auto';
+      button.style.zIndex = '9999';
+      button.style.transition = 'all 0.8s ease-in-out, transform 0.4s';
+      button.style.transform = 'scale(0.7)';
+
+      // Replace text/icon
+      setTimeout(() => {
+        button.innerHTML = '💬';
+        button.classList.remove('bg-white', 'text-primary');
+        button.classList.add('bg-primary', 'text-white');
+      }, 500);
+
+      // Open actual chatbot widget
+      setTimeout(() => {
+        if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
+          BusinessChatWidget.open();
         }
       }, 900);
     });
