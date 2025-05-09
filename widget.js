@@ -11,10 +11,11 @@ class BusinessChatWidget {
       ...config
     };
 
+        // Only log a warning, don’t block initialization
     if (!this.config.apiKey) {
-      console.error('API key is required for the Business Chat Widget');
-      return;
+      console.warn('No API key provided. Continuing without authentication.');
     }
+
 
     this.messages = [];
     this.isOpen = false;
