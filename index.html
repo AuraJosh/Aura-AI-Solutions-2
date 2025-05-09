@@ -199,7 +199,9 @@
 
       setTimeout(() => {
         if (window.BusinessChatWidget && typeof BusinessChatWidget.open === 'function') {
-          BusinessChatWidget.open();
+          if (window.myChatWidget) {
+            window.myChatWidget.open();
+          }
         }
       }, 800);
     });
