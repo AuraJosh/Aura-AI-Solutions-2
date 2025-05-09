@@ -153,7 +153,7 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile menu
+    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
@@ -180,7 +180,7 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
     });
 
-    // Billing toggle
+    // Billing toggle animation
     const toggle = document.getElementById('billing-toggle');
     const prices = {
       essential: { monthly: 50, discounted: 50 * 0.85 },
@@ -192,14 +192,26 @@
       elite: document.getElementById('price-elite'),
       executive: document.getElementById('price-executive')
     };
+
+    function animatePrice(el, from, to, duration = 300) {
+      const start = performance.now();
+      function update(now) {
+        const progress = Math.min((now - start) / duration, 1);
+        const current = from + (to - from) * progress;
+        el.textContent = `£${Math.round(current)}`;
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
     toggle.addEventListener('change', () => {
       const isYearly = toggle.checked;
-      priceEls.essential.textContent = `£${Math.round(isYearly ? prices.essential.discounted : prices.essential.monthly)}`;
-      priceEls.elite.textContent = `£${Math.round(isYearly ? prices.elite.discounted : prices.elite.monthly)}`;
-      priceEls.executive.textContent = `£${Math.round(isYearly ? prices.executive.discounted : prices.executive.monthly)}`;
+      animatePrice(priceEls.essential, parseInt(priceEls.essential.textContent.slice(1)), isYearly ? prices.essential.discounted : prices.essential.monthly);
+      animatePrice(priceEls.elite, parseInt(priceEls.elite.textContent.slice(1)), isYearly ? prices.elite.discounted : prices.elite.monthly);
+      animatePrice(priceEls.executive, parseInt(priceEls.executive.textContent.slice(1)), isYearly ? prices.executive.discounted : prices.executive.monthly);
     });
 
-    // Chatbot widget
+    // Chatbot
     const chatWidget = new BusinessChatWidget({
       apiKey: 'your-api-key-here',
       apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
