@@ -95,8 +95,17 @@
   </div>
 
   <section class="relative bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-900 py-20">
-    <div class="container mx-auto px-4 text-center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+   <!-- Video Background -->
+  <video autoplay muted loop playsinline class="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-30">
+    <source src="background.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Overlay to help readability (optional but recommended) -->
+  <div class="absolute inset-0 bg-white/80 dark:bg-gray-900/70 z-10"></div>
+
+      <div class="relative z-20 container mx-auto px-4 text-center">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
         <!-- Essential Plan -->
         <div class="relative bg-blue-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transition">
