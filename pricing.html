@@ -42,27 +42,38 @@
       background-size: 200% auto;
       animation: shimmer 2.5s linear infinite;
     }
-    /* Video background styles */
-    #background-video {
+
+    /* Background Video */
+    .video-background {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
-      z-index: -1;
-      opacity: 0.3; /* Optional: Adjust visibility */
-      pointer-events: none;
+      z-index: -10;
+    }
+
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: -5;
     }
   </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
 
 <!-- Background Video -->
-<video id="background-video" autoplay muted loop playsinline>
+<video autoplay muted loop playsinline class="video-background">
   <source src="background.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+<div class="video-overlay"></div>
 
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
@@ -112,14 +123,75 @@
     <span class="text-sm font-medium">Billed Annually</span>
   </div>
 
-  <!-- Pricing Cards -->
-  <!-- (All your pricing section code remains unchanged) -->
-
+  <!-- Pricing Plans -->
   <section class="relative bg-gradient-to-b from-gray-100 to-white dark:from-gray-800 dark:to-gray-900 py-20">
     <div class="container mx-auto px-4 text-center">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <!-- (Essential, Elite, Executive plans remain unchanged here) -->
-        <!-- ... existing pricing card HTML ... -->
+
+               <!-- Essential Plan -->
+        <div class="relative bg-blue-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transition">
+          <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 15%</span>
+          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
+          <div class="mb-4">
+            <span id="price-essential" class="text-4xl font-extrabold text-gray-900 dark:text-white">£50</span>
+            <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+          </div>
+          <button class="w-full bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-white font-semibold py-2 rounded hover:bg-blue-200 dark:hover:bg-blue-600 transition">Get Started</button>
+          <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
+            <li>✔ Basic chatbot</li>
+            <li>✔ 1,000 messages / month</li>
+            <li>✔ 1 chatbot</li>
+            <li>✔ Support response: within 1 week</li>
+            <li>✔ Includes Aura AI branding</li>
+          </ul>
+        </div>
+
+       <!-- Elite Plan -->
+      <div class="relative bg-purple-50 dark:bg-gradient-to-br dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 hover:shadow-2xl transition">
+        <span id="discount-elite" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 18%</span>
+        <div class="absolute top-2 left-4 bg-white/10 text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
+        <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text drop-shadow-md">Elite</h3>
+        <div class="mb-4">
+          <span id="price-elite" class="text-4xl font-extrabold text-pink-600 dark:text-white">£150</span>
+          <span class="block text-sm text-pink-400 dark:text-white/80">per month</span>
+        </div>
+        <button class="w-full bg-white text-primary font-semibold py-2 rounded hover:bg-gray-200 transition">Start Elite</button>
+        <ul class="mt-6 space-y-3 text-left text-sm">
+          <li class="text-pink-600 dark:text-white">✔ Everything in Essential</li>
+          <li class="text-pink-600 dark:text-white">✔ Example Answers / FAQs</li>
+          <li class="text-pink-600 dark:text-white">✔ Multilingual support</li>
+          <li class="text-pink-600 dark:text-white">✔ 5,000 messages / month</li>
+          <li class="text-pink-600 dark:text-white">✔ 3 chatbots</li>
+          <li class="text-pink-600 dark:text-white">✔ Priority support</li>
+          <li class="text-pink-600 dark:text-white">✔ Preset style themes & personalities</li>
+          <li class="text-pink-600 dark:text-white">✔ Regular analytics + premade dashboard</li>
+          <li class="text-pink-600 dark:text-white">✔ Includes Aura AI branding</li>
+        </ul>
+      </div>
+
+
+
+    <!-- Executive Plan -->
+    <div class="relative bg-[#8a8888] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-yellow-500/30 shadow-xl rounded-2xl p-8 hover:ring-2 hover:ring-yellow-400/30 transition">
+      <span id="discount-executive" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 20%</span>
+      <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
+      <div class="mb-4">
+        <span id="price-executive" class="text-4xl font-extrabold text-yellow-400 dark:text-yellow-300">£500</span>
+        <span class="block text-sm text-yellow-300 dark:text-yellow-200">per month</span>
+      </div>
+      <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded transition">Contact Sales</button>
+      <ul class="mt-6 space-y-3 text-left text-sm">
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Everything in Elite & Essential</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Unlimited messages</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ 24-hour support turnaround</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Custom widget design</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Custom chatbot personalities</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Full analytics suite</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Advanced AI-powered dashboard</li>
+        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Your own branding (white-label)</li>
+      </ul>
+    </div>
+
       </div>
     </div>
     <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-b from-transparent to-white dark:to-gray-900 pointer-events-none"></div>
