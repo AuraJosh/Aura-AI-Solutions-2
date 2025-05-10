@@ -169,9 +169,13 @@
           initialMessage: "Hello! I'm your AI assistant. How can I help you today?"
         });
     
-        window.myChatWidget.open();
+        // Optional: slight delay to ensure open happens after init
+        setTimeout(() => {
+          window.myChatWidget.open();
+        }, 100);
       }, 400);
     });
+
 
 
     // Cursor Trail
