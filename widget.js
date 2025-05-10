@@ -128,9 +128,10 @@ class BusinessChatWidget {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': this.config.apiKey
+          ...(this.config.apiKey ? { 'x-api-key': this.config.apiKey } : {})
         },
-        body: JSON.stringify({ question: message, previousMessages })
+
+        body: JSON.stringify({ message })
       });
 
       this.removeLoadingIndicator();
