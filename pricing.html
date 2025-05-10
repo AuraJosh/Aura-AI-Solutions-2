@@ -34,6 +34,14 @@
       opacity: 1;
       transform: scale(1);
     }
+    @keyframes shimmer {
+      0% { background-position: -100% 0; }
+      100% { background-position: 100% 0; }
+    }
+    .shimmer-text {
+      background-size: 200% auto;
+      animation: shimmer 2.5s linear infinite;
+    }
   </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -93,7 +101,7 @@
         <!-- Essential Plan -->
         <div class="relative bg-blue-50 dark:bg-blue-900/40 text-gray-800 dark:text-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl duration-300 border border-blue-100 dark:border-blue-800">
           <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 15%</span>
-          <h3 class="text-2xl font-bold mb-1">Essential</h3>
+          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
           <div class="mb-4">
             <span id="price-essential" class="text-4xl font-extrabold text-gray-900 dark:text-white">£50</span>
             <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
@@ -112,7 +120,7 @@
         <div class="relative bg-gradient-to-br from-primary to-accent text-white rounded-2xl shadow-2xl p-8 transform hover:-translate-y-2 duration-300 border-4 border-white/10">
           <span id="discount-elite" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 18%</span>
           <div class="absolute top-2 left-4 bg-white/10 text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-          <h3 class="text-2xl font-bold mb-1">Elite</h3>
+          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text drop-shadow-md">Elite</h3>
           <div class="mb-4">
             <span id="price-elite" class="text-4xl font-extrabold text-white">£150</span>
             <span class="block text-sm text-white/80">per month</span>
@@ -134,7 +142,7 @@
         <!-- Executive Plan -->
         <div class="relative bg-gray-100 dark:bg-gray-800/60 text-gray-900 dark:text-gray-200 rounded-2xl shadow-xl p-8 transition-transform hover:-translate-y-2 hover:shadow-2xl duration-300 border border-gray-200 dark:border-gray-700">
           <span id="discount-executive" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 20%</span>
-          <h3 class="text-2xl font-bold mb-1 text-pink-600 dark:text-pink-400">Executive</h3>
+          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
           <div class="mb-4">
             <span id="price-executive" class="text-4xl font-extrabold text-pink-600 dark:text-pink-400">£500</span>
             <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
@@ -170,7 +178,6 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Restore dark mode toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
     const savedTheme = localStorage.getItem('theme');
