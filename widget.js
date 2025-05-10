@@ -198,7 +198,6 @@ class BusinessChatWidget {
         headers,
         body: JSON.stringify({
           question: message,
-          previousMessages
         })
       });
       
