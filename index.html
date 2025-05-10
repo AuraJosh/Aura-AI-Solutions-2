@@ -153,25 +153,26 @@
         }
         return;
       }
-
+    
       chatbotLaunched = true;
-
+    
       tryBtn.style.transition = 'opacity 0.4s ease';
       tryBtn.style.opacity = '0';
-
+    
       setTimeout(() => {
         tryBtn.style.display = 'none';
-
+    
         window.myChatWidget = new BusinessChatWidget({
-          apiKey: '', // <-- Replace with your real API key
-          apiEndpoint: 'https://384f8lmpn2.execute-api.eu-north-1.amazonaws.com/prod',
+          apiEndpoint: 'https://384f8lmpn2.execute-api.eu-north-1.amazonaws.com/prod/AURA-chatbot',
           widgetTitle: 'Aura AI Assistant',
-          primaryColor: '#4a90e2'
+          primaryColor: '#4a90e2',
+          initialMessage: "Hello! I'm your AI assistant. How can I help you today?"
         });
-
+    
         window.myChatWidget.open();
       }, 400);
     });
+
 
     // Cursor Trail
     const trailLength = 12;
