@@ -53,17 +53,6 @@
       object-fit: cover;
       z-index: -10;
     }
-
-    .video-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.6);
-      backdrop-filter: blur(2px);
-      z-index: -5;
-    }
   </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
@@ -73,7 +62,7 @@
   <source src="background.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
-<div class="video-overlay"></div>
+
 
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-gray-900 shadow z-50">
