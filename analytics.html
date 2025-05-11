@@ -10,68 +10,72 @@
 
   <!-- Firebase SDK (Module Support) -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-    // ✅ Replace with your actual Firebase project config
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      appId: "YOUR_APP_ID"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyC86Xa6gQUi24rKLEiWt1HDs2x6dgUstiU",
+    authDomain: "aura-aba27.firebaseapp.com",
+    projectId: "aura-aba27",
+    storageBucket: "aura-aba27.firebasestorage.app",
+    messagingSenderId: "541278625857",
+    appId: "1:541278625857:web:e98b6ff2262f5f3ebbe6c0",
+    measurementId: "G-3LKPN4YBD1"
+  };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
 
-    // Handle login form submit
-    document.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.querySelector('input[type="email"]').value;
-      const password = document.querySelector('input[type="password"]').value;
+  // Handle Login
+  document.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.querySelector('input[type="password"]').value;
 
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        document.getElementById("auth-container").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-      } catch (error) {
-        alert("Login failed: " + error.message);
-      }
-    });
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      document.getElementById("auth-container").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+    } catch (error) {
+      alert("Login failed: " + error.message);
+    }
+  });
 
-    // Handle form toggling & sign up
-    window.toggleForm = function (type) {
-      const container = document.getElementById("auth-container");
+  // Handle Form Switching & Sign Up
+  window.toggleForm = function (type) {
+    const container = document.getElementById("auth-container");
 
-      if (type === "signup") {
-        container.innerHTML = document.getElementById("signup-form").innerHTML;
-        document.querySelector("form").addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const email = document.querySelector('input[type="email"]').value;
-          const password = document.querySelector('input[type="password"]').value;
+    if (type === "signup") {
+      container.innerHTML = document.getElementById("signup-form").innerHTML;
+      document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.querySelector('input[type="email"]').value;
+        const password = document.querySelector('input[type="password"]').value;
 
-          try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            alert("Account created! You can now log in.");
-            location.reload();
-          } catch (error) {
-            alert("Sign-up failed: " + error.message);
-          }
-        });
-      } else if (type === "forgot") {
-        container.innerHTML = document.getElementById("forgot-form").innerHTML;
-      } else {
-        location.reload();
-      }
-    };
-
-    // Logout
-    window.logout = async function () {
-      await signOut(auth);
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("Account created! You can now log in.");
+          location.reload();
+        } catch (error) {
+          alert("Sign-up failed: " + error.message);
+        }
+      });
+    } else if (type === "forgot") {
+      container.innerHTML = document.getElementById("forgot-form").innerHTML;
+    } else {
       location.reload();
-    };
-  </script>
+    }
+  };
+
+  // Logout
+  window.logout = async function () {
+    await signOut(auth);
+    location.reload();
+  };
+</script>
+
 </head>
 
 <body class="bg-gray-900 text-white">
