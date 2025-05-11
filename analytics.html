@@ -61,12 +61,32 @@
       Your browser does not support the video tag.
     </video>
 
-    <!-- Header/Nav -->
-    <header class="relative z-10 bg-black/60 text-white p-4 flex justify-between items-center">
-      <!-- Replace with your actual header code -->
-      <h1 class="text-xl font-bold">My Analytics Dashboard</h1>
-      <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Logout</button>
-    </header>
+    <!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="#" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+
+    <!-- Center: Replaced Navigation with Dashboard Title -->
+    <div class="hidden md:flex justify-center flex-1">
+      <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
+    </div>
+
+    <!-- Right: Mobile button or logout -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
+    </div>
+  </div>
+</header>
+
 
     <!-- Analytics Container -->
     <main class="relative z-10 flex items-center justify-center h-full">
