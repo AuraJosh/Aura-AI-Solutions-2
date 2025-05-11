@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+
+  <!-- Simulated Auth Page -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">Sign In</h2>
+      <form>
+        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-semibold">Sign In</button>
+      </form>
+      <div class="flex justify-between mt-4 text-sm">
+        <button onclick="toggleForm('signup')" class="text-blue-400 hover:underline">Sign Up</button>
+        <button onclick="toggleForm('forgot')" class="text-blue-400 hover:underline">Forgot Password?</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Variants (Sign Up, Forgot Password) -->
+  <template id="signup-form">
+    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+      <form>
+        <input type="text" placeholder="Name" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded font-semibold">Sign Up</button>
+      </form>
+      <div class="mt-4 text-sm text-center">
+        <button onclick="toggleForm('login')" class="text-blue-400 hover:underline">Back to Sign In</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="forgot-form">
+    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
+      <h2 class="text-2xl font-bold mb-6 text-center">Reset Password</h2>
+      <form>
+        <input type="email" placeholder="Enter your email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 p-3 rounded font-semibold">Reset</button>
+      </form>
+      <div class="mt-4 text-sm text-center">
+        <button onclick="toggleForm('login')" class="text-blue-400 hover:underline">Back to Sign In</button>
+      </div>
+    </div>
+  </template>
+
+  <!-- Authenticated Dashboard Page -->
+  <div id="dashboard" class="hidden relative w-full h-screen overflow-hidden">
+    <!-- Background Video -->
+    <video autoplay loop muted class="absolute inset-0 w-full h-full object-cover z-0">
+      <source src="your-background-video.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+
+    <!-- Header/Nav -->
+    <header class="relative z-10 bg-black/60 text-white p-4 flex justify-between items-center">
+      <!-- Replace with your actual header code -->
+      <h1 class="text-xl font-bold">My Analytics Dashboard</h1>
+      <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded">Logout</button>
+    </header>
+
+    <!-- Analytics Container -->
+    <main class="relative z-10 flex items-center justify-center h-full">
+      <div class="bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg w-3/4 h-3/4">
+        <!-- Future analytics will go here -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleForm(type) {
+      const container = document.getElementById("auth-container");
+      if (type === 'signup') {
+        container.innerHTML = document.getElementById("signup-form").innerHTML;
+      } else if (type === 'forgot') {
+        container.innerHTML = document.getElementById("forgot-form").innerHTML;
+      } else {
+        location.reload(); // Simple way to return to login
+      }
+    }
+
+    // Simulated login (replace with real auth logic)
+    document.addEventListener('submit', function (e) {
+      e.preventDefault();
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('dashboard').classList.remove('hidden');
+    });
+
+    function logout() {
+      location.reload(); // Simulate logout
+    }
+  </script>
+
+</body>
+</html>
