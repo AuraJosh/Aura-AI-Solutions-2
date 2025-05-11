@@ -55,51 +55,52 @@
 
   <!-- Authenticated Dashboard Page -->
   <div id="dashboard" class="hidden relative w-full h-screen overflow-hidden">
-    <!-- Background Video -->
-    <video autoplay loop muted class="absolute inset-0 w-full h-full object-cover z-0">
-      <source src="background.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-   <div class="absolute inset-0 bg-black/60 z-10"></div>
 
+    <!-- Background Wrapper (video + overlay only) -->
+    <div class="absolute inset-0 z-0">
+      <video autoplay loop muted class="w-full h-full object-cover">
+        <source src="background.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div class="absolute inset-0 bg-black/60"></div>
+    </div>
 
-    <!-- Header -->
-<header class="fixed w-full bg-[#060d1f] shadow z-50">
-  <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Left: Logo + Text -->
-    <div class="flex items-center space-x-4 flex-1">
-      <a href="#" class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+    <!-- Header (fixed at top) -->
+    <header class="fixed w-full bg-[#060d1f] shadow z-20">
+      <div class="container mx-auto flex items-center justify-between p-4">
+        <!-- Left: Logo + Text -->
+        <div class="flex items-center space-x-4 flex-1">
+          <a href="#" class="flex items-center space-x-4">
+            <div class="relative h-20 w-[150px]">
+              <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+              <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+            </div>
+            <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+          </a>
         </div>
-        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-      </a>
-    </div>
 
-    <!-- Center: Replaced Navigation with Dashboard Title -->
-    <div class="hidden md:flex justify-center flex-1">
-      <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
-    </div>
+        <!-- Center: Dashboard Title -->
+        <div class="hidden md:flex justify-center flex-1">
+          <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
+        </div>
 
-    <!-- Right: Mobile button or logout -->
-    <div class="flex items-center justify-end space-x-4 flex-1">
-      <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
-    </div>
-  </div>
-</header>
+        <!-- Right: Logout -->
+        <div class="flex items-center justify-end space-x-4 flex-1">
+          <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
+        </div>
+      </div>
+    </header>
 
-
-    <!-- Analytics Container -->
-    <main class="relative z-10 pt-28 px-4 flex justify-center">
+    <!-- Main Analytics Container -->
+    <main class="relative z-20 pt-40 px-4 flex justify-center">
       <div class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg">
         <!-- Future analytics will go here -->
       </div>
     </main>
 
-
   </div>
 
+  <!-- JS Logic -->
   <script>
     function toggleForm(type) {
       const container = document.getElementById("auth-container");
