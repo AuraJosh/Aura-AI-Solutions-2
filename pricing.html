@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="dark scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -40,8 +40,6 @@
       background-size: 200% auto;
       animation: shimmer 2.5s linear infinite;
     }
-
-    /* Background Video */
     .video-background {
       position: fixed;
       top: 0;
@@ -51,53 +49,65 @@
       object-fit: cover;
       z-index: -10;
     }
+    .typing-text {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
+      border-right: 2px solid;
+    }
+    .typing-text.finished {
+      border-right: none;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
   </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<body class="bg-gray-900 text-gray-200">
 
 <!-- Background Video -->
 <video autoplay muted loop playsinline class="video-background">
   <source src="background.mp4" type="video/mp4">
-  Your browser does not support the video tag.
 </video>
 
-<!-- NEW DARK OVERLAY -->
 <div class="fixed inset-0 bg-black/60 z-[-5]"></div>
 
 <!-- Header -->
-<header class="fixed w-full bg-white dark:bg-[#060d1f] shadow z-50">
-<div class="container mx-auto flex items-center justify-between p-4">
-  <!-- Left: Logo + Text -->
-  <div class="flex items-center space-x-4 flex-1">
-    <a href="index.html" class="flex items-center space-x-4">
-      <div class="relative h-20 w-[150px]">
-        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block dark:hidden">
-        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
-      </div>
-      <span class="typing-text text-sm md:text-base text-gray-800 dark:text-white">Aura AI Solutions</span>
-    </a>
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <!-- Center: Navigation -->
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <!-- Right: Mobile button -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
   </div>
-
-  <!-- Center: Navigation -->
-  <nav class="hidden md:flex justify-center space-x-6 flex-1">
-    <a href="index.html" class="hover:text-primary">Home</a>
-    <a href="services.html" class="hover:text-primary">Services</a>
-    <a href="pricing.html" class="hover:text-primary">Pricing</a>
-    <a href="review.html" class="hover:text-primary">Review</a>
-    <a href="contact.html" class="hover:text-primary">Contact</a>
-  </nav>
-
-  <!-- Right: Theme toggle + Mobile menu -->
-  <div class="flex items-center justify-end space-x-4 flex-1">
-    <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
-    <button id="theme-toggle" class="text-xl hover:text-primary focus:outline-none" title="Toggle dark mode">🌙</button>
-  </div>
-</div>
-
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-[#0A1F44] p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
     <a href="services.html" class="hover:text-primary">Services</a>
@@ -107,7 +117,6 @@
   </nav>
 </div>
 
-<!-- Page Content -->
 <main class="pt-32 container mx-auto px-4 pb-4 text-center text-white">
   <h1 class="mt-4 text-4xl font-bold mb-4">Our Pricing</h1>
   <p class="text-lg mb-2">Flexible plans designed to meet your business needs and scale as you grow.</p>
@@ -117,7 +126,7 @@
     <span class="text-sm font-medium text-white">Billed Monthly</span>
     <label class="inline-flex relative items-center cursor-pointer">
       <input type="checkbox" id="billing-toggle" class="sr-only peer">
-      <div class="w-11 h-6 bg-gray-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary dark:peer-focus:ring-accent rounded-full peer dark:bg-gray-700 peer-checked:bg-primary transition-all"></div>
+      <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:bg-primary transition-all"></div>
       <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-full transition-transform"></div>
     </label>
     <span class="text-sm font-medium text-white">Billed Annually</span>
@@ -128,16 +137,16 @@
     <div class="container mx-auto px-4 text-center">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-               <!-- Essential Plan -->
-        <div class="relative bg-blue-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300">
+        <!-- Essential Plan -->
+        <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300">
           <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 15%</span>
           <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
           <div class="mb-4">
-            <span id="price-essential" class="text-4xl font-extrabold text-gray-900 dark:text-white">£50</span>
-            <span class="block text-sm text-gray-500 dark:text-gray-400">per month</span>
+            <span id="price-essential" class="text-4xl font-extrabold text-white">£50</span>
+            <span class="block text-sm text-gray-400">per month</span>
           </div>
-          <button class="w-full bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-white font-semibold py-2 rounded hover:bg-blue-200 dark:hover:bg-blue-600 transition">Get Started</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-gray-700 dark:text-gray-300">
+          <button class="w-full bg-blue-700 text-white font-semibold py-2 rounded hover:bg-blue-600 transition">Get Started</button>
+          <ul class="mt-6 space-y-3 text-left text-sm text-gray-300">
             <li>✔ Basic chatbot</li>
             <li>✔ 1,000 messages / month</li>
             <li>✔ 1 chatbot</li>
@@ -146,58 +155,52 @@
           </ul>
         </div>
 
-             
-            <!-- Elite Plan -->
-      <div class="relative bg-[#8ac6ff] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300">
-        <span id="discount-elite" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 18%</span>
-        <div class="absolute top-2 left-4 bg-orange-500 text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-        <h3 class="text-2xl font-bold mb-1 relative inline-block">
-          <span class="absolute inset-0 text-[#ff8ac7]" style="text-shadow: 0 0 10px #ff8ac7, 0 0 20px #ff8ac7; z-index: -1;">Elite</span>
-          <span class="relative bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text">Elite</span>
-        </h3>
-        <div class="mb-4">
-          <span id="price-elite" class="text-4xl font-extrabold text-purple-600 dark:text-purple-400">£150</span>
-          <span class="block text-sm text-purple-500 dark:text-purple-300">per month</span>
+        <!-- Elite Plan -->
+        <div class="relative bg-[#8ac6ff] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300">
+          <span id="discount-elite" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 18%</span>
+          <div class="absolute top-2 left-4 bg-orange-500 text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
+          <h3 class="text-2xl font-bold mb-1 relative inline-block">
+            <span class="absolute inset-0 text-[#ff8ac7]" style="text-shadow: 0 0 10px #ff8ac7, 0 0 20px #ff8ac7; z-index: -1;">Elite</span>
+            <span class="relative bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text">Elite</span>
+          </h3>
+          <div class="mb-4">
+            <span id="price-elite" class="text-4xl font-extrabold text-purple-400">£150</span>
+            <span class="block text-sm text-purple-300">per month</span>
+          </div>
+          <button class="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white font-semibold py-2 rounded hover:brightness-110 transition">Start Elite</button>
+          <ul class="mt-6 space-y-3 text-left text-sm text-purple-300">
+            <li>✔ Everything in Essential</li>
+            <li>✔ Example Answers / FAQs</li>
+            <li>✔ Multilingual support</li>
+            <li>✔ 5,000 messages / month</li>
+            <li>✔ 3 chatbots</li>
+            <li>✔ Priority support</li>
+            <li>✔ Preset style themes & personalities</li>
+            <li>✔ Regular analytics + premade dashboard</li>
+            <li>✔ Includes Aura AI branding</li>
+          </ul>
         </div>
-        <button class="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white font-semibold py-2 rounded hover:brightness-110 transition">Start Elite</button>
-        <ul class="mt-6 space-y-3 text-left text-sm">
-          <li class="text-purple-700 dark:text-purple-300">✔ Everything in Essential</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Example Answers / FAQs</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Multilingual support</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ 5,000 messages / month</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ 3 chatbots</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Priority support</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Preset style themes & personalities</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Regular analytics + premade dashboard</li>
-          <li class="text-purple-700 dark:text-purple-300">✔ Includes Aura AI branding</li>
-        </ul>
-      </div>
 
-
-
-
-    <!-- Executive Plan -->
-    <div class="relative bg-[#8a8888] dark:bg-gradient-to-br dark:from-[#1f1f1f] dark:via-[#212222] dark:to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-8 hover:ring-2 hover:ring-yellow-400/30 transform hover:-translate-y-2 transition duration-300">
-      <span id="discount-executive" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 20%</span>
-      <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
-      <div class="mb-4">
-        <div>
-        <span id="price-executive" class="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span>
-        <span class="block text-sm text-yellow-300 dark:text-yellow-200">per month</span>
+        <!-- Executive Plan -->
+        <div class="relative dark:bg-gradient-to-br dark:from-[#1f1f1f] dark:via-[#212222] dark:to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-8 hover:ring-2 hover:ring-yellow-400/30 transform hover:-translate-y-2 transition duration-300">
+          <span id="discount-executive" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 20%</span>
+          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
+          <div class="mb-4">
+            <span id="price-executive" class="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span>
+            <span class="block text-sm text-yellow-200">per month</span>
+          </div>
+          <button class="w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 hover:brightness-110 text-gray-900 font-semibold py-2 rounded transition">Contact Sales</button>
+          <ul class="mt-6 space-y-3 text-left text-sm text-yellow-200">
+            <li>✔ Everything in Elite & Essential</li>
+            <li>✔ Unlimited messages</li>
+            <li>✔ 24-hour support turnaround</li>
+            <li>✔ Custom widget design</li>
+            <li>✔ Custom chatbot personalities</li>
+            <li>✔ Full analytics suite</li>
+            <li>✔ Advanced AI-powered dashboard</li>
+            <li>✔ Your own branding (white-label)</li>
+          </ul>
         </div>
-      </div>
-      <button class="w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 hover:brightness-110 text-gray-900 font-semibold py-2 rounded transition">Contact Sales</button>
-      <ul class="mt-6 space-y-3 text-left text-sm">
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Everything in Elite & Essential</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Unlimited messages</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ 24-hour support turnaround</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Custom widget design</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Custom chatbot personalities</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Full analytics suite</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Advanced AI-powered dashboard</li>
-        <li class="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">✔ Your own branding (white-label)</li>
-      </ul>
-    </div>
 
       </div>
     </div>
@@ -216,24 +219,6 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      html.classList.add('dark');
-      themeToggle.textContent = '☀️';
-    } else {
-      html.classList.remove('dark');
-      themeToggle.textContent = '🌙';
-    }
-    themeToggle.addEventListener('click', () => {
-      html.classList.toggle('dark');
-      const isDark = html.classList.contains('dark');
-      themeToggle.textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-
     const toggle = document.getElementById('billing-toggle');
     const prices = {
       essential: { monthly: 50, discounted: 50 * 0.85 },
@@ -250,6 +235,8 @@
       elite: document.getElementById('discount-elite'),
       executive: document.getElementById('discount-executive')
     };
+
+    const getPriceValue = (el) => parseInt(el.textContent.replace(/[^\d]/g, ''));
 
     function animatePrice(el, from, to, duration = 300) {
       const start = performance.now();
@@ -271,9 +258,9 @@
 
     toggle.addEventListener('change', () => {
       const isYearly = toggle.checked;
-      animatePrice(priceEls.essential, parseInt(priceEls.essential.textContent.slice(1)), isYearly ? prices.essential.discounted : prices.essential.monthly);
-      animatePrice(priceEls.elite, parseInt(priceEls.elite.textContent.slice(1)), isYearly ? prices.elite.discounted : prices.elite.monthly);
-      animatePrice(priceEls.executive, parseInt(priceEls.executive.textContent.slice(1)), isYearly ? prices.executive.discounted : prices.executive.monthly);
+      animatePrice(priceEls.essential, getPriceValue(priceEls.essential), isYearly ? prices.essential.discounted : prices.essential.monthly);
+      animatePrice(priceEls.elite, getPriceValue(priceEls.elite), isYearly ? prices.elite.discounted : prices.elite.monthly);
+      animatePrice(priceEls.executive, getPriceValue(priceEls.executive), isYearly ? prices.executive.discounted : prices.executive.monthly);
       updateDiscountBadges(isYearly);
     });
 
@@ -285,7 +272,7 @@
     const typingEl = document.querySelector('.typing-text');
     setTimeout(() => {
       typingEl.classList.add('finished');
-    }, 4500); // match 4s typing + 0.5s blink buffer
+    }, 4500);
   });
 </script>
 
