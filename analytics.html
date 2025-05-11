@@ -4,10 +4,76 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analytics Dashboard</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js"></script>
+
+  <!-- Firebase SDK (Module Support) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-auth.js";
+
+    // ✅ Replace with your actual Firebase project config
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Handle login form submit
+    document.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.querySelector('input[type="email"]').value;
+      const password = document.querySelector('input[type="password"]').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        document.getElementById("auth-container").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+      } catch (error) {
+        alert("Login failed: " + error.message);
+      }
+    });
+
+    // Handle form toggling & sign up
+    window.toggleForm = function (type) {
+      const container = document.getElementById("auth-container");
+
+      if (type === "signup") {
+        container.innerHTML = document.getElementById("signup-form").innerHTML;
+        document.querySelector("form").addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.querySelector('input[type="email"]').value;
+          const password = document.querySelector('input[type="password"]').value;
+
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            alert("Account created! You can now log in.");
+            location.reload();
+          } catch (error) {
+            alert("Sign-up failed: " + error.message);
+          }
+        });
+      } else if (type === "forgot") {
+        container.innerHTML = document.getElementById("forgot-form").innerHTML;
+      } else {
+        location.reload();
+      }
+    };
+
+    // Logout
+    window.logout = async function () {
+      await signOut(auth);
+      location.reload();
+    };
+  </script>
 </head>
+
 <body class="bg-gray-900 text-white">
 
   <!-- Simulated Auth Page -->
