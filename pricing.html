@@ -274,6 +274,14 @@
     updateDiscountBadges(toggle.checked);
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const typingEl = document.querySelector('.typing-text');
+    setTimeout(() => {
+      typingEl.classList.add('finished');
+    }, 4500); // match 4s typing + 0.5s blink buffer
+  });
+</script>
 
 </body>
 </html>
