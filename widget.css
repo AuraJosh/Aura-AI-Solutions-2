@@ -1,3 +1,8 @@
+/**
+ * Business FAQ Chatbot Widget Styles
+ * These styles can be used as an alternative to the inline styles in widget.js
+ */
+
 .business-chat-widget {
   position: fixed;
   bottom: 20px;
@@ -17,7 +22,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #4a90e2;
+  background-color: var(--primary-color, #4a90e2);
   color: white;
   border: none;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
@@ -54,7 +59,7 @@
 }
 
 .widget-chat-header {
-  background-color: #4a90e2;
+  background-color: var(--primary-color, #4a90e2);
   color: white;
   padding: 15px;
   display: flex;
@@ -95,7 +100,7 @@
 
 .user-message {
   align-self: flex-end;
-  background-color: #4a90e2;
+  background-color: var(--primary-color, #4a90e2);
   color: white;
   border-bottom-right-radius: 5px;
 }
@@ -126,7 +131,7 @@
   background-color: transparent;
   border: none;
   margin-left: 10px;
-  color: #4a90e2;
+  color: var(--primary-color, #4a90e2);
   cursor: pointer;
 }
 
@@ -149,6 +154,7 @@
 .loading-dots span:nth-child(1) {
   animation-delay: -0.32s;
 }
+
 .loading-dots span:nth-child(2) {
   animation-delay: -0.16s;
 }
