@@ -69,9 +69,12 @@
 <!-- Header -->
 <header class="fixed w-full bg-white dark:bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex justify-between items-center p-4">
-    <a href="index.html" class="flex items-center space-x-2">
-      <img src="logo-light.png" alt="Aura AI Logo" class="h-20 w-auto block dark:hidden">
-      <img src="logo-dark.png" alt="Aura AI Logo Dark" class="h-20 w-auto hidden dark:block">
+    <a href="index.html" class="flex items-center space-x-4">
+    <div class="relative h-20 w-[150px]">
+      <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block dark:hidden">
+      <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
+    </div>
+      <span class="typing-text text-sm md:text-base text-gray-800 dark:text-white">Aura AI Solutions</span>
     </a>
     <nav class="hidden md:flex space-x-6">
       <a href="index.html" class="hover:text-primary">Home</a>
