@@ -51,9 +51,13 @@ body {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  border-right: 2px solid;
   font-family: 'SF Pro Display', sans-serif;
   animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
+  border-right: 2px solid;
+}
+
+.typing-text.finished {
+  border-right: none;
 }
 
 @keyframes typing {
@@ -64,6 +68,7 @@ body {
 @keyframes blink {
   50% { border-color: transparent }
 }
+
 
 
 
