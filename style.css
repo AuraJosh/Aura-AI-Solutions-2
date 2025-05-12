@@ -77,18 +77,20 @@ body {
   }
   50% {
     opacity: 1;
-    filter: blur(8px);
+    filter: blur(10px);
     transform: scale(1.05);
   }
 }
 
 .elite-title {
   position: relative;
-  color: transparent;
+  display: inline-block;
+  font-weight: 700;
   background: linear-gradient(to right, #c084fc, #8b5cf6, #6366f1);
   -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-weight: bold;
+  color: transparent;
 }
 
 .elite-title::before {
@@ -96,9 +98,9 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: -1;
+  font-weight: 700;
   color: #ff8ac7;
-  font-weight: bold;
+  z-index: -1;
   pointer-events: none;
   filter: blur(6px);
   opacity: 0.8;
