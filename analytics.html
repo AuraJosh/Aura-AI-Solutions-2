@@ -58,14 +58,15 @@
   <!-- Authenticated Dashboard Page -->
   <div id="dashboard" class="hidden relative w-full h-screen overflow-hidden">
 
-    <!-- Background Video + Overlay -->
+   <!-- Background Wrapper (video + overlay only) -->
     <div class="absolute inset-0 z-0">
       <video autoplay loop muted class="w-full h-full object-cover">
         <source src="background.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      <div class="absolute inset-0 bg-black/60"></div>
+      <div class="absolute inset-0 bg-black/60 z-0"></div> <!-- overlay safely under content -->
     </div>
+
 
     <!-- Header -->
     <header class="fixed w-full bg-[#060d1f] shadow z-20">
