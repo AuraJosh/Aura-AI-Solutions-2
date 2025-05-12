@@ -6,106 +6,42 @@
   <title>Analytics Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white overflow-auto">
+<body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
-  <!-- Auth Container -->
-  <div id="auth-container" class="min-h-screen flex items-center justify-center">
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
-      <h2 class="text-2xl font-bold mb-6 text-center">Sign In</h2>
-      <form id="login-form">
-        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
-        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
-        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-semibold">Sign In</button>
-      </form>
-      <div class="flex justify-between mt-4 text-sm">
-        <button onclick="toggleForm('signup')" class="text-blue-400 hover:underline">Sign Up</button>
-        <button onclick="toggleForm('forgot')" class="text-blue-400 hover:underline">Forgot Password?</button>
+  <!-- Header -->
+  <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+    <div class="container mx-auto flex items-center justify-between p-4">
+      <div class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+        </div>
+        <span class="text-white text-base">Aura AI Solutions</span>
       </div>
+      <h1 class="text-white font-semibold text-lg">Analytics Dashboard</h1>
+      <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
     </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-40 px-4 flex justify-center relative z-10">
+    <div class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg">
+      <!-- Future analytics will go here -->
+    </div>
+  </main>
+
+  <!-- Background Video -->
+  <div class="fixed inset-0 -z-10 pointer-events-none">
+    <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+      <source src="background.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div class="absolute inset-0 bg-black/60"></div>
   </div>
 
-  <!-- Signup Template -->
-  <template id="signup-form">
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
-      <h2 class="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-      <form id="signup-form-instance">
-        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
-        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
-        <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded font-semibold">Sign Up</button>
-      </form>
-      <div class="mt-4 text-sm text-center">
-        <button onclick="toggleForm('login')" class="text-blue-400 hover:underline">Back to Sign In</button>
-      </div>
-    </div>
-  </template>
-
-  <!-- Forgot Password Template -->
-  <template id="forgot-form">
-    <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
-      <h2 class="text-2xl font-bold mb-6 text-center">Reset Password</h2>
-      <form>
-        <input type="email" placeholder="Enter your email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
-        <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 p-3 rounded font-semibold">Reset</button>
-      </form>
-      <div class="mt-4 text-sm text-center">
-        <button onclick="toggleForm('login')" class="text-blue-400 hover:underline">Back to Sign In</button>
-      </div>
-    </div>
-  </template>
-
-  <!-- Authenticated Dashboard Page -->
-  <div id="dashboard" class="hidden relative z-10 w-full min-h-screen">
-
-    <!-- Header -->
-    <header class="fixed w-full bg-[#060d1f] shadow z-20">
-      <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="flex items-center space-x-4 flex-1">
-          <a href="#" class="flex items-center space-x-4">
-            <div class="relative h-20 w-[150px]">
-              <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-              <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
-            </div>
-            <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-          </a>
-        </div>
-
-        <div class="hidden md:flex justify-center flex-1">
-          <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
-        </div>
-
-        <div class="flex items-center justify-end space-x-4 flex-1">
-          <button id="logout-btn" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="relative z-20 pt-40 px-4 flex justify-center">
-      <div class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg">
-        <!-- Future analytics will go here -->
-      </div>
-    </main>
-
-    <!-- Background -->
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-      <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-        <source src="background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div class="absolute inset-0 bg-black/60"></div>
-    </div>
-  </div>
-
-  <!-- Firebase Auth Logic -->
+  <!-- Firebase Auth -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
@@ -113,82 +49,28 @@
       projectId: "aura-ai-85b65",
       storageBucket: "aura-ai-85b65.appspot.com",
       messagingSenderId: "492492484793",
-      appId: "1:492492484793:web:7f9038d50f523241536b68",
-      measurementId: "G-JS3EW44B2Y"
+      appId: "1:492492484793:web:7f9038d50f523241536b68"
     };
 
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const auth = getAuth(app);
 
-    window.addEventListener("DOMContentLoaded", () => {
-      const loginForm = document.getElementById("login-form");
-      if (loginForm) {
-        loginForm.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const email = loginForm.querySelector('input[type="email"]').value;
-          const password = loginForm.querySelector('input[type="password"]').value;
-
-          try {
-            await signInWithEmailAndPassword(auth, email, password);
-            document.getElementById("auth-container").classList.add("hidden");
-            document.getElementById("dashboard").classList.remove("hidden");
-
-            // ✅ Add logout listener AFTER dashboard is shown
-            const logoutBtn = document.getElementById("logout-btn");
-            if (logoutBtn) {
-              logoutBtn.addEventListener("click", async () => {
-                try {
-                  await signOut(auth);
-                  location.reload();
-                } catch (err) {
-                  alert("Logout failed: " + err.message);
-                }
-              });
-            }
-
-          } catch (error) {
-            if (error.code === 'auth/user-not-found') {
-              alert("No account found with this email.");
-            } else if (error.code === 'auth/wrong-password') {
-              alert("Incorrect password.");
-            } else {
-              alert("Login failed: " + error.message);
-            }
-          }
-        });
+    // Protect this page
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
       }
     });
 
-    window.toggleForm = function (type) {
-      const container = document.getElementById("auth-container");
-
-      if (type === 'signup') {
-        container.innerHTML = document.getElementById("signup-form").innerHTML;
-
-        setTimeout(() => {
-          const signupForm = document.getElementById("signup-form-instance");
-          signupForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = signupForm.querySelector('input[type="email"]').value;
-            const password = signupForm.querySelector('input[type="password"]').value;
-
-            try {
-              await createUserWithEmailAndPassword(auth, email, password);
-              alert("Account created. Please log in.");
-              location.reload();
-            } catch (error) {
-              alert("Sign-up failed: " + error.message);
-            }
-          });
-        }, 0);
-      } else if (type === 'forgot') {
-        container.innerHTML = document.getElementById("forgot-form").innerHTML;
-      } else {
-        location.reload();
+    // Logout button
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (err) {
+        alert("Logout failed: " + err.message);
       }
-    };
+    });
   </script>
-
 </body>
 </html>
