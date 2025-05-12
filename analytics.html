@@ -59,7 +59,6 @@
     <!-- Header -->
     <header class="fixed w-full bg-[#060d1f] shadow z-20">
       <div class="container mx-auto flex items-center justify-between p-4">
-        <!-- Logo -->
         <div class="flex items-center space-x-4 flex-1">
           <a href="#" class="flex items-center space-x-4">
             <div class="relative h-20 w-[150px]">
@@ -70,12 +69,10 @@
           </a>
         </div>
 
-        <!-- Title -->
         <div class="hidden md:flex justify-center flex-1">
           <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
         </div>
 
-        <!-- Logout -->
         <div class="flex items-center justify-end space-x-4 flex-1">
           <button id="logout-btn" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
         </div>
@@ -89,7 +86,7 @@
       </div>
     </main>
 
-    <!-- Background moved below content -->
+    <!-- Background -->
     <div class="fixed inset-0 -z-10 pointer-events-none">
       <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
         <source src="background.mp4" type="video/mp4" />
@@ -97,7 +94,7 @@
       </video>
       <div class="absolute inset-0 bg-black/60"></div>
     </div>
-
+  </div>
 
   <!-- Firebase Auth Logic -->
   <script type="module">
@@ -136,6 +133,20 @@
             await signInWithEmailAndPassword(auth, email, password);
             document.getElementById("auth-container").classList.add("hidden");
             document.getElementById("dashboard").classList.remove("hidden");
+
+            // ✅ Add logout listener AFTER dashboard is shown
+            const logoutBtn = document.getElementById("logout-btn");
+            if (logoutBtn) {
+              logoutBtn.addEventListener("click", async () => {
+                try {
+                  await signOut(auth);
+                  location.reload();
+                } catch (err) {
+                  alert("Logout failed: " + err.message);
+                }
+              });
+            }
+
           } catch (error) {
             if (error.code === 'auth/user-not-found') {
               alert("No account found with this email.");
@@ -144,18 +155,6 @@
             } else {
               alert("Login failed: " + error.message);
             }
-          }
-        });
-      }
-
-      const logoutBtn = document.getElementById("logout-btn");
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", async () => {
-          try {
-            await signOut(auth);
-            location.reload();
-          } catch (err) {
-            alert("Logout failed: " + err.message);
           }
         });
       }
