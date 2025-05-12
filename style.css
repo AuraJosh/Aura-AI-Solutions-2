@@ -105,8 +105,8 @@ body {
   filter: blur(6px);
   opacity: 0.8;
   animation: pulse-glow 3s ease-in-out infinite;
+  white-space: nowrap;
 }
-
 
 
 /* Do NOT style header/footer directly here — Tailwind handles that */
