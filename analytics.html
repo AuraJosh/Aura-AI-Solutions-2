@@ -90,14 +90,14 @@
     </main>
 
     <!-- Background moved below content -->
-    <div class="absolute inset-0 -z-10">
-      <video autoplay loop muted class="w-full h-full object-cover">
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+      <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
         <source src="background.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
-      <div class="absolute inset-0 bg-black/60 pointer-events-none"></div>
+      <div class="absolute inset-0 bg-black/60"></div>
     </div>
-  </div>
+
 
   <!-- Firebase Auth Logic -->
   <script type="module">
