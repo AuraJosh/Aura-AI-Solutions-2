@@ -103,32 +103,34 @@
 
   <!-- Firebase Auth Logic -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-      authDomain: "aura-ai-85b65.firebaseapp.com",
-      projectId: "aura-ai-85b65",
-      storageBucket: "aura-ai-85b65.appspot.com",
-      messagingSenderId: "492492484793",
-      appId: "1:492492484793:web:7f9038d50f523241536b68",
-      measurementId: "G-JS3EW44B2Y"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+    authDomain: "aura-ai-85b65.firebaseapp.com",
+    projectId: "aura-ai-85b65",
+    storageBucket: "aura-ai-85b65.appspot.com",
+    messagingSenderId: "492492484793",
+    appId: "1:492492484793:web:7f9038d50f523241536b68",
+    measurementId: "G-JS3EW44B2Y"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
 
-    // Login form handling
-    window.addEventListener("DOMContentLoaded", () => {
-      const loginForm = document.getElementById("login-form");
+  // One unified DOMContentLoaded
+  window.addEventListener("DOMContentLoaded", () => {
+    // Login
+    const loginForm = document.getElementById("login-form");
+    if (loginForm) {
       loginForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         const email = loginForm.querySelector('input[type="email"]').value;
@@ -148,47 +150,52 @@
           }
         }
       });
-    });
-
-    // Toggle form views
-    window.toggleForm = function (type) {
-      const container = document.getElementById("auth-container");
-
-      if (type === 'signup') {
-        container.innerHTML = document.getElementById("signup-form").innerHTML;
-
-        setTimeout(() => {
-          const signupForm = document.getElementById("signup-form-instance");
-          signupForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-            const email = signupForm.querySelector('input[type="email"]').value;
-            const password = signupForm.querySelector('input[type="password"]').value;
-
-            try {
-              await createUserWithEmailAndPassword(auth, email, password);
-              alert("Account created. Please log in.");
-              location.reload();
-            } catch (error) {
-              alert("Sign-up failed: " + error.message);
-            }
-          });
-        }, 0);
-      } else if (type === 'forgot') {
-        container.innerHTML = document.getElementById("forgot-form").innerHTML;
-      } else {
-        location.reload();
-      }
-    };
+    }
 
     // Logout
-    window.logout = async function () {
-      try {
-        await signOut(auth);
-        location.reload();
-      } catch (err) {
-        alert("Logout failed: " + err.message);
-      }
-    };
-  </script>
+    const logoutBtn = document.getElementById("logout-btn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", async () => {
+        try {
+          await signOut(auth);
+          location.reload();
+        } catch (err) {
+          alert("Logout failed: " + err.message);
+        }
+      });
+    }
+  });
+
+  // Toggle forms & sign-up
+  window.toggleForm = function (type) {
+    const container = document.getElementById("auth-container");
+
+    if (type === 'signup') {
+      container.innerHTML = document.getElementById("signup-form").innerHTML;
+
+      setTimeout(() => {
+        const signupForm = document.getElementById("signup-form-instance");
+        signupForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = signupForm.querySelector('input[type="email"]').value;
+          const password = signupForm.querySelector('input[type="password"]').value;
+
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            alert("Account created. Please log in.");
+            location.reload();
+          } catch (error) {
+            alert("Sign-up failed: " + error.message);
+          }
+        });
+      }, 0);
+    } else if (type === 'forgot') {
+      container.innerHTML = document.getElementById("forgot-form").innerHTML;
+    } else {
+      location.reload();
+    }
+  };
+</script>
+
 </body>
 </html>
