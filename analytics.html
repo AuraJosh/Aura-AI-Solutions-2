@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analytics Dashboard</title>
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 text-white">
@@ -58,16 +56,6 @@
   <!-- Authenticated Dashboard Page -->
   <div id="dashboard" class="hidden relative z-10 w-full h-screen overflow-hidden">
 
-   <!-- Background Wrapper (video + overlay only) -->
-    <div class="absolute inset-0 z-0">
-      <video autoplay loop muted class="w-full h-full object-cover">
-        <source src="background.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      <div class="absolute inset-0 bg-black/60 z-0 pointer-events-none"></div>
-    </div>
-
-
     <!-- Header -->
     <header class="fixed w-full bg-[#060d1f] shadow z-20">
       <div class="container mx-auto flex items-center justify-between p-4">
@@ -100,103 +88,108 @@
         <!-- Future analytics will go here -->
       </div>
     </main>
+
+    <!-- Background moved below content -->
+    <div class="absolute inset-0 -z-10">
+      <video autoplay loop muted class="w-full h-full object-cover">
+        <source src="background.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div class="absolute inset-0 bg-black/60 pointer-events-none"></div>
+    </div>
   </div>
 
   <!-- Firebase Auth Logic -->
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-    authDomain: "aura-ai-85b65.firebaseapp.com",
-    projectId: "aura-ai-85b65",
-    storageBucket: "aura-ai-85b65.appspot.com",
-    messagingSenderId: "492492484793",
-    appId: "1:492492484793:web:7f9038d50f523241536b68",
-    measurementId: "G-JS3EW44B2Y"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+      authDomain: "aura-ai-85b65.firebaseapp.com",
+      projectId: "aura-ai-85b65",
+      storageBucket: "aura-ai-85b65.appspot.com",
+      messagingSenderId: "492492484793",
+      appId: "1:492492484793:web:7f9038d50f523241536b68",
+      measurementId: "G-JS3EW44B2Y"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
 
-  // One unified DOMContentLoaded
-  window.addEventListener("DOMContentLoaded", () => {
-    // Login
-    const loginForm = document.getElementById("login-form");
-    if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = loginForm.querySelector('input[type="email"]').value;
-        const password = loginForm.querySelector('input[type="password"]').value;
-
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-          document.getElementById("auth-container").classList.add("hidden");
-          document.getElementById("dashboard").classList.remove("hidden");
-        } catch (error) {
-          if (error.code === 'auth/user-not-found') {
-            alert("No account found with this email.");
-          } else if (error.code === 'auth/wrong-password') {
-            alert("Incorrect password.");
-          } else {
-            alert("Login failed: " + error.message);
-          }
-        }
-      });
-    }
-
-    // Logout
-    const logoutBtn = document.getElementById("logout-btn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", async () => {
-        try {
-          await signOut(auth);
-          location.reload();
-        } catch (err) {
-          alert("Logout failed: " + err.message);
-        }
-      });
-    }
-  });
-
-  // Toggle forms & sign-up
-  window.toggleForm = function (type) {
-    const container = document.getElementById("auth-container");
-
-    if (type === 'signup') {
-      container.innerHTML = document.getElementById("signup-form").innerHTML;
-
-      setTimeout(() => {
-        const signupForm = document.getElementById("signup-form-instance");
-        signupForm.addEventListener("submit", async (e) => {
+    window.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("login-form");
+      if (loginForm) {
+        loginForm.addEventListener("submit", async (e) => {
           e.preventDefault();
-          const email = signupForm.querySelector('input[type="email"]').value;
-          const password = signupForm.querySelector('input[type="password"]').value;
+          const email = loginForm.querySelector('input[type="email"]').value;
+          const password = loginForm.querySelector('input[type="password"]').value;
 
           try {
-            await createUserWithEmailAndPassword(auth, email, password);
-            alert("Account created. Please log in.");
-            location.reload();
+            await signInWithEmailAndPassword(auth, email, password);
+            document.getElementById("auth-container").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
           } catch (error) {
-            alert("Sign-up failed: " + error.message);
+            if (error.code === 'auth/user-not-found') {
+              alert("No account found with this email.");
+            } else if (error.code === 'auth/wrong-password') {
+              alert("Incorrect password.");
+            } else {
+              alert("Login failed: " + error.message);
+            }
           }
         });
-      }, 0);
-    } else if (type === 'forgot') {
-      container.innerHTML = document.getElementById("forgot-form").innerHTML;
-    } else {
-      location.reload();
-    }
-  };
-</script>
+      }
+
+      const logoutBtn = document.getElementById("logout-btn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", async () => {
+          try {
+            await signOut(auth);
+            location.reload();
+          } catch (err) {
+            alert("Logout failed: " + err.message);
+          }
+        });
+      }
+    });
+
+    window.toggleForm = function (type) {
+      const container = document.getElementById("auth-container");
+
+      if (type === 'signup') {
+        container.innerHTML = document.getElementById("signup-form").innerHTML;
+
+        setTimeout(() => {
+          const signupForm = document.getElementById("signup-form-instance");
+          signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = signupForm.querySelector('input[type="email"]').value;
+            const password = signupForm.querySelector('input[type="password"]').value;
+
+            try {
+              await createUserWithEmailAndPassword(auth, email, password);
+              alert("Account created. Please log in.");
+              location.reload();
+            } catch (error) {
+              alert("Sign-up failed: " + error.message);
+            }
+          });
+        }, 0);
+      } else if (type === 'forgot') {
+        container.innerHTML = document.getElementById("forgot-form").innerHTML;
+      } else {
+        location.reload();
+      }
+    };
+  </script>
 
 </body>
 </html>
