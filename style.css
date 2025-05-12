@@ -85,12 +85,15 @@ body {
 .elite-title {
   position: relative;
   display: inline-block;
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1.5rem; /* Matches text-2xl (text-2xl = 1.5rem) */
+  line-height: 2rem;
   background: linear-gradient(to right, #c084fc, #8b5cf6, #6366f1);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent;
+  font-family: 'SF Pro Display', sans-serif;
 }
 
 .elite-title::before {
@@ -98,15 +101,19 @@ body {
   position: absolute;
   top: 0;
   left: 0;
-  font-weight: 700;
+  font-weight: 900;
+  font-size: 1.5rem; /* Match exactly */
+  line-height: 2rem;
+  font-family: 'SF Pro Display', sans-serif;
   color: #ff8ac7;
   z-index: -1;
   pointer-events: none;
-  filter: blur(6px);
-  opacity: 0.8;
+  filter: blur(10px);
+  opacity: 0.9;
   animation: pulse-glow 3s ease-in-out infinite;
   white-space: nowrap;
 }
+
 
 
 /* Do NOT style header/footer directly here — Tailwind handles that */
