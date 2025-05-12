@@ -117,11 +117,89 @@
     }
 
     // Simulated login (replace with real auth logic)
-    document.addEventListener('submit', function (e) {
-      e.preventDefault();
-      document.getElementById('auth-container').classList.add('hidden');
-      document.getElementById('dashboard').classList.remove('hidden');
-    });
+    <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+    authDomain: "aura-ai-85b65.firebaseapp.com",
+    projectId: "aura-ai-85b65",
+    storageBucket: "aura-ai-85b65.appspot.com",
+    messagingSenderId: "492492484793",
+    appId: "1:492492484793:web:7f9038d50f523241536b68",
+    measurementId: "G-JS3EW44B2Y"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+
+  // ✅ Real Firebase Login
+  document.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const email = document.querySelector('input[type="email"]').value;
+    const password = document.querySelector('input[type="password"]').value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      document.getElementById("auth-container").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+    } catch (error) {
+      if (error.code === 'auth/user-not-found') {
+        alert("No account found with this email.");
+      } else if (error.code === 'auth/wrong-password') {
+        alert("Incorrect password.");
+      } else {
+        alert("Login failed: " + error.message);
+      }
+    }
+  });
+
+  // ✅ Toggle Forms and Handle Sign-Up
+  window.toggleForm = function (type) {
+    const container = document.getElementById("auth-container");
+
+    if (type === 'signup') {
+      container.innerHTML = document.getElementById("signup-form").innerHTML;
+
+      document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.querySelector('input[type="email"]').value;
+        const password = document.querySelector('input[type="password"]').value;
+
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          alert("Account created. Please log in.");
+          location.reload();
+        } catch (error) {
+          alert("Sign-up failed: " + error.message);
+        }
+      });
+    } else if (type === 'forgot') {
+      container.innerHTML = document.getElementById("forgot-form").innerHTML;
+    } else {
+      location.reload();
+    }
+  };
+
+  // ✅ Logout
+  window.logout = async function () {
+    try {
+      await signOut(auth);
+      location.reload();
+    } catch (err) {
+      alert("Logout failed: " + err.message);
+    }
+  };
+</script>
+
 
     function logout() {
       location.reload(); // Simulate logout
