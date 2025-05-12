@@ -196,11 +196,16 @@
   };
 
   // Logout
+
   window.logout = async function () {
-    await signOut(auth);
-    location.reload();
+    try {
+      await signOut(auth);
+      location.reload();
+    } catch (err) {
+      alert("Logout failed: " + err.message);
+    }
   };
-</script>
+
 
   
 </body>
