@@ -8,16 +8,15 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="bg-gray-900 text-white">
 
-  <!-- Simulated Auth Page -->
+  <!-- Auth Container -->
   <div id="auth-container" class="min-h-screen flex items-center justify-center">
     <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
       <h2 class="text-2xl font-bold mb-6 text-center">Sign In</h2>
-      <form>
-        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
-        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+      <form id="login-form">
+        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
+        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-semibold">Sign In</button>
       </form>
       <div class="flex justify-between mt-4 text-sm">
@@ -27,14 +26,13 @@
     </div>
   </div>
 
-  <!-- Auth Variants (Sign Up, Forgot Password) -->
+  <!-- Signup Template -->
   <template id="signup-form">
     <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
       <h2 class="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-      <form>
-        <input type="text" placeholder="Name" class="w-full p-3 mb-4 bg-gray-700 rounded" />
-        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
-        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+      <form id="signup-form-instance">
+        <input type="email" placeholder="Email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
+        <input type="password" placeholder="Password" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 p-3 rounded font-semibold">Sign Up</button>
       </form>
       <div class="mt-4 text-sm text-center">
@@ -43,11 +41,12 @@
     </div>
   </template>
 
+  <!-- Forgot Password Template -->
   <template id="forgot-form">
     <div class="w-full max-w-md p-8 bg-gray-800 rounded-xl shadow-md">
       <h2 class="text-2xl font-bold mb-6 text-center">Reset Password</h2>
       <form>
-        <input type="email" placeholder="Enter your email" class="w-full p-3 mb-4 bg-gray-700 rounded" />
+        <input type="email" placeholder="Enter your email" class="w-full p-3 mb-4 bg-gray-700 rounded" required />
         <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 p-3 rounded font-semibold">Reset</button>
       </form>
       <div class="mt-4 text-sm text-center">
@@ -59,7 +58,7 @@
   <!-- Authenticated Dashboard Page -->
   <div id="dashboard" class="hidden relative w-full h-screen overflow-hidden">
 
-    <!-- Background Wrapper (video + overlay only) -->
+    <!-- Background Video + Overlay -->
     <div class="absolute inset-0 z-0">
       <video autoplay loop muted class="w-full h-full object-cover">
         <source src="background.mp4" type="video/mp4" />
@@ -68,10 +67,10 @@
       <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
-    <!-- Header (fixed at top) -->
+    <!-- Header -->
     <header class="fixed w-full bg-[#060d1f] shadow z-20">
       <div class="container mx-auto flex items-center justify-between p-4">
-        <!-- Left: Logo + Text -->
+        <!-- Logo -->
         <div class="flex items-center space-x-4 flex-1">
           <a href="#" class="flex items-center space-x-4">
             <div class="relative h-20 w-[150px]">
@@ -82,218 +81,114 @@
           </a>
         </div>
 
-        <!-- Center: Dashboard Title -->
+        <!-- Title -->
         <div class="hidden md:flex justify-center flex-1">
           <span class="text-lg font-semibold text-white">Analytics Dashboard</span>
         </div>
 
-        <!-- Right: Logout -->
+        <!-- Logout -->
         <div class="flex items-center justify-end space-x-4 flex-1">
           <button onclick="logout()" class="text-sm bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white">Logout</button>
         </div>
       </div>
     </header>
 
-    <!-- Main Analytics Container -->
+    <!-- Main Content -->
     <main class="relative z-20 pt-40 px-4 flex justify-center">
       <div class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg">
         <!-- Future analytics will go here -->
       </div>
     </main>
-
   </div>
 
-  <!-- JS Logic -->
-  <script>
-    function toggleForm(type) {
+  <!-- Firebase Auth Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+      authDomain: "aura-ai-85b65.firebaseapp.com",
+      projectId: "aura-ai-85b65",
+      storageBucket: "aura-ai-85b65.appspot.com",
+      messagingSenderId: "492492484793",
+      appId: "1:492492484793:web:7f9038d50f523241536b68",
+      measurementId: "G-JS3EW44B2Y"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
+
+    // Login form handling
+    window.addEventListener("DOMContentLoaded", () => {
+      const loginForm = document.getElementById("login-form");
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = loginForm.querySelector('input[type="email"]').value;
+        const password = loginForm.querySelector('input[type="password"]').value;
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          document.getElementById("auth-container").classList.add("hidden");
+          document.getElementById("dashboard").classList.remove("hidden");
+        } catch (error) {
+          if (error.code === 'auth/user-not-found') {
+            alert("No account found with this email.");
+          } else if (error.code === 'auth/wrong-password') {
+            alert("Incorrect password.");
+          } else {
+            alert("Login failed: " + error.message);
+          }
+        }
+      });
+    });
+
+    // Toggle form views
+    window.toggleForm = function (type) {
       const container = document.getElementById("auth-container");
+
       if (type === 'signup') {
         container.innerHTML = document.getElementById("signup-form").innerHTML;
+
+        setTimeout(() => {
+          const signupForm = document.getElementById("signup-form-instance");
+          signupForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = signupForm.querySelector('input[type="email"]').value;
+            const password = signupForm.querySelector('input[type="password"]').value;
+
+            try {
+              await createUserWithEmailAndPassword(auth, email, password);
+              alert("Account created. Please log in.");
+              location.reload();
+            } catch (error) {
+              alert("Sign-up failed: " + error.message);
+            }
+          });
+        }, 0);
       } else if (type === 'forgot') {
         container.innerHTML = document.getElementById("forgot-form").innerHTML;
       } else {
-        location.reload(); // Simple way to return to login
+        location.reload();
       }
-    }
+    };
 
-    // Simulated login (replace with real auth logic)
-    <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-    authDomain: "aura-ai-85b65.firebaseapp.com",
-    projectId: "aura-ai-85b65",
-    storageBucket: "aura-ai-85b65.appspot.com",
-    messagingSenderId: "492492484793",
-    appId: "1:492492484793:web:7f9038d50f523241536b68",
-    measurementId: "G-JS3EW44B2Y"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-
-  // ✅ Real Firebase Login
-  document.addEventListener("submit", async function (e) {
-    e.preventDefault();
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
-
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      document.getElementById("auth-container").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
-    } catch (error) {
-      if (error.code === 'auth/user-not-found') {
-        alert("No account found with this email.");
-      } else if (error.code === 'auth/wrong-password') {
-        alert("Incorrect password.");
-      } else {
-        alert("Login failed: " + error.message);
-      }
-    }
-  });
-
-  // ✅ Toggle Forms and Handle Sign-Up
-  window.toggleForm = function (type) {
-    const container = document.getElementById("auth-container");
-
-    if (type === 'signup') {
-      container.innerHTML = document.getElementById("signup-form").innerHTML;
-
-      document.querySelector("form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.querySelector('input[type="email"]').value;
-        const password = document.querySelector('input[type="password"]').value;
-
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert("Account created. Please log in.");
-          location.reload();
-        } catch (error) {
-          alert("Sign-up failed: " + error.message);
-        }
-      });
-    } else if (type === 'forgot') {
-      container.innerHTML = document.getElementById("forgot-form").innerHTML;
-    } else {
-      location.reload();
-    }
-  };
-
-  // ✅ Logout
-  window.logout = async function () {
-    try {
-      await signOut(auth);
-      location.reload();
-    } catch (err) {
-      alert("Logout failed: " + err.message);
-    }
-  };
-</script>
-
-
-    function logout() {
-      location.reload(); // Simulate logout
-    }
-  </script>
-
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-analytics.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-    authDomain: "aura-ai-85b65.firebaseapp.com",
-    projectId: "aura-ai-85b65",
-    storageBucket: "aura-ai-85b65.appspot.com",
-    messagingSenderId: "492492484793",
-    appId: "1:492492484793:web:7f9038d50f523241536b68",
-    measurementId: "G-JS3EW44B2Y"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-
-  // Listen to login form submit
-     document.addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const email = document.querySelector('input[type="email"]').value;
-      const password = document.querySelector('input[type="password"]').value;
-    
+    // Logout
+    window.logout = async function () {
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        document.getElementById("auth-container").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-      } catch (error) {
-        if (error.code === 'auth/user-not-found') {
-          alert("No account found with this email.");
-        } else if (error.code === 'auth/wrong-password') {
-          alert("Incorrect password. Please try again.");
-        } else if (error.code === 'auth/invalid-email') {
-          alert("Invalid email format.");
-        } else {
-          alert("Login failed: " + error.message);
-        }
+        await signOut(auth);
+        location.reload();
+      } catch (err) {
+        alert("Logout failed: " + err.message);
       }
-    });
-
-
-  // Toggle form views & sign up
-  window.toggleForm = function (type) {
-    const container = document.getElementById("auth-container");
-
-    if (type === 'signup') {
-      container.innerHTML = document.getElementById("signup-form").innerHTML;
-
-      // Attach Firebase sign-up handler
-      document.querySelector("form").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const email = document.querySelector('input[type="email"]').value;
-        const password = document.querySelector('input[type="password"]').value;
-
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          alert("Account created. Please log in.");
-          location.reload();
-        } catch (error) {
-          alert("Sign-up failed: " + error.message);
-        }
-      });
-    } else if (type === 'forgot') {
-      container.innerHTML = document.getElementById("forgot-form").innerHTML;
-    } else {
-      location.reload(); // reset to login
-    }
-  };
-
-  // Logout
-
-  window.logout = async function () {
-    try {
-      await signOut(auth);
-      location.reload();
-    } catch (err) {
-      alert("Logout failed: " + err.message);
-    }
-  };
-
-
-  
+    };
+  </script>
 </body>
 </html>
