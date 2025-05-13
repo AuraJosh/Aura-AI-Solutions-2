@@ -27,11 +27,8 @@
   Your browser does not support the video tag.
 </video>
 
-<!-- Dark Overlay -->
-<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
-
 <!-- Header -->
-<header class="fixed w-full bg-[#060d1f]/90 backdrop-blur shadow z-50">
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
     <div class="flex items-center space-x-4 flex-1">
       <a href="index.html" class="flex items-center space-x-4">
@@ -58,7 +55,7 @@
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900/90 backdrop-blur p-4 z-50 shadow-lg">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
     <a href="services.html" class="hover:text-primary font-semibold">Services</a>
@@ -78,7 +75,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
 
     <!-- Chatbot Service -->
-    <div class="p-10 bg-blue-900/50 rounded-3xl shadow-xl backdrop-blur transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
+    <div class="p-10 bg-blue-900 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
       <div class="flex items-start space-x-4">
         <div class="text-4xl">💬</div>
         <div>
@@ -92,7 +89,7 @@
     </div>
 
     <!-- Coming Soon -->
-    <div class="p-10 bg-gray-800/60 rounded-3xl shadow-xl backdrop-blur transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
+    <div class="p-10 bg-gray-800 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
       <div class="flex items-start space-x-4">
         <div class="text-4xl">🚀</div>
         <div>
@@ -109,7 +106,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-900/90 backdrop-blur text-gray-400 py-8 text-center relative z-10">
+<footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
   <div class="mb-4">
     <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
     <a href="#" class="mx-2 hover:text-white">Terms of Service</a>
@@ -122,20 +119,3 @@
   document.addEventListener('DOMContentLoaded', function () {
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
-    menuBtn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
-    });
-
-    // Chatbot
-    const chatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
-    });
-  });
-</script>
-
-</body>
-
-</html>
