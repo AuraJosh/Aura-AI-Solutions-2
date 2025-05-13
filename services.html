@@ -154,6 +154,16 @@
     }
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const typingEl = document.querySelector('.typing-text');
+    if (typingEl) {
+      setTimeout(() => {
+        typingEl.classList.add('finished');
+      }, 4500);
+    }
+  });
+</script>
 
 </body>
 </html>
