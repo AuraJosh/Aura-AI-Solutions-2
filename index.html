@@ -233,6 +233,16 @@
     }
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const typingEl = document.querySelector('.typing-text');
+    if (typingEl) {
+      setTimeout(() => {
+        typingEl.classList.add('finished');
+      }, 4500); // Matches the 4s typing + 0.5s for blink cycles
+    }
+  });
+</script>
 
 </body>
 </html>
