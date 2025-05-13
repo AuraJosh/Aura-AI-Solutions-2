@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -10,7 +10,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -23,8 +22,6 @@
   </script>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="widget.css">
-
-  <!-- Chatbot Widget Script -->
   <script src="widget.js"></script>
 
   <style>
@@ -41,19 +38,19 @@
   </style>
   <link rel="icon" href="favicon.png" type="image/png">
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<body class="bg-gray-900 text-gray-200">
 
 <!-- Header -->
-<header class="fixed w-full bg-white dark:bg-[#060d1f] shadow z-50">
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
 <div class="container mx-auto flex items-center justify-between p-4">
   <!-- Left: Logo + Text -->
   <div class="flex items-center space-x-4 flex-1">
     <a href="index.html" class="flex items-center space-x-4">
       <div class="relative h-20 w-[150px]">
-        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block dark:hidden">
-        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
+        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block hidden">
+        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
       </div>
-      <span class="typing-text text-sm md:text-base text-gray-800 dark:text-white">Aura AI Solutions</span>
+      <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
     </a>
   </div>
 
@@ -66,17 +63,16 @@
     <a href="contact.html" class="hover:text-primary">Contact</a>
   </nav>
 
-  <!-- Right: Theme toggle + Mobile menu -->
+  <!-- Right: Mobile menu only -->
   <div class="flex items-center justify-end space-x-4 flex-1">
     <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
-    <button id="theme-toggle" class="text-xl hover:text-primary focus:outline-none" title="Toggle dark mode">🌙</button>
   </div>
 </div>
 
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
     <a href="services.html" class="hover:text-primary">Services</a>
@@ -127,32 +123,10 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile Menu Toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
 
-    // Theme Toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-    if (useDark) {
-      html.classList.add('dark');
-      themeToggle.textContent = '☀️';
-    } else {
-      html.classList.remove('dark');
-      themeToggle.textContent = '🌙';
-    }
-    themeToggle.addEventListener('click', () => {
-      html.classList.toggle('dark');
-      const isDark = html.classList.contains('dark');
-      themeToggle.textContent = isDark ? '☀️' : '🌙';
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-
-    // Try Bot Button → Load + Show Chatbot
     const tryBtn = document.getElementById('try-bot-btn');
     let chatbotLaunched = false;
 
@@ -163,32 +137,28 @@
         }
         return;
       }
-    
+
       chatbotLaunched = true;
-    
       tryBtn.style.transition = 'opacity 0.4s ease';
       tryBtn.style.opacity = '0';
-    
+
       setTimeout(() => {
         tryBtn.style.display = 'none';
-    
+
         window.myChatWidget = new BusinessChatWidget({
           apiEndpoint: 'https://384f8lmpn2.execute-api.eu-north-1.amazonaws.com/prod/AURA-chatbot',
           widgetTitle: 'Aura AI Assistant',
           primaryColor: '#4a90e2',
           initialMessage: "Hello! I'm your AI assistant. How can I help you today?"
         });
-    
-        // Optional: slight delay to ensure open happens after init
+
         setTimeout(() => {
           window.myChatWidget.open();
         }, 100);
       }, 400);
     });
 
-
-
-    // Cursor Trail
+    // Cursor trail
     const trailLength = 12;
     const trail = [];
     for (let i = 0; i < trailLength; i++) {
@@ -222,8 +192,6 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       document.title = awayTitle;
-
-      // Optional: blink effect
       blinkInterval = setInterval(() => {
         document.title = document.title === awayTitle ? blinkTitle : awayTitle;
       }, 1000);
@@ -239,7 +207,7 @@
     if (typingEl) {
       setTimeout(() => {
         typingEl.classList.add('finished');
-      }, 4500); // Matches the 4s typing + 0.5s for blink cycles
+      }, 4500);
     }
   });
 </script>
