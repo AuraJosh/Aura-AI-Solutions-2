@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Home | Aura AI Solutions</title>
+  <title>Aura AI Solutions</title>
   <link rel="icon" href="data:,">
 
   <!-- Tailwind + Custom Styles -->
@@ -212,5 +212,27 @@
     animateTrail();
   });
 </script>
+<script>
+  const defaultTitle = document.title;
+  const awayTitle = "👋 Come back soon!";
+  const blinkTitle = "⚡ Chat with Aura AI...";
+
+  let blinkInterval;
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      document.title = awayTitle;
+
+      // Optional: blink effect
+      blinkInterval = setInterval(() => {
+        document.title = document.title === awayTitle ? blinkTitle : awayTitle;
+      }, 1000);
+    } else {
+      document.title = defaultTitle;
+      clearInterval(blinkInterval);
+    }
+  });
+</script>
+
 </body>
 </html>
