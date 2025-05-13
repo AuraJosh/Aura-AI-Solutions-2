@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Terms of Service | Aura AI Solutions</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #333;
+    }
+    h1, h2 {
+      color: #1a1a1a;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    p {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Terms of Service</h1>
+  <p><strong>Effective Date:</strong> [Insert Date]</p>
+
+  <p>
+    Welcome to Aura AI Solutions (“Company”, “we”, “our”, or “us”). These Terms of Service (“Terms”) govern your use of our website
+    <a href="https://auraai.uk" target="_blank" rel="noopener noreferrer">https://auraai.uk</a> (the “Site”) and any services or products provided through it.
+    By accessing or using our Site, you agree to be bound by these Terms. If you do not agree, please do not use our Site.
+  </p>
+
+  <h2>1. Use of the Site</h2>
+  <p>You agree to use our website only for lawful purposes and in a way that does not infringe on the rights of, restrict, or inhibit anyone else's use of the Site.</p>
+
+  <h2>2. Intellectual Property</h2>
+  <p>
+    All content on the Site, including text, graphics, logos, icons, images, and software, is the property of Aura AI Solutions or its licensors and is protected by intellectual property laws.
+    You may not reproduce, distribute, or create derivative works from any content without our prior written consent.
+  </p>
+
+  <h2>3. User Content</h2>
+  <p>
+    If you submit or upload any content to our Site (e.g., through contact forms or email), you grant us a non-exclusive, worldwide, royalty-free license to use, store, and process that content in accordance with our Privacy Policy.
+  </p>
+
+  <h2>4. Disclaimers</h2>
+  <p>
+    Our website and services are provided "as is" and "as available" without warranties of any kind. We do not guarantee that the Site will be error-free or uninterrupted.
+    To the fullest extent permitted by law, we disclaim all warranties, express or implied.
+  </p>
+
+  <h2>5. Limitation of Liability</h2>
+  <p>
+    To the extent permitted by law, Aura AI Solutions shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Site or services.
+    This includes, without limitation, loss of data, income, or profit.
+  </p>
+
+  <h2>6. Links to Third-Party Sites</h2>
+  <p>
+    Our Site may contain links to third-party websites. We are not responsible for the content or privacy practices of these sites. Use them at your own risk.
+  </p>
+
+  <h2>7. Termination</h2>
+  <p>
+    We may terminate or suspend your access to the Site at any time, without notice, for any reason, including if you breach these Terms.
+  </p>
+
+  <h2>8. Changes to These Terms</h2>
+  <p>
+    We may update these Terms from time to time. Any changes will be posted on this page with an updated effective date.
+    Continued use of the Site after changes are made indicates your acceptance of the new Terms.
+  </p>
+
+  <h2>9. Governing Law</h2>
+  <p>
+    These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England.
+  </p>
+
+  <h2>10. Contact Us</h2>
+  <p>
+    If you have any questions about these Terms, please contact us at:<br>
+    <strong>Email:</strong> [Insert Your Email]<br>
+    <strong>Address:</strong> [Insert Business Address]
+  </p>
+
+</body>
+</html>
