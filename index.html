@@ -158,30 +158,7 @@
       }, 400);
     });
 
-    // Cursor trail
-    const trailLength = 12;
-    const trail = [];
-    for (let i = 0; i < trailLength; i++) {
-      const dot = document.createElement('div');
-      dot.className = 'cursor-trail-dot';
-      document.body.appendChild(dot);
-      trail.push(dot);
-    }
-    let mouseX = 0, mouseY = 0;
-    document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-    function animateTrail() {
-      trail.forEach((dot, index) => {
-        dot.style.transform = `translate(${mouseX}px, ${mouseY}px) scale(${(trailLength - index) / trailLength})`;
-        dot.style.opacity = `${(trailLength - index) / trailLength}`;
-      });
-      requestAnimationFrame(animateTrail);
-    }
-    animateTrail();
-  });
-</script>
+   
 <script>
   const defaultTitle = document.title;
   const awayTitle = "👋 Come back soon!";
