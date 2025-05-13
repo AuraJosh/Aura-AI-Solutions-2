@@ -18,6 +18,7 @@
       }
     }
   </script>
+  <link rel="icon" href="favicon.png" type="image/png">
 </head>
 <body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
 
@@ -133,6 +134,24 @@
       widgetTitle: 'Business Assistant',
       primaryColor: '#4a90e2'
     });
+  });
+</script>
+<script>
+  const defaultTitle = document.title;
+  const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
+  let blinkInterval;
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      let i = 0;
+      blinkInterval = setInterval(() => {
+        document.title = awayMessages[i % awayMessages.length];
+        i++;
+      }, 1000); // Change every 1 second
+    } else {
+      clearInterval(blinkInterval);
+      document.title = defaultTitle;
+    }
   });
 </script>
 
