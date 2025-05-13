@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -18,8 +17,8 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="widget.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="widget.css" />
   <script src="widget.js"></script>
 
   <style>
@@ -42,7 +41,16 @@
     }
   </style>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+<body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
+
+<!-- Background Video -->
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
+  <source src="background.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+<!-- Dark Overlay -->
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
 <!-- Thank You Banner -->
 <div id="thank-you-banner" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
@@ -55,62 +63,56 @@
 </div>
 
 <!-- Header -->
-<header class="fixed w-full bg-white dark:bg-[#060d1f] shadow z-50">
-<div class="container mx-auto flex items-center justify-between p-4">
-  <!-- Left: Logo + Text -->
-  <div class="flex items-center space-x-4 flex-1">
-    <a href="index.html" class="flex items-center space-x-4">
-      <div class="relative h-20 w-[150px]">
-        <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block dark:hidden">
-        <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
-      </div>
-      <span class="typing-text text-sm md:text-base text-gray-800 dark:text-white">Aura AI Solutions</span>
-    </a>
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary font-bold">Contact</a>
+    </nav>
+
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
+    </div>
   </div>
-
-  <!-- Center: Navigation -->
-  <nav class="hidden md:flex justify-center space-x-6 flex-1">
-    <a href="index.html" class="hover:text-primary">Home</a>
-    <a href="services.html" class="hover:text-primary">Services</a>
-    <a href="pricing.html" class="hover:text-primary">Pricing</a>
-    <a href="review.html" class="hover:text-primary">Review</a>
-    <a href="contact.html" class="hover:text-primary">Contact</a>
-  </nav>
-
-  <!-- Right: Theme toggle + Mobile menu -->
-  <div class="flex items-center justify-end space-x-4 flex-1">
-    <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
-    <button id="theme-toggle" class="text-xl hover:text-primary focus:outline-none" title="Toggle dark mode">🌙</button>
-  </div>
-</div>
-
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-white dark:bg-gray-900 p-4 z-50 shadow-lg">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
     <a href="services.html" class="hover:text-primary">Services</a>
     <a href="pricing.html" class="hover:text-primary">Pricing</a>
     <a href="review.html" class="hover:text-primary">Review</a>
-    <a href="contact.html" class="hover:text-primary">Contact</a>
+    <a href="contact.html" class="hover:text-primary font-bold">Contact</a>
   </nav>
 </div>
 
 <!-- Contact Form Section -->
-<main class="pt-32 container mx-auto px-4 py-20">
-  <h1 class="text-4xl font-bold mb-8 text-center">
-    Get In Touch With Our Team</h1>
-  <form id="contact-form" action="https://formspree.io/f/mkgrovkp" method="POST" class="max-w-2xl mx-auto space-y-6">
-    <input type="text" name="name" placeholder="Name" class="w-full p-3 border rounded" required>
-    <input type="email" name="email" placeholder="Email" class="w-full p-3 border rounded" required>
-    <textarea name="message" placeholder="Message" class="w-full p-3 border rounded" rows="5" required></textarea>
-    <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700">Send Message</button>
+<main class="pt-32 container mx-auto px-4 py-20 relative z-10 flex-grow">
+  <h1 class="text-5xl font-bold mb-12 text-center text-white">Get In Touch With Our Team</h1>
+  <form id="contact-form" action="https://formspree.io/f/mkgrovkp" method="POST" class="max-w-2xl mx-auto bg-gray-800 p-10 rounded-3xl shadow-xl space-y-6">
+    <input type="text" name="name" placeholder="Your Name" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" required>
+    <input type="email" name="email" placeholder="Your Email" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" required>
+    <textarea name="message" placeholder="Your Message" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" rows="5" required></textarea>
+    <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700 transition">Send Message</button>
   </form>
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+<footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
   <div class="mb-4">
     <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
     <a href="#" class="mx-2 hover:text-white">Terms of Service</a>
@@ -121,47 +123,12 @@
 <!-- Scripts -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Mobile menu toggle
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => {
       menu.classList.toggle('hidden');
     });
 
-    // Theme toggle
-    const themeToggle = document.getElementById('theme-toggle');
-    const html = document.documentElement;
-
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const useDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
-
-    if (useDark) {
-      html.classList.add('dark');
-      if (themeToggle) themeToggle.textContent = '☀️';
-    } else {
-      html.classList.remove('dark');
-      if (themeToggle) themeToggle.textContent = '🌙';
-    }
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        html.classList.toggle('dark');
-        const isDark = html.classList.contains('dark');
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
-    }
-
-    // Chatbot
-    const chatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
-    });
-
-    // Contact form submission
     const form = document.getElementById('contact-form');
     if (form) {
       form.addEventListener('submit', function (e) {
@@ -199,6 +166,14 @@
         });
       });
     }
+
+    // Chatbot
+    const chatWidget = new BusinessChatWidget({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2'
+    });
   });
 
   function closeBanner() {
