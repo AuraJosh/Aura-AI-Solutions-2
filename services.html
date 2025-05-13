@@ -19,12 +19,17 @@
     }
   </script>
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body class="bg-gray-900 text-gray-200 relative overflow-hidden">
+
+<!-- Background Video -->
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-1]">
+  <source src="background.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 <!-- Header -->
-<header class="fixed w-full bg-[#060d1f] shadow z-50">
+<header class="fixed w-full bg-[#060d1f]/90 backdrop-blur shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Left: Logo + Text -->
     <div class="flex items-center space-x-4 flex-1">
       <a href="index.html" class="flex items-center space-x-4">
         <div class="relative h-20 w-[150px]">
@@ -35,7 +40,6 @@
       </a>
     </div>
 
-    <!-- Center: Navigation -->
     <nav class="hidden md:flex justify-center space-x-6 flex-1">
       <a href="index.html" class="hover:text-primary">Home</a>
       <a href="services.html" class="hover:text-primary">Services</a>
@@ -44,7 +48,6 @@
       <a href="contact.html" class="hover:text-primary">Contact</a>
     </nav>
 
-    <!-- Right: Mobile menu only (theme toggle removed) -->
     <div class="flex items-center justify-end space-x-4 flex-1">
       <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
     </div>
@@ -52,7 +55,7 @@
 </header>
 
 <!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900/90 backdrop-blur p-4 z-50 shadow-lg">
   <nav class="flex flex-col space-y-2">
     <a href="index.html" class="hover:text-primary">Home</a>
     <a href="services.html" class="hover:text-primary font-semibold">Services</a>
@@ -63,7 +66,7 @@
 </div>
 
 <!-- Services Section -->
-<main class="pt-32 container mx-auto px-4 py-24">
+<main class="pt-32 container mx-auto px-4 py-24 relative z-10">
   <h1 class="text-5xl font-bold mb-8 text-center text-white">Our Services</h1>
   <p class="text-xl text-center text-gray-300 max-w-2xl mx-auto mb-16">
     We build AI-driven tools to elevate your customer experience, starting with powerful chatbot technology — and more to come.
@@ -72,7 +75,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
 
     <!-- Chatbot Service -->
-    <div class="p-10 bg-blue-900/40 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
+    <div class="p-10 bg-blue-900/50 rounded-3xl shadow-xl backdrop-blur transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
       <div class="flex items-start space-x-4">
         <div class="text-4xl">💬</div>
         <div>
@@ -86,7 +89,7 @@
     </div>
 
     <!-- Coming Soon -->
-    <div class="p-10 bg-gray-800/60 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
+    <div class="p-10 bg-gray-800/60 rounded-3xl shadow-xl backdrop-blur transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
       <div class="flex items-start space-x-4">
         <div class="text-4xl">🚀</div>
         <div>
@@ -103,7 +106,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+<footer class="bg-gray-900/90 backdrop-blur text-gray-400 py-8 text-center relative z-10">
   <div class="mb-4">
     <a href="#" class="mx-2 hover:text-white">Privacy Policy</a>|
     <a href="#" class="mx-2 hover:text-white">Terms of Service</a>
@@ -131,4 +134,5 @@
 </script>
 
 </body>
+
 </html>
