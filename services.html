@@ -19,13 +19,16 @@
     }
   </script>
 </head>
-<body class="bg-gray-900 text-gray-200 relative overflow-hidden">
+<body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
 
 <!-- Background Video -->
-<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-1]">
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
   <source src="background.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
+
+<!-- Dark Overlay -->
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
@@ -66,7 +69,7 @@
 </div>
 
 <!-- Services Section -->
-<main class="pt-32 container mx-auto px-4 py-24 relative z-10">
+<main class="pt-32 container mx-auto px-4 py-24 relative z-10 flex-grow">
   <h1 class="text-5xl font-bold mb-8 text-center text-white">Our Services</h1>
   <p class="text-xl text-center text-gray-300 max-w-2xl mx-auto mb-16">
     We build AI-driven tools to elevate your customer experience, starting with powerful chatbot technology — and more to come.
@@ -119,3 +122,19 @@
   document.addEventListener('DOMContentLoaded', function () {
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+
+    // Chatbot
+    const chatWidget = new BusinessChatWidget({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2'
+    });
+  });
+</script>
+
+</body>
+</html>
