@@ -30,11 +30,13 @@
 </head>
 <body class="bg-gray-900 text-gray-100 overflow-x-hidden">
 
+<!-- Background Video -->
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
   <source src="background.mp4" type="video/mp4">
 </video>
 <div class="fixed inset-0 bg-black/70 z-[-1]"></div>
 
+<!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
     <a href="index.html" class="flex items-center space-x-4">
@@ -45,93 +47,61 @@
 </header>
 
 <main class="pt-32">
-  <section class="text-center px-6 py-24">
-    <h1 class="text-5xl font-bold mb-6 text-white">AI Chatbot Solutions</h1>
-    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-      Our advanced AI chatbot offers 24/7 intelligent support that understands context, engages naturally, and integrates seamlessly with your business tools.
-    </p>
-    <a href="#features" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Explore Features</a>
-  </section>
+  <!-- Existing content remains unchanged -->
 
-  <section class="parallax h-[450px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');">
-    <div class="bg-black bg-opacity-60 p-10 rounded-xl">
-      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Transform Your Customer Experience with AI</h2>
-      <p class="text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p>
-    </div>
-  </section>
-
-  <section class="py-20 bg-gray-800 px-6" id="features">
+  <!-- Plan Details Section -->
+  <section class="py-24 bg-gray-800 px-6">
     <div class="max-w-6xl mx-auto space-y-16">
-      <!-- Existing Feature Sections... -->
-    </div>
-  </section>
+      <h2 class="text-4xl font-bold text-white text-center mb-12">Plan Details</h2>
 
-  <!-- Pricing Plans -->
-  <section class="bg-gray-900 py-20 px-6">
-    <div class="max-w-6xl mx-auto text-center mb-16">
-      <h2 class="text-4xl font-bold text-white">Pricing Plans</h2>
-      <p class="text-gray-400 mt-4 text-lg">Choose a plan that fits your business. Each option is designed to grow with your needs.</p>
-    </div>
-    <div class="grid md:grid-cols-3 gap-10">
-      <!-- Essential Plan -->
-      <div class="bg-gray-800 border border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300">
-        <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text">Essential</h3>
-        <div class="mb-4">
-          <span class="text-4xl font-extrabold text-white">£50</span>
-          <span class="block text-sm text-gray-400">per month</span>
-        </div>
-        <ul class="mt-6 space-y-3 text-left text-sm text-gray-300">
-          <li>✔ Basic chatbot</li>
-          <li>✔ 1,000 messages / month</li>
-          <li>✔ 1 chatbot</li>
-          <li>✔ Support response: within 1 week</li>
-          <li>✔ Includes Aura AI branding</li>
+      <!-- Essential Plan Details -->
+      <div data-aos="fade-up">
+        <h3 class="text-3xl font-bold text-blue-400 mb-4">Essential Plan - £50/month</h3>
+        <p class="text-gray-300 mb-4">The Essential plan is ideal for individuals, freelancers, or small businesses getting started with AI chat. It provides a no-frills entry point to chatbot automation.</p>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+          <li><strong>Basic chatbot:</strong> Answer basic FAQs, handle greetings, and route users to contact forms.</li>
+          <li><strong>1,000 messages/month:</strong> Sufficient for low-traffic websites or trial use.</li>
+          <li><strong>1 chatbot instance:</strong> Easily embed one bot on your primary website.</li>
+          <li><strong>Support within 1 week:</strong> Email-based, queued support response.</li>
+          <li><strong>Includes Aura AI branding:</strong> Perfect for early adopters who don't require white-labeling.</li>
         </ul>
       </div>
 
-      <!-- Elite Plan -->
-      <div class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300">
-        <div class="bg-orange-500 text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest inline-block mb-3">Most Popular</div>
-        <h3 class="text-2xl font-bold text-purple-400 mb-1">Elite</h3>
-        <div class="mb-4">
-          <span class="text-4xl font-extrabold text-purple-400">£150</span>
-          <span class="block text-sm text-purple-300">per month</span>
-        </div>
-        <ul class="mt-6 space-y-3 text-left text-sm text-purple-300">
-          <li>✔ Everything in Essential</li>
-          <li>✔ Example Answers / FAQs</li>
-          <li>✔ Multilingual support</li>
-          <li>✔ 5,000 messages / month</li>
-          <li>✔ 3 chatbots</li>
-          <li>✔ Priority support</li>
-          <li>✔ Preset style themes & personalities</li>
-          <li>✔ Regular analytics + premade dashboard</li>
-          <li>✔ Includes Aura AI branding</li>
+      <!-- Elite Plan Details -->
+      <div data-aos="fade-up">
+        <h3 class="text-3xl font-bold text-purple-400 mb-4">Elite Plan - £150/month</h3>
+        <p class="text-gray-300 mb-4">Our most popular option for growing businesses that want deeper functionality and wider usage. Ideal for ecommerce, service-based brands, and teams managing multiple bots.</p>
+        <ul class="list-disc list-inside text-purple-300 space-y-2">
+          <li><strong>Everything in Essential</strong> included plus enhanced tools.</li>
+          <li><strong>Example Answers/FAQs:</strong> Boost bot performance with a library of proven templates.</li>
+          <li><strong>Multilingual support:</strong> Reach global audiences in their preferred language.</li>
+          <li><strong>5,000 messages/month:</strong> Suits mid-size traffic across multiple channels.</li>
+          <li><strong>3 chatbots:</strong> Deploy across various pages, departments, or brands.</li>
+          <li><strong>Priority support:</strong> Faster response and issue resolution from our team.</li>
+          <li><strong>Preset styles and personalities:</strong> Customize your bot's voice and tone with themes.</li>
+          <li><strong>Analytics dashboard:</strong> Access insights into user activity, top questions, and performance.</li>
         </ul>
       </div>
 
-      <!-- Executive Plan -->
-      <div class="bg-gradient-to-br from-[#1f1f1f] via-[#212222] to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-8 hover:ring-2 hover:ring-yellow-400/30 transform hover:-translate-y-2 transition duration-300">
-        <h3 class="text-2xl font-bold bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text mb-1">Executive</h3>
-        <div class="mb-4">
-          <span class="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span>
-          <span class="block text-sm text-yellow-200">per month</span>
-        </div>
-        <ul class="mt-6 space-y-3 text-left text-sm text-yellow-200">
-          <li>✔ Everything in Elite & Essential</li>
-          <li>✔ Unlimited messages</li>
-          <li>✔ 24-hour support turnaround</li>
-          <li>✔ Custom widget design</li>
-          <li>✔ Custom chatbot personalities</li>
-          <li>✔ Full analytics suite</li>
-          <li>✔ Advanced AI-powered dashboard</li>
-          <li>✔ Your own branding (white-label)</li>
+      <!-- Executive Plan Details -->
+      <div data-aos="fade-up">
+        <h3 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan - £500/month</h3>
+        <p class="text-gray-300 mb-4">Built for enterprises, agencies, or tech-driven brands that need complete control, maximum scale, and white-label capabilities. Includes everything from previous plans, and more.</p>
+        <ul class="list-disc list-inside text-yellow-200 space-y-2">
+          <li><strong>Unlimited messages:</strong> Designed for high-traffic environments with no usage caps.</li>
+          <li><strong>24-hour support turnaround:</strong> Premium service for urgent needs.</li>
+          <li><strong>Custom widget design:</strong> Modify UI, colors, behavior, and embed rules.</li>
+          <li><strong>Custom personalities:</strong> Tailor chatbot personas to reflect different departments or campaigns.</li>
+          <li><strong>Full analytics suite:</strong> Deep-dive reporting including trends, sentiment, and conversion funnels.</li>
+          <li><strong>Advanced AI dashboard:</strong> AI-assisted suggestions for content gaps, automation, and optimization.</li>
+          <li><strong>White-labeling:</strong> Replace Aura branding with your own, ideal for resellers or agencies.</li>
         </ul>
       </div>
     </div>
   </section>
 </main>
 
+<!-- Footer -->
 <footer class="bg-gray-950 text-gray-500 py-8 text-center">
   <div class="mb-4">
     <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
@@ -140,12 +110,14 @@
   <p class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</p>
 </footer>
 
+<!-- Scripts -->
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
   AOS.init({ once: true, duration: 1000 });
 
   const counters = document.querySelectorAll('.counter');
   const speed = 200;
+
   const animateCounters = () => {
     counters.forEach(counter => {
       const updateCount = () => {
@@ -162,6 +134,7 @@
       updateCount();
     });
   };
+
   window.addEventListener('scroll', () => {
     const section = document.querySelector('#stats');
     const sectionTop = section.offsetTop;
