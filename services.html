@@ -14,6 +14,12 @@
       background-repeat: no-repeat;
       background-size: cover;
     }
+    .gradient-divider {
+      background: linear-gradient(to right, #6366F1, #8B5CF6);
+      height: 6px;
+      width: 100%;
+      margin: 4rem 0;
+    }
   </style>
   <script>
     tailwind.config = {
@@ -34,39 +40,21 @@
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
   <source src="background.mp4" type="video/mp4">
 </video>
-<div class="fixed inset-0 bg-black/70 z-[-1]"></div>
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Left: Logo + Text -->
-    <div class="flex items-center space-x-4 flex-1">
-      <a href="index.html" class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
-        </div>
-        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-      </a>
-    </div>
-    <!-- Center: Navigation -->
-    <nav class="hidden md:flex justify-center space-x-6 flex-1">
-      <a href="index.html" class="hover:text-primary">Home</a>
-      <a href="services.html" class="hover:text-primary">Services</a>
-      <a href="pricing.html" class="hover:text-primary">Pricing</a>
-      <a href="review.html" class="hover:text-primary">Review</a>
-      <a href="contact.html" class="hover:text-primary">Contact</a>
-    </nav>
-    <!-- Right: Mobile button -->
-    <div class="flex items-center justify-end space-x-4 flex-1">
-      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
-    </div>
+    <a href="index.html" class="flex items-center space-x-4">
+      <img src="logo-dark.png" alt="Aura AI Logo" class="h-12">
+      <span class="text-white text-lg font-semibold">Aura AI Solutions</span>
+    </a>
   </div>
 </header>
 
-<main class="pt-32">
+<main class="pt-40">
   <!-- Hero -->
-  <section class="text-center px-6 py-24">
+  <section class="text-center px-6 py-32">
     <h1 class="text-5xl font-bold mb-6 text-white">AI Chatbot Solutions</h1>
     <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
       Our advanced AI chatbot offers 24/7 intelligent support that understands context, engages naturally, and integrates seamlessly with your business tools.
@@ -122,30 +110,21 @@
       <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
         <div>
           <h2 class="text-3xl font-bold text-primary mb-4">Essential Plan</h2>
-          <p class="text-lg text-gray-300 mb-4">
-            The Essential Plan is your gateway into conversational AI. Built for individuals and startups, it delivers powerful chatbot capabilities without overwhelming complexity.
-          </p>
+          <p class="text-lg text-gray-300 mb-4">The Essential Plan is your gateway into conversational AI...</p>
           <ul class="space-y-2 text-gray-400 list-disc list-inside">
             <li>Up to 1,000 messages/month</li>
-            <li>Single chatbot instance — perfect for small-scale deployment</li>
-            <li>Standard support (response in 7 days)</li>
-            <li>Aura AI branded experience</li>
+            <li>Single chatbot instance</li>
+            <li>Standard support</li>
+            <li>Aura AI branded</li>
           </ul>
-          <p class="mt-4 text-gray-400">
-            This plan is ideal for testing chatbot potential or deploying a support agent for basic FAQs and lead capture. The straightforward setup ensures you’re live in minutes — no complex configs required.
-          </p>
+          <p class="mt-4 text-gray-400">Perfect for startups, this plan gives you a powerful base to automate support and answer FAQs.</p>
         </div>
         <div class="text-center" data-aos="zoom-in">
           <img src="essential-plan.svg" alt="Essential Plan" class="w-full max-w-md mx-auto">
         </div>
       </div>
 
-      <!-- Parallax Divider -->
-      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-1.jpg');">
-        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
-          <h3 class="text-xl md:text-2xl text-white font-semibold">From foundation to finesse — scale your AI presence as your business grows.</h3>
-        </div>
-      </div>
+      <div class="gradient-divider"></div>
 
       <!-- Elite Plan -->
       <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-left">
@@ -154,49 +133,31 @@
         </div>
         <div>
           <h2 class="text-3xl font-bold text-pink-400 mb-4">Elite Plan</h2>
-          <p class="text-lg text-gray-300 mb-4">
-            The Elite Plan takes your AI capabilities to the next level. Designed for scaling businesses, it introduces customization, multi-bot deployment, and advanced multilingual features.
-          </p>
+          <p class="text-lg text-gray-300 mb-4">The Elite Plan enhances your chatbot's capabilities...</p>
           <ul class="space-y-2 text-gray-400 list-disc list-inside">
-            <li>Up to 5,000 messages/month</li>
-            <li>Deploy up to 3 chatbots simultaneously</li>
-            <li>Built-in FAQ handling and example-based training</li>
-            <li>Multilingual support for global audiences</li>
-            <li>Preset personality styles and tone settings</li>
-            <li>Analytics dashboard with weekly reports</li>
-            <li>Priority support access</li>
+            <li>5,000 messages/month</li>
+            <li>3 chatbot instances</li>
+            <li>FAQs, styles, multilingual</li>
+            <li>Analytics dashboard</li>
           </ul>
-          <p class="mt-4 text-gray-400">
-            If you're running multiple departments or sites, this plan allows targeted bots for each — with shared data insights and smart personalization. Think of it as your digital team, ready on-demand.
-          </p>
+          <p class="mt-4 text-gray-400">Grow your customer engagement with smarter AI interactions and data-backed decisions.</p>
         </div>
       </div>
 
-      <!-- Parallax Divider -->
-      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-2.jpg');">
-        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
-          <h3 class="text-xl md:text-2xl text-white font-semibold">Deeper insights. Smarter responses. Higher engagement. Welcome to Elite AI.</h3>
-        </div>
-      </div>
+      <div class="gradient-divider"></div>
 
       <!-- Executive Plan -->
       <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
         <div>
           <h2 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan</h2>
-          <p class="text-lg text-gray-300 mb-4">
-            The Executive Plan is our most powerful offering — perfect for enterprises, agencies, and operations needing complete AI control and scalability.
-          </p>
+          <p class="text-lg text-gray-300 mb-4">The Executive Plan offers full control, customization, and enterprise scalability...</p>
           <ul class="space-y-2 text-gray-400 list-disc list-inside">
-            <li>Unlimited messages & chat instances</li>
-            <li>Custom-branded (white-labeled) chatbot experiences</li>
-            <li>AI-powered dashboards with behavioral insights</li>
-            <li>Fully editable chatbot design & personality layers</li>
-            <li>24-hour support response time</li>
-            <li>Full analytics suite + raw data exports</li>
+            <li>Unlimited messaging</li>
+            <li>White-labeled branding</li>
+            <li>AI dashboards & exports</li>
+            <li>24h support</li>
           </ul>
-          <p class="mt-4 text-gray-400">
-            Built for full-scale automation, this plan lets you engineer bespoke AI agents that match your voice, branding, and goals. With advanced insight tools and API hooks, it becomes an extension of your enterprise workflow.
-          </p>
+          <p class="mt-4 text-gray-400">For high-volume teams needing real-time insights and full customization across all bots.</p>
         </div>
         <div class="text-center" data-aos="zoom-in">
           <img src="executive-plan.svg" alt="Executive Plan" class="w-full max-w-md mx-auto">
