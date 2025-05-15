@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pricing | Aura AI Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Chatbot Service | Aura AI Solutions</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    .parallax {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  </style>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
@@ -18,294 +27,181 @@
       }
     }
   </script>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .discount-badge {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    .discount-badge.hidden {
-      opacity: 0;
-      transform: scale(0.95);
-      pointer-events: none;
-    }
-    .discount-badge.visible {
-      opacity: 1;
-      transform: scale(1);
-    }
-    @keyframes shimmer {
-      0% { background-position: -100% 0; }
-      100% { background-position: 100% 0; }
-    }
-    .shimmer-text {
-      background-size: 200% auto;
-      animation: shimmer 2.5s linear infinite;
-    }
-    .video-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -10;
-    }
-    .typing-text {
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
-      border-right: 2px solid;
-    }
-    .typing-text.finished {
-      border-right: none;
-    }
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-    @keyframes blink {
-      50% { border-color: transparent }
-    }
-  </style>
-  <link rel="stylesheet" href="widget.css">
-  <script src="widget.js"></script>
-  <link rel="icon" href="favicon.png" type="image/png">
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body class="bg-gray-900 text-gray-100 overflow-x-hidden">
 
 <!-- Background Video -->
-<video autoplay muted loop playsinline class="video-background">
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
   <source src="background.mp4" type="video/mp4">
 </video>
-
-<!-- Static fallback image for mobile -->
-  <img src="fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-
-<div class="fixed inset-0 bg-black/60 z-[-5]"></div>
+<div class="fixed inset-0 bg-black/70 z-[-1]"></div>
 
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Left: Logo + Text -->
-    <div class="flex items-center space-x-4 flex-1">
-      <a href="index.html" class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
-        </div>
-        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-      </a>
-    </div>
-    <!-- Center: Navigation -->
-    <nav class="hidden md:flex justify-center space-x-6 flex-1">
-      <a href="index.html" class="hover:text-primary">Home</a>
-      <a href="services.html" class="hover:text-primary">Services</a>
-      <a href="pricing.html" class="hover:text-primary">Pricing</a>
-      <a href="review.html" class="hover:text-primary">Review</a>
-      <a href="contact.html" class="hover:text-primary">Contact</a>
-    </nav>
-    <!-- Right: Mobile button -->
-    <div class="flex items-center justify-end space-x-4 flex-1">
-      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
-    </div>
+    <a href="index.html" class="flex items-center space-x-4">
+      <img src="logo-dark.png" alt="Aura AI Logo" class="h-12">
+      <span class="text-white text-lg font-semibold">Aura AI Solutions</span>
+    </a>
   </div>
 </header>
 
-<!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-[#0A1F44] p-4 z-50 shadow-lg">
-  <nav class="flex flex-col space-y-2">
-    <a href="index.html" class="hover:text-primary">Home</a>
-    <a href="services.html" class="hover:text-primary">Services</a>
-    <a href="pricing.html" class="hover:text-primary">Pricing</a>
-    <a href="review.html" class="hover:text-primary">Review</a>
-    <a href="contact.html" class="hover:text-primary">Contact</a>
-  </nav>
-</div>
+<main class="pt-32">
+  <!-- Hero -->
+  <section class="text-center px-6 py-24">
+    <h1 class="text-5xl font-bold mb-6 text-white">AI Chatbot Solutions</h1>
+    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+      Our advanced AI chatbot offers 24/7 intelligent support that understands context, engages naturally, and integrates seamlessly with your business tools.
+    </p>
+    <a href="#features" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Explore Features</a>
+  </section>
 
-<main class="pt-32 container mx-auto px-4 pb-4 text-center text-white">
-  <h1 class="mt-4 text-4xl font-bold mb-4">Our Pricing</h1>
-  <p class="text-lg mb-2">Flexible plans designed to meet your business needs and scale as you grow.</p>
+  <!-- Parallax Overview -->
+  <section class="parallax h-[450px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');">
+    <div class="bg-black bg-opacity-60 p-10 rounded-xl">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Transform Your Customer Experience with AI</h2>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p>
+    </div>
+  </section>
 
-  <!-- Toggle Switch -->
-  <div class="flex items-center justify-center mb-2 space-x-4">
-    <span class="text-sm font-medium text-white">Billed Monthly</span>
-    <label class="inline-flex relative items-center cursor-pointer">
-      <input type="checkbox" id="billing-toggle" class="sr-only peer">
-      <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:bg-primary transition-all"></div>
-      <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-full transition-transform"></div>
-    </label>
-    <span class="text-sm font-medium text-white">Billed Annually</span>
-  </div>
-
-  <!-- Pricing Plans -->
-  <section class="relative py-20">
-    <div class="container mx-auto px-4 text-center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-        <!-- Essential Plan -->
-        <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300">
-          <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 15%</span>
-          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
-          <div class="mb-4">
-            <span id="price-essential" class="text-4xl font-extrabold text-white">£50</span>
-            <span class="block text-sm text-gray-400">per month</span>
-          </div>
-          <button class="w-full bg-blue-700 text-white font-semibold py-2 rounded hover:bg-blue-600 transition">Get Started</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-gray-300">
-            <li>✔ Basic chatbot</li>
-            <li>✔ 1,000 messages / month</li>
-            <li>✔ 1 chatbot</li>
-            <li>✔ Support response: within 1 week</li>
-            <li>✔ Includes Aura AI branding</li>
+  <!-- Features Section -->
+  <section class="py-20 bg-gray-800 px-6" id="features">
+    <div class="max-w-6xl mx-auto space-y-16">
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Key Features</h3>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>🤖 Context-aware responses trained on your FAQs, docs, or databases</li>
+            <li>🌐 Multilingual support for international audiences</li>
+            <li>📊 Real-time analytics dashboard to track engagement & performance</li>
+            <li>🔌 Integration with CRM, Shopify, Calendly, and more</li>
+            <li>🎨 Fully customizable UI and tone to match your brand</li>
           </ul>
         </div>
-
-        <!-- Elite Plan -->
-        <div class="relative bg-[#8ac6ff] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 hover:shadow-2xl transform hover:-translate-y-2 transition duration-300">
-          <span id="discount-elite" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 18%</span>
-          <div class="absolute top-2 left-4 bg-orange-500 text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-          <h3 class="elite-title">Elite</h3>
-          <div class="mb-4">
-            <span id="price-elite" class="text-4xl font-extrabold text-purple-400">£150</span>
-            <span class="block text-sm text-purple-300">per month</span>
-          </div>
-          <button class="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white font-semibold py-2 rounded hover:brightness-110 transition">Start Elite</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-purple-300">
-            <li>✔ Everything in Essential</li>
-            <li>✔ Example Answers / FAQs</li>
-            <li>✔ Multilingual support</li>
-            <li>✔ 5,000 messages / month</li>
-            <li>✔ 3 chatbots</li>
-            <li>✔ Priority support</li>
-            <li>✔ Preset style themes & personalities</li>
-            <li>✔ Regular analytics + premade dashboard</li>
-            <li>✔ Includes Aura AI branding</li>
-          </ul>
-        </div>
-
-        <!-- Executive Plan -->
-        <div class="relative dark:bg-gradient-to-br dark:from-[#1f1f1f] dark:via-[#212222] dark:to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-8 hover:ring-2 hover:ring-yellow-400/30 transform hover:-translate-y-2 transition duration-300">
-          <span id="discount-executive" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save 20%</span>
-          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
-          <div class="mb-4">
-            <span id="price-executive" class="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span>
-            <span class="block text-sm text-yellow-200">per month</span>
-          </div>
-          <button class="w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 hover:brightness-110 text-gray-900 font-semibold py-2 rounded transition">Contact Sales</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-yellow-200">
-            <li>✔ Everything in Elite & Essential</li>
-            <li>✔ Unlimited messages</li>
-            <li>✔ 24-hour support turnaround</li>
-            <li>✔ Custom widget design</li>
-            <li>✔ Custom chatbot personalities</li>
-            <li>✔ Full analytics suite</li>
-            <li>✔ Advanced AI-powered dashboard</li>
-            <li>✔ Your own branding (white-label)</li>
-          </ul>
-        </div>
-
+        <img src="chat-ui-preview.png" alt="Chat UI" class="rounded-xl shadow-xl" />
       </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <img src="insights-dashboard.png" alt="Analytics Dashboard" class="rounded-xl shadow-xl" />
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Business Impact</h3>
+          <p class="text-lg text-gray-300 mb-4">Our clients report an average 85% reduction in support workload, and a 25% increase in customer satisfaction within 60 days.</p>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>📈 Convert more leads with instant answers</li>
+            <li>⏱ Save thousands of hours annually on live chat</li>
+            <li>🧠 Provide personalized support with smart memory</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN INFORMATION SECTIONS -->
+  <section class="bg-gray-950 py-20 px-6 text-gray-200">
+    <div class="max-w-6xl mx-auto space-y-24">
+
+      <!-- Essential Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-primary mb-4">Essential Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Essential Plan is your gateway into conversational AI. Built for individuals and startups, it delivers powerful chatbot capabilities without overwhelming complexity.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Up to 1,000 messages/month</li>
+            <li>Single chatbot instance — perfect for small-scale deployment</li>
+            <li>Standard support (response in 7 days)</li>
+            <li>Aura AI branded experience</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            This plan is ideal for testing chatbot potential or deploying a support agent for basic FAQs and lead capture. The straightforward setup ensures you’re live in minutes — no complex configs required.
+          </p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="essential-plan.svg" alt="Essential Plan" class="w-full max-w-md mx-auto">
+        </div>
+      </div>
+
+      <!-- Parallax Divider -->
+      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-1.jpg');">
+        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
+          <h3 class="text-xl md:text-2xl text-white font-semibold">From foundation to finesse — scale your AI presence as your business grows.</h3>
+        </div>
+      </div>
+
+      <!-- Elite Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-left">
+        <div class="text-center md:order-2" data-aos="zoom-in">
+          <img src="elite-plan.svg" alt="Elite Plan" class="w-full max-w-md mx-auto">
+        </div>
+        <div>
+          <h2 class="text-3xl font-bold text-pink-400 mb-4">Elite Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Elite Plan takes your AI capabilities to the next level. Designed for scaling businesses, it introduces customization, multi-bot deployment, and advanced multilingual features.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Up to 5,000 messages/month</li>
+            <li>Deploy up to 3 chatbots simultaneously</li>
+            <li>Built-in FAQ handling and example-based training</li>
+            <li>Multilingual support for global audiences</li>
+            <li>Preset personality styles and tone settings</li>
+            <li>Analytics dashboard with weekly reports</li>
+            <li>Priority support access</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            If you're running multiple departments or sites, this plan allows targeted bots for each — with shared data insights and smart personalization. Think of it as your digital team, ready on-demand.
+          </p>
+        </div>
+      </div>
+
+      <!-- Parallax Divider -->
+      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-2.jpg');">
+        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
+          <h3 class="text-xl md:text-2xl text-white font-semibold">Deeper insights. Smarter responses. Higher engagement. Welcome to Elite AI.</h3>
+        </div>
+      </div>
+
+      <!-- Executive Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Executive Plan is our most powerful offering — perfect for enterprises, agencies, and operations needing complete AI control and scalability.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Unlimited messages & chat instances</li>
+            <li>Custom-branded (white-labeled) chatbot experiences</li>
+            <li>AI-powered dashboards with behavioral insights</li>
+            <li>Fully editable chatbot design & personality layers</li>
+            <li>24-hour support response time</li>
+            <li>Full analytics suite + raw data exports</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            Built for full-scale automation, this plan lets you engineer bespoke AI agents that match your voice, branding, and goals. With advanced insight tools and API hooks, it becomes an extension of your enterprise workflow.
+          </p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="executive-plan.svg" alt="Executive Plan" class="w-full max-w-md mx-auto">
+        </div>
+      </div>
+
     </div>
   </section>
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+<footer class="bg-gray-950 text-gray-500 py-8 text-center">
   <div class="mb-4">
     <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
     <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
   </div>
-  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+  <p class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</p>
 </footer>
 
 <!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const toggle = document.getElementById('billing-toggle');
-    const prices = {
-      essential: { monthly: 50, discounted: 50 * 0.85 },
-      elite: { monthly: 150, discounted: 150 * 0.82 },
-      executive: { monthly: 500, discounted: 500 * 0.80 }
-    };
-    const priceEls = {
-      essential: document.getElementById('price-essential'),
-      elite: document.getElementById('price-elite'),
-      executive: document.getElementById('price-executive')
-    };
-    const discountEls = {
-      essential: document.getElementById('discount-essential'),
-      elite: document.getElementById('discount-elite'),
-      executive: document.getElementById('discount-executive')
-    };
-
-    const getPriceValue = (el) => parseInt(el.textContent.replace(/[^\d]/g, ''));
-
-    function animatePrice(el, from, to, duration = 300) {
-      const start = performance.now();
-      function update(now) {
-        const progress = Math.min((now - start) / duration, 1);
-        const current = from + (to - from) * progress;
-        el.textContent = `£${Math.round(current)}`;
-        if (progress < 1) requestAnimationFrame(update);
-      }
-      requestAnimationFrame(update);
-    }
-
-    function updateDiscountBadges(show) {
-      Object.values(discountEls).forEach(el => {
-        el.classList.toggle('hidden', !show);
-        el.classList.toggle('visible', show);
-      });
-    }
-
-    toggle.addEventListener('change', () => {
-      const isYearly = toggle.checked;
-      animatePrice(priceEls.essential, getPriceValue(priceEls.essential), isYearly ? prices.essential.discounted : prices.essential.monthly);
-      animatePrice(priceEls.elite, getPriceValue(priceEls.elite), isYearly ? prices.elite.discounted : prices.elite.monthly);
-      animatePrice(priceEls.executive, getPriceValue(priceEls.executive), isYearly ? prices.executive.discounted : prices.executive.monthly);
-      updateDiscountBadges(isYearly);
-    });
-
-    updateDiscountBadges(toggle.checked);
-  });
+  AOS.init({ once: true, duration: 1000 });
 </script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const typingEl = document.querySelector('.typing-text');
-    setTimeout(() => {
-      typingEl.classList.add('finished');
-    }, 4500);
-  });
-</script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    new BusinessChatWidget({
-      apiEndpoint: 'https://384f8lmpn2.execute-api.eu-north-1.amazonaws.com/prod/AURA-chatbot',
-      widgetTitle: 'Aura AI Assistant',
-      primaryColor: '#4a90e2',
-      initialMessage: "Hello! I'm your AI assistant. How can I help you today?"
-    });
-  });
-</script>
-<script>
-  const defaultTitle = document.title;
-  const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
-  let blinkInterval;
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      let i = 0;
-      blinkInterval = setInterval(() => {
-        document.title = awayMessages[i % awayMessages.length];
-        i++;
-      }, 1000); // Change every 1 second
-    } else {
-      clearInterval(blinkInterval);
-      document.title = defaultTitle;
-    }
-  });
-</script>
-
 </body>
 </html>
