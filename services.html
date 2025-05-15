@@ -45,10 +45,28 @@
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
-    <a href="index.html" class="flex items-center space-x-4">
-      <img src="logo-dark.png" alt="Aura AI Logo" class="h-12">
-      <span class="text-white text-lg font-semibold">Aura AI Solutions</span>
-    </a>
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <!-- Center: Navigation -->
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <!-- Right: Mobile button -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
   </div>
 </header>
 
