@@ -47,56 +47,144 @@
 </header>
 
 <main class="pt-32">
-  <!-- Existing content remains unchanged -->
+  <!-- Hero -->
+  <section class="text-center px-6 py-24">
+    <h1 class="text-5xl font-bold mb-6 text-white">AI Chatbot Solutions</h1>
+    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+      Our advanced AI chatbot offers 24/7 intelligent support that understands context, engages naturally, and integrates seamlessly with your business tools.
+    </p>
+    <a href="#features" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Explore Features</a>
+  </section>
 
-  <!-- Plan Details Section -->
-  <section class="py-24 bg-gray-800 px-6">
+  <!-- Parallax Overview -->
+  <section class="parallax h-[450px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');">
+    <div class="bg-black bg-opacity-60 p-10 rounded-xl">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Transform Your Customer Experience with AI</h2>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-gray-800 px-6" id="features">
     <div class="max-w-6xl mx-auto space-y-16">
-      <h2 class="text-4xl font-bold text-white text-center mb-12">Plan Details</h2>
-
-      <!-- Essential Plan Details -->
-      <div data-aos="fade-up">
-        <h3 class="text-3xl font-bold text-blue-400 mb-4">Essential Plan - £50/month</h3>
-        <p class="text-gray-300 mb-4">The Essential plan is ideal for individuals, freelancers, or small businesses getting started with AI chat. It provides a no-frills entry point to chatbot automation.</p>
-        <ul class="list-disc list-inside text-gray-300 space-y-2">
-          <li><strong>Basic chatbot:</strong> Answer basic FAQs, handle greetings, and route users to contact forms.</li>
-          <li><strong>1,000 messages/month:</strong> Sufficient for low-traffic websites or trial use.</li>
-          <li><strong>1 chatbot instance:</strong> Easily embed one bot on your primary website.</li>
-          <li><strong>Support within 1 week:</strong> Email-based, queued support response.</li>
-          <li><strong>Includes Aura AI branding:</strong> Perfect for early adopters who don't require white-labeling.</li>
-        </ul>
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Key Features</h3>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>🤖 Context-aware responses trained on your FAQs, docs, or databases</li>
+            <li>🌐 Multilingual support for international audiences</li>
+            <li>📊 Real-time analytics dashboard to track engagement & performance</li>
+            <li>🔌 Integration with CRM, Shopify, Calendly, and more</li>
+            <li>🎨 Fully customizable UI and tone to match your brand</li>
+          </ul>
+        </div>
+        <img src="chat-ui-preview.png" alt="Chat UI" class="rounded-xl shadow-xl" />
       </div>
 
-      <!-- Elite Plan Details -->
-      <div data-aos="fade-up">
-        <h3 class="text-3xl font-bold text-purple-400 mb-4">Elite Plan - £150/month</h3>
-        <p class="text-gray-300 mb-4">Our most popular option for growing businesses that want deeper functionality and wider usage. Ideal for ecommerce, service-based brands, and teams managing multiple bots.</p>
-        <ul class="list-disc list-inside text-purple-300 space-y-2">
-          <li><strong>Everything in Essential</strong> included plus enhanced tools.</li>
-          <li><strong>Example Answers/FAQs:</strong> Boost bot performance with a library of proven templates.</li>
-          <li><strong>Multilingual support:</strong> Reach global audiences in their preferred language.</li>
-          <li><strong>5,000 messages/month:</strong> Suits mid-size traffic across multiple channels.</li>
-          <li><strong>3 chatbots:</strong> Deploy across various pages, departments, or brands.</li>
-          <li><strong>Priority support:</strong> Faster response and issue resolution from our team.</li>
-          <li><strong>Preset styles and personalities:</strong> Customize your bot's voice and tone with themes.</li>
-          <li><strong>Analytics dashboard:</strong> Access insights into user activity, top questions, and performance.</li>
-        </ul>
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <img src="insights-dashboard.png" alt="Analytics Dashboard" class="rounded-xl shadow-xl" />
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Business Impact</h3>
+          <p class="text-lg text-gray-300 mb-4">Our clients report an average 85% reduction in support workload, and a 25% increase in customer satisfaction within 60 days.</p>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>📈 Convert more leads with instant answers</li>
+            <li>⏱ Save thousands of hours annually on live chat</li>
+            <li>🧠 Provide personalized support with smart memory</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN INFORMATION SECTIONS -->
+  <section class="bg-gray-950 py-20 px-6 text-gray-200">
+    <div class="max-w-6xl mx-auto space-y-24">
+
+      <!-- Essential Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-primary mb-4">Essential Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Essential Plan is your gateway into conversational AI. Built for individuals and startups, it delivers powerful chatbot capabilities without overwhelming complexity.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Up to 1,000 messages/month</li>
+            <li>Single chatbot instance — perfect for small-scale deployment</li>
+            <li>Standard support (response in 7 days)</li>
+            <li>Aura AI branded experience</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            This plan is ideal for testing chatbot potential or deploying a support agent for basic FAQs and lead capture. The straightforward setup ensures you’re live in minutes — no complex configs required.
+          </p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="essential-plan.svg" alt="Essential Plan" class="w-full max-w-md mx-auto">
+        </div>
       </div>
 
-      <!-- Executive Plan Details -->
-      <div data-aos="fade-up">
-        <h3 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan - £500/month</h3>
-        <p class="text-gray-300 mb-4">Built for enterprises, agencies, or tech-driven brands that need complete control, maximum scale, and white-label capabilities. Includes everything from previous plans, and more.</p>
-        <ul class="list-disc list-inside text-yellow-200 space-y-2">
-          <li><strong>Unlimited messages:</strong> Designed for high-traffic environments with no usage caps.</li>
-          <li><strong>24-hour support turnaround:</strong> Premium service for urgent needs.</li>
-          <li><strong>Custom widget design:</strong> Modify UI, colors, behavior, and embed rules.</li>
-          <li><strong>Custom personalities:</strong> Tailor chatbot personas to reflect different departments or campaigns.</li>
-          <li><strong>Full analytics suite:</strong> Deep-dive reporting including trends, sentiment, and conversion funnels.</li>
-          <li><strong>Advanced AI dashboard:</strong> AI-assisted suggestions for content gaps, automation, and optimization.</li>
-          <li><strong>White-labeling:</strong> Replace Aura branding with your own, ideal for resellers or agencies.</li>
-        </ul>
+      <!-- Parallax Divider -->
+      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-1.jpg');">
+        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
+          <h3 class="text-xl md:text-2xl text-white font-semibold">From foundation to finesse — scale your AI presence as your business grows.</h3>
+        </div>
       </div>
+
+      <!-- Elite Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-left">
+        <div class="text-center md:order-2" data-aos="zoom-in">
+          <img src="elite-plan.svg" alt="Elite Plan" class="w-full max-w-md mx-auto">
+        </div>
+        <div>
+          <h2 class="text-3xl font-bold text-pink-400 mb-4">Elite Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Elite Plan takes your AI capabilities to the next level. Designed for scaling businesses, it introduces customization, multi-bot deployment, and advanced multilingual features.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Up to 5,000 messages/month</li>
+            <li>Deploy up to 3 chatbots simultaneously</li>
+            <li>Built-in FAQ handling and example-based training</li>
+            <li>Multilingual support for global audiences</li>
+            <li>Preset personality styles and tone settings</li>
+            <li>Analytics dashboard with weekly reports</li>
+            <li>Priority support access</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            If you're running multiple departments or sites, this plan allows targeted bots for each — with shared data insights and smart personalization. Think of it as your digital team, ready on-demand.
+          </p>
+        </div>
+      </div>
+
+      <!-- Parallax Divider -->
+      <div class="parallax h-72 flex items-center justify-center bg-fixed bg-center bg-cover" style="background-image: url('divider-2.jpg');">
+        <div class="bg-black bg-opacity-60 px-10 py-6 rounded-xl">
+          <h3 class="text-xl md:text-2xl text-white font-semibold">Deeper insights. Smarter responses. Higher engagement. Welcome to Elite AI.</h3>
+        </div>
+      </div>
+
+      <!-- Executive Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">
+            The Executive Plan is our most powerful offering — perfect for enterprises, agencies, and operations needing complete AI control and scalability.
+          </p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Unlimited messages & chat instances</li>
+            <li>Custom-branded (white-labeled) chatbot experiences</li>
+            <li>AI-powered dashboards with behavioral insights</li>
+            <li>Fully editable chatbot design & personality layers</li>
+            <li>24-hour support response time</li>
+            <li>Full analytics suite + raw data exports</li>
+          </ul>
+          <p class="mt-4 text-gray-400">
+            Built for full-scale automation, this plan lets you engineer bespoke AI agents that match your voice, branding, and goals. With advanced insight tools and API hooks, it becomes an extension of your enterprise workflow.
+          </p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="executive-plan.svg" alt="Executive Plan" class="w-full max-w-md mx-auto">
+        </div>
+      </div>
+
     </div>
   </section>
 </main>
@@ -114,33 +202,6 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
   AOS.init({ once: true, duration: 1000 });
-
-  const counters = document.querySelectorAll('.counter');
-  const speed = 200;
-
-  const animateCounters = () => {
-    counters.forEach(counter => {
-      const updateCount = () => {
-        const target = +counter.getAttribute('data-target');
-        const count = +counter.innerText;
-        const increment = target / speed;
-        if (count < target) {
-          counter.innerText = Math.ceil(count + increment);
-          setTimeout(updateCount, 20);
-        } else {
-          counter.innerText = target;
-        }
-      };
-      updateCount();
-    });
-  };
-
-  window.addEventListener('scroll', () => {
-    const section = document.querySelector('#stats');
-    const sectionTop = section.offsetTop;
-    const trigger = window.scrollY + window.innerHeight;
-    if (trigger > sectionTop) animateCounters();
-  });
 </script>
 </body>
 </html>
