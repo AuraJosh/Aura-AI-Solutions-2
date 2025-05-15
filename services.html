@@ -2,10 +2,20 @@
 <html lang="en" class="scroll-smooth dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Services | Aura AI Solutions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Chatbot Service | Aura AI Solutions</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    .parallax {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+  </style>
   <script>
     tailwind.config = {
       theme: {
@@ -18,155 +28,137 @@
       }
     }
   </script>
-  <link rel="icon" href="favicon.png" type="image/png">
 </head>
-<body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
+<body class="bg-gray-900 text-gray-100 overflow-x-hidden">
 
 <!-- Background Video -->
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
   <source src="background.mp4" type="video/mp4">
-  Your browser does not support the video tag.
 </video>
-
-  <!-- Static fallback image for mobile -->
-  <img src="fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-
-<!-- Dark Overlay -->
-<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
+<div class="fixed inset-0 bg-black/70 z-[-1]"></div>
 
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
   <div class="container mx-auto flex items-center justify-between p-4">
-    <div class="flex items-center space-x-4 flex-1">
-      <a href="index.html" class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block hidden">
-          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
-        </div>
-        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-      </a>
-    </div>
-
-    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+    <a href="index.html" class="flex items-center space-x-4">
+      <img src="logo-dark.png" alt="Aura AI Logo" class="h-12">
+      <span class="text-white text-lg font-semibold">Aura AI Solutions</span>
+    </a>
+    <nav class="hidden md:flex space-x-6">
       <a href="index.html" class="hover:text-primary">Home</a>
-      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="services.html" class="text-primary font-bold">Services</a>
       <a href="pricing.html" class="hover:text-primary">Pricing</a>
       <a href="review.html" class="hover:text-primary">Review</a>
       <a href="contact.html" class="hover:text-primary">Contact</a>
     </nav>
-
-    <div class="flex items-center justify-end space-x-4 flex-1">
-      <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
-    </div>
   </div>
 </header>
 
-<!-- Mobile Menu -->
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
-  <nav class="flex flex-col space-y-2">
-    <a href="index.html" class="hover:text-primary">Home</a>
-    <a href="services.html" class="hover:text-primary font-semibold">Services</a>
-    <a href="pricing.html" class="hover:text-primary">Pricing</a>
-    <a href="review.html" class="hover:text-primary">Review</a>
-    <a href="contact.html" class="hover:text-primary">Contact</a>
-  </nav>
-</div>
+<main class="pt-32">
+  <!-- Hero -->
+  <section class="text-center px-6 py-24">
+    <h1 class="text-5xl font-bold mb-6 text-white">AI Chatbot Solutions</h1>
+    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+      Automate customer support, generate leads, and grow your business 24/7 with Aura AI's intelligent chatbot platform.
+    </p>
+    <a href="#get-started" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Get Started</a>
+  </section>
 
-<!-- Services Section -->
-<main class="pt-32 container mx-auto px-4 py-24 relative z-10 flex-grow">
-  <h1 class="text-5xl font-bold mb-8 text-center text-white">Our Services</h1>
-  <p class="text-xl text-center text-gray-300 max-w-2xl mx-auto mb-16">
-    We build AI-driven tools to elevate your customer experience, starting with powerful chatbot technology — and more to come.
-  </p>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-
-    <!-- Chatbot Service -->
-    <div class="p-10 bg-blue-900 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
-      <div class="flex items-start space-x-4">
-        <div class="text-4xl">💬</div>
-        <div>
-          <h2 class="text-3xl font-bold mb-2 text-primary">AI Chatbot Widget</h2>
-          <p class="text-lg text-gray-300 leading-relaxed">
-            Embed our smart chatbot widget on your website to automate conversations, answer questions instantly, and collect customer insights 24/7.
-            Improve efficiency, reduce workload, and drive more conversions — all without lifting a finger.
-          </p>
-        </div>
+  <!-- Features -->
+  <section class="bg-gray-800 py-20 px-6" id="features">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+      <div data-aos="fade-right">
+        <h2 class="text-3xl font-bold text-primary mb-4">What Our Chatbot Can Do</h2>
+        <ul class="text-gray-300 space-y-3 text-lg">
+          <li>✅ Handle unlimited chats simultaneously</li>
+          <li>✅ Provide 24/7 support with instant responses</li>
+          <li>✅ Integrate with your CRM and tools</li>
+          <li>✅ Customize tone, branding & responses</li>
+          <li>✅ Save time, reduce costs, and boost conversions</li>
+        </ul>
+      </div>
+      <div data-aos="zoom-in">
+        <img src="chatbot-illustration.svg" alt="AI Chatbot" class="w-full max-w-md mx-auto">
       </div>
     </div>
+  </section>
 
-    <!-- Coming Soon -->
-    <div class="p-10 bg-gray-800 rounded-3xl shadow-xl transform transition hover:scale-[1.02] hover:shadow-2xl duration-300">
-      <div class="flex items-start space-x-4">
-        <div class="text-4xl">🚀</div>
-        <div>
-          <h2 class="text-3xl font-bold mb-2 text-pink-400">More AI Tools Coming Soon</h2>
-          <p class="text-lg text-gray-300 leading-relaxed">
-            We’re building new features to empower your business even further — including smart integrations, analytics dashboards, 
-            and AI-powered insights. Stay tuned for the next evolution of Aura AI Solutions.
-          </p>
-        </div>
+  <!-- Stats -->
+  <section class="py-20 bg-gray-900 text-center">
+    <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-8" id="stats">
+      <div>
+        <h3 class="text-5xl font-bold text-primary counter" data-target="85">0</h3>
+        <p class="text-gray-300 mt-2">Reduction in Support Workload</p>
+      </div>
+      <div>
+        <h3 class="text-5xl font-bold text-primary counter" data-target="92">0</h3>
+        <p class="text-gray-300 mt-2">Customer Satisfaction Score</p>
+      </div>
+      <div>
+        <h3 class="text-5xl font-bold text-primary counter" data-target="3.2">0</h3>
+        <p class="text-gray-300 mt-2">Hours Saved per Day</p>
       </div>
     </div>
+  </section>
 
-  </div>
+  <!-- Parallax CTA -->
+  <section class="parallax h-[400px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');">
+    <div class="bg-black bg-opacity-60 p-10 rounded-xl">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Let AI Take the Reins</h2>
+      <p class="text-lg text-gray-300 mb-6">Our chatbot does the work, so you can focus on scaling your business.</p>
+      <a href="#get-started" class="px-6 py-3 bg-primary text-white rounded-md hover:bg-accent transition">Start Your Free Trial</a>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section id="get-started" class="py-20 bg-gray-800 text-center px-6">
+    <h2 class="text-4xl font-bold text-white mb-6">Ready to Automate?</h2>
+    <p class="text-lg text-gray-300 mb-8 max-w-2xl mx-auto">Install our chatbot widget in minutes and start delivering smarter, faster support today.</p>
+    <a href="contact.html" class="px-8 py-4 bg-primary text-white rounded-lg hover:bg-accent transition text-lg font-semibold">Contact Us to Get Started</a>
+  </section>
 </main>
 
 <!-- Footer -->
-<footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
+<footer class="bg-gray-950 text-gray-500 py-8 text-center">
   <div class="mb-4">
     <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
     <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
   </div>
-  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+  <p class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</p>
 </footer>
 
 <!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const menuBtn = document.getElementById('menu-btn');
-    const menu = document.getElementById('menu');
-    menuBtn.addEventListener('click', () => {
-      menu.classList.toggle('hidden');
+  AOS.init({ once: true, duration: 1000 });
+
+  // Counter Animation
+  const counters = document.querySelectorAll('.counter');
+  const speed = 200;
+
+  const animateCounters = () => {
+    counters.forEach(counter => {
+      const updateCount = () => {
+        const target = +counter.getAttribute('data-target');
+        const count = +counter.innerText;
+        const increment = target / speed;
+        if (count < target) {
+          counter.innerText = Math.ceil(count + increment);
+          setTimeout(updateCount, 20);
+        } else {
+          counter.innerText = target;
+        }
+      };
+      updateCount();
     });
+  };
 
-    // Chatbot
-    const chatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
-    });
+  window.addEventListener('scroll', () => {
+    const section = document.querySelector('#stats');
+    const sectionTop = section.offsetTop;
+    const trigger = window.scrollY + window.innerHeight;
+    if (trigger > sectionTop) animateCounters();
   });
 </script>
-<script>
-  const defaultTitle = document.title;
-  const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
-  let blinkInterval;
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      let i = 0;
-      blinkInterval = setInterval(() => {
-        document.title = awayMessages[i % awayMessages.length];
-        i++;
-      }, 1000); // Change every 1 second
-    } else {
-      clearInterval(blinkInterval);
-      document.title = defaultTitle;
-    }
-  });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const typingEl = document.querySelector('.typing-text');
-    if (typingEl) {
-      setTimeout(() => {
-        typingEl.classList.add('finished');
-      }, 4500);
-    }
-  });
-</script>
-
 </body>
 </html>
