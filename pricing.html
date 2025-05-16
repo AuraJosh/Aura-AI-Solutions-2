@@ -276,18 +276,24 @@
     toggle.addEventListener('change', () => {
       const isYearly = toggle.checked;
 
-      if (isYearly) {
-        discountedPriceEl.classList.add('hidden');
-        originalPriceEl.classList.remove('line-through');
-        animatePrice(originalPriceEl, getPriceValue(originalPriceEl), prices.essential.annualMonthly);
-        if (betaBadgeEl) betaBadgeEl.classList.add('hidden');
-      } else {
-        discountedPriceEl.classList.remove('hidden');
-        originalPriceEl.classList.add('line-through');
-        originalPriceEl.textContent = `£${prices.essential.monthly}`;
-        discountedPriceEl.textContent = `£${prices.essential.discounted}`;
-        if (betaBadgeEl) betaBadgeEl.classList.remove('hidden');
-      }
+     if (isYearly) {
+      discountedPriceEl.classList.add('hidden');
+      originalPriceEl.classList.remove('line-through');
+      originalPriceEl.classList.remove('text-2xl');
+      originalPriceEl.classList.add('text-4xl', 'font-extrabold');
+      animatePrice(originalPriceEl, getPriceValue(originalPriceEl), prices.essential.annualMonthly);
+    
+      if (betaBadgeEl) betaBadgeEl.classList.add('hidden');
+    } else {
+      discountedPriceEl.classList.remove('hidden');
+      originalPriceEl.classList.add('line-through');
+      originalPriceEl.classList.remove('text-4xl', 'font-extrabold');
+      originalPriceEl.classList.add('text-2xl');
+      originalPriceEl.textContent = `£${prices.essential.monthly}`;
+      discountedPriceEl.textContent = `£${prices.essential.discounted}`;
+    
+      if (betaBadgeEl) betaBadgeEl.classList.remove('hidden');
+    }
 
 
 
