@@ -148,10 +148,13 @@
           <span class="absolute top-4 left-4 text-xs bg-red-500 text-white px-3 py-1 rounded-full font-semibold ring-1 ring-red-300 shadow">50% OFF – Beta</span>
           <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save more yearly</span>
           <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
-          <div class="mb-4">
-            <span id="price-essential" class="text-4xl font-extrabold text-white">£25</span>
-            <span class="block text-sm text-gray-400">per month</span>
+          <div class="mb-4 flex flex-col items-center gap-1">
+          <div class="flex items-baseline space-x-2">
+            <span id="original-price-essential" class="text-2xl line-through text-gray-400">£50</span>
+            <span id="discounted-price-essential" class="text-4xl font-extrabold text-white">£25</span>
           </div>
+          <span class="block text-sm text-gray-400">per month</span>
+        </div>
           <button class="w-full bg-blue-700 text-white font-semibold py-2 rounded hover:bg-blue-600 transition">Get Started</button>
           <ul class="mt-6 space-y-3 text-left text-sm text-gray-300">
             <li>✔ Basic chatbot</li>
@@ -253,6 +256,10 @@
       executive: document.getElementById('discount-executive')
     };
 
+    const originalPriceEl = document.getElementById('original-price-essential');
+    const discountedPriceEl = document.getElementById('discounted-price-essential');
+
+
     const getPriceValue = (el) => parseInt(el.textContent.replace(/[^\d]/g, ''));
 
     function animatePrice(el, from, to, duration = 300) {
@@ -274,23 +281,30 @@
     }
 
     toggle.addEventListener('change', () => {
-      const isYearly = toggle.checked;
-      animatePrice(priceEls.essential, getPriceValue(priceEls.essential), isYearly ? prices.essential.discounted : prices.essential.monthly);
-      animatePrice(priceEls.elite, getPriceValue(priceEls.elite), isYearly ? prices.elite.discounted : prices.elite.monthly);
-      animatePrice(priceEls.executive, getPriceValue(priceEls.executive), isYearly ? prices.executive.discounted : prices.executive.monthly);
-      updateDiscountBadges(isYearly);
-    });
+  const isYearly = toggle.checked;
 
-    updateDiscountBadges(toggle.checked);
-  });
-</script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const typingEl = document.querySelector('.typing-text');
-    setTimeout(() => {
-      typingEl.classList.add('finished');
-    }, 4500);
-  });
+  // Essential
+  if (isYearly) {
+    // Show annual price, hide discount
+    discountedPriceEl.classList.add('hidden');
+    originalPriceEl.classList.remove('line-through');
+    animatePrice(originalPriceEl, 50, prices.essential.discounted);
+  } else {
+    // Show monthly discount
+    discountedPriceEl.classList.remove('hidden');
+    originalPriceEl.classList.add('line-through');
+    discountedPriceEl.textContent = `£${Math.round(prices.essential.discounted)}`;
+    originalPriceEl.textContent = `£${Math.round(prices.essential.monthly)}`;
+  }
+
+  // Elite
+  animatePrice(priceEls.elite, getPriceValue(priceEls.elite), isYearly ? prices.elite.discounted : prices.elite.monthly);
+  // Executive
+  animatePrice(priceEls.executive, getPriceValue(priceEls.executive), isYearly ? prices.executive.discounted : prices.executive.monthly);
+
+  updateDiscountBadges(isYearly);
+});
+
 </script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
