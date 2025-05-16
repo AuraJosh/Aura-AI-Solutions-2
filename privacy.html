@@ -1,118 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy | Aura AI Solutions</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 20px;
-      color: #333;
-    }
-    h1, h2 {
-      color: #1a1a1a;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    p {
-      margin-bottom: 20px;
-    }
-  </style>
+  <link rel="icon" href="favicon.png" type="image/png" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="bg-gray-900 text-gray-200">
 
-  <h1>Privacy Policy</h1>
-  <p><strong>Effective Date:</strong> [Insert Date]</p>
+<!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block" />
+        </div>
+        <span class="text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4">&#9776;</button>
+    </div>
+  </div>
+</header>
 
-  <p>
-    Aura AI Solutions (“we”, “our”, or “us”) is committed to protecting and respecting your privacy.
-    This Privacy Policy explains how we collect, use, and store your personal information when you visit our website
-    <a href="https://auraai.uk" target="_blank" rel="noopener noreferrer">https://auraai.uk</a>,
-    contact us, or use our services.
-  </p>
+<!-- Mobile Menu -->
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
+  <nav class="flex flex-col space-y-2">
+    <a href="index.html" class="hover:text-primary">Home</a>
+    <a href="services.html" class="hover:text-primary">Services</a>
+    <a href="pricing.html" class="hover:text-primary">Pricing</a>
+    <a href="review.html" class="hover:text-primary">Review</a>
+    <a href="contact.html" class="hover:text-primary">Contact</a>
+  </nav>
+</div>
 
-  <h2>1. Information We Collect</h2>
-  <p>We may collect and process the following personal data:</p>
-  <ul>
-    <li><strong>Identity Data:</strong> Name, email address</li>
-    <li><strong>Technical Data:</strong> IP address, browser type/version</li>
-    <li><strong>Usage Data:</strong> How you use our website</li>
-    <li><strong>Communication Data:</strong> Any data you provide through contact forms or email</li>
-  </ul>
+<!-- Main Content -->
+<main class="pt-36 pb-20 px-6 max-w-5xl mx-auto space-y-8">
+  <h1 class="text-3xl md:text-5xl font-bold text-white mb-6">Privacy Policy</h1>
+  <div class="prose prose-invert max-w-none">
+    <p><strong>Effective Date:</strong> [Insert Date]</p>
+    <p><strong>Last Updated:</strong> [Insert Date]</p>
+    <p><strong>Company Name:</strong> Aura AI Solutions</p>
+    <p><strong>Contact Email:</strong> your@email.com</p>
+    <p><strong>Business Address:</strong> [Your Business Address]</p>
 
-  <h2>2. How We Collect Your Information</h2>
-  <p>We collect data through:</p>
-  <ul>
-    <li>Website forms (e.g., contact or sign-up forms)</li>
-    <li>Direct communication via email</li>
-    <li>Automatically through cookies and website analytics</li>
-  </ul>
+    <p>This Privacy Policy describes how Aura AI Solutions ("we", "our", or "us") collects, uses, and shares your personal and business data when you access or use our websites, services, AI tools, and other digital platforms.</p>
 
-  <h2>3. How We Use Your Data</h2>
-  <p>We use your data to:</p>
-  <ul>
-    <li>Respond to your enquiries</li>
-    <li>Provide and manage our services</li>
-    <li>Improve our website and user experience</li>
-    <li>Maintain internal records</li>
-  </ul>
+    <h2>1. Definitions</h2>
+    <ul>
+      <li><strong>Personal Data:</strong> Information that can identify an individual.</li>
+      <li><strong>Processing:</strong> Operations performed on personal data.</li>
+      <li><strong>Client Data:</strong> Business information shared with us by clients.</li>
+      <li><strong>AI Output:</strong> Results generated by our AI models.</li>
+    </ul>
 
-  <h2>4. Where Your Data Is Stored</h2>
-  <p>
-    We store data primarily in <strong>Google Sheets</strong>, which is secured via Google’s cloud infrastructure.
-    We take reasonable steps to ensure your data is handled securely and in accordance with this policy.
-  </p>
+    <h2>2. Scope of Policy</h2>
+    <p>This policy applies to visitors, clients, users of our AI platforms, and job applicants. It does not cover third-party services we do not control.</p>
 
-  <h2>5. Third-Party Services</h2>
-  <p>We may share data with trusted third parties for business operations, including:</p>
-  <ul>
-    <li><strong>Google</strong> (Google Sheets, Google Analytics)</li>
-  </ul>
-  <p>These services are contractually bound to protect your data and only use it for specified purposes.</p>
+    <h2>3. Information We Collect</h2>
+    <ul>
+      <li><strong>Directly Provided:</strong> Name, contact info, login credentials, uploaded files, feedback.</li>
+      <li><strong>Automatically Collected:</strong> IP address, browser data, usage logs, cookies.</li>
+      <li><strong>Third-Party Data:</strong> Data from integrations, analytics tools, CRMs.</li>
+    </ul>
 
-  <h2>6. Your Data Protection Rights</h2>
-  <p>Under UK GDPR, you have the right to:</p>
-  <ul>
-    <li>Access your personal data</li>
-    <li>Request correction of incorrect data</li>
-    <li>Request deletion of your data</li>
-    <li>Object to certain processing activities</li>
-    <li>Complain to the <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">Information Commissioner’s Office (ICO)</a></li>
-  </ul>
-  <p>To exercise these rights, please contact us at: <strong>[Insert Your Email]</strong></p>
+    <h2>4. How We Use Your Data</h2>
+    <ul>
+      <li>To deliver AI services and results.</li>
+      <li>To customize experiences and outputs.</li>
+      <li>To maintain platform security and performance.</li>
+      <li>To improve and develop new services.</li>
+      <li>To comply with legal obligations.</li>
+    </ul>
 
-  <h2>7. Cookies</h2>
-  <p>
-    Our site may use cookies to enhance your experience.
-    You can control or delete cookies through your browser settings.
-    A detailed Cookie Policy is available separately or upon request.
-  </p>
+    <h2>5. Legal Bases (GDPR)</h2>
+    <ul>
+      <li>Consent</li>
+      <li>Contractual necessity</li>
+      <li>Legal obligations</li>
+      <li>Legitimate interest</li>
+    </ul>
 
-  <h2>8. Data Security</h2>
-  <p>
-    We use appropriate technical and organizational measures to protect your personal data from unauthorized access,
-    disclosure, or loss.
-  </p>
+    <h2>6. Data Sharing</h2>
+    <ul>
+      <li>Service providers (e.g., hosting, analytics)</li>
+      <li>Legal authorities if required</li>
+      <li>Business transfers (e.g., mergers)</li>
+    </ul>
 
-  <h2>9. Changes to This Policy</h2>
-  <p>
-    We may update this Privacy Policy occasionally. We encourage you to review this page periodically to stay informed.
-  </p>
+    <h2>7. AI Model Usage</h2>
+    <p>Client data is not used for training shared models without consent. We support custom training under strict confidentiality agreements.</p>
 
-  <h2>10. Contact Us</h2>
-  <p>
-    If you have any questions or concerns about this Privacy Policy, you can contact us at:
-  </p>
-  <p>
-    <strong>Email:</strong> [Insert Your Email]<br>
-    <strong>Address:</strong> [Insert Your Business Address]
-  </p>
+    <h2>8. International Data Transfers</h2>
+    <p>Data may be stored outside your country. We use Standard Contractual Clauses and other safeguards to ensure protection.</p>
+
+    <h2>9. Data Retention</h2>
+    <p>We retain data only as long as necessary for our legitimate purposes and legal obligations. Clients may request deletion of their data.</p>
+
+    <h2>10. Your Rights</h2>
+    <ul>
+      <li>Access, correct, or delete data</li>
+      <li>Object or restrict processing</li>
+      <li>Withdraw consent</li>
+      <li>File a complaint with a data authority</li>
+    </ul>
+
+    <h2>11. Security</h2>
+    <p>We use encryption, access controls, secure APIs, and regular audits to protect your data. No system is completely secure, so please remain cautious.</p>
+
+    <h2>12. Cookies</h2>
+    <p>We use cookies for performance, analytics, and personalization. You can manage preferences through browser settings.</p>
+
+    <h2>13. Third-Party Links</h2>
+    <p>Our platforms may link to third-party websites. We are not responsible for their privacy practices.</p>
+
+    <h2>14. Children’s Privacy</h2>
+    <p>Our services are not intended for children under 13 (or 16 where applicable). We do not knowingly collect data from minors.</p>
+
+    <h2>15. Automated Decision-Making</h2>
+    <p>Some AI services include automated analysis. Human review is available upon request where applicable.</p>
+
+    <h2>16. Policy Updates</h2>
+    <p>We may update this policy. Changes will be posted on this page with an updated date.</p>
+
+    <h2>17. Contact</h2>
+    <p>Email: your@email.com</p>
+    <p>Address: [Your Business Address]</p>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+  <div class="mb-4">
+    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  });
+</script>
 
 </body>
 </html>
