@@ -1,94 +1,253 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Terms of Service | Aura AI Solutions</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Terms of Service - [Your Company Name]</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 20px;
-      color: #333;
-    }
-    h1, h2 {
-      color: #1a1a1a;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    p {
-      margin-bottom: 20px;
+    html, body {
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-900 text-gray-200 pt-28 px-6 pb-16 max-w-4xl mx-auto">
 
-  <h1>Terms of Service</h1>
-  <p><strong>Effective Date:</strong> [Insert Date]</p>
+<!-- Header -->
+<header class="fixed top-0 left-0 w-full bg-[#060d1f] shadow z-50">
+  <div class="w-full max-w-screen-xl mx-auto flex items-center justify-between px-4 py-3">
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain dark:hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
+  </div>
+</header>
 
-  <p>
-    Welcome to Aura AI Solutions (“Company”, “we”, “our”, or “us”). These Terms of Service (“Terms”) govern your use of our website
-    <a href="https://auraai.uk" target="_blank" rel="noopener noreferrer">https://auraai.uk</a> (the “Site”) and any services or products provided through it.
-    By accessing or using our Site, you agree to be bound by these Terms. If you do not agree, please do not use our Site.
-  </p>
+<!-- Mobile Menu -->
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
+  <nav class="flex flex-col space-y-2">
+    <a href="index.html" class="hover:text-primary">Home</a>
+    <a href="services.html" class="hover:text-primary">Services</a>
+    <a href="pricing.html" class="hover:text-primary">Pricing</a>
+    <a href="review.html" class="hover:text-primary">Review</a>
+    <a href="contact.html" class="hover:text-primary">Contact</a>
+  </nav>
+</div>
 
-  <h2>1. Use of the Site</h2>
-  <p>You agree to use our website only for lawful purposes and in a way that does not infringe on the rights of, restrict, or inhibit anyone else's use of the Site.</p>
+<main class="space-y-6">
+  <h1 class="text-4xl font-bold text-white">Terms of Service</h1>
+  <p><strong>Effective Date:</strong> [Insert Date]<br>
+  <strong>Last Updated:</strong> [Insert Date]<br>
+  <strong>Company Name:</strong> [Your Company Name]<br>
+  <strong>Contact Email:</strong> [your@email.com]<br>
+  <strong>Business Address:</strong> [Your Business Address]</p>
 
-  <h2>2. Intellectual Property</h2>
-  <p>
-    All content on the Site, including text, graphics, logos, icons, images, and software, is the property of Aura AI Solutions or its licensors and is protected by intellectual property laws.
-    You may not reproduce, distribute, or create derivative works from any content without our prior written consent.
-  </p>
+  <p>These Terms of Service ("Terms") govern your access to and use of the website, products, software, APIs, services, and any related applications (collectively, the "Services") provided by <strong>[Your Company Name]</strong> ("we," "our," "us").</p>
 
-  <h2>3. User Content</h2>
-  <p>
-    If you submit or upload any content to our Site (e.g., through contact forms or email), you grant us a non-exclusive, worldwide, royalty-free license to use, store, and process that content in accordance with our Privacy Policy.
-  </p>
+  <p>By accessing or using our Services, you agree to be bound by these Terms. If you do not agree to all of these Terms, you may not access or use the Services.</p>
 
-  <h2>4. Disclaimers</h2>
-  <p>
-    Our website and services are provided "as is" and "as available" without warranties of any kind. We do not guarantee that the Site will be error-free or uninterrupted.
-    To the fullest extent permitted by law, we disclaim all warranties, express or implied.
-  </p>
+  <section class="space-y-6">
+    <h2 class="text-2xl font-semibold text-white mt-6">1. Eligibility</h2>
+    <ul class="list-disc list-inside space-y-1">
+      <li>At least 18 years of age (or the age of majority in your jurisdiction),</li>
+      <li>Capable of entering into a binding contract,</li>
+      <li>Not prohibited from using our Services under applicable laws.</li>
+    </ul>
+    <p>If you are using the Services on behalf of a company or other legal entity, you represent and warrant that you are authorized to bind that entity to these Terms.</p>
 
-  <h2>5. Limitation of Liability</h2>
-  <p>
-    To the extent permitted by law, Aura AI Solutions shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Site or services.
-    This includes, without limitation, loss of data, income, or profit.
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">2. Services Overview</h2>
+    <p>[Your Company Name] provides artificial intelligence and machine learning solutions tailored to businesses. Our offerings may include:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>AI-powered analytics, automation, and recommendation engines,</li>
+      <li>Custom model training based on client data,</li>
+      <li>API access for AI services,</li>
+      <li>Platform dashboards and visualization tools,</li>
+      <li>Professional services, onboarding, or consulting.</li>
+    </ul>
+    <p>The features and capabilities available to you may vary based on your subscription or service tier.</p>
 
-  <h2>6. Links to Third-Party Sites</h2>
-  <p>
-    Our Site may contain links to third-party websites. We are not responsible for the content or privacy practices of these sites. Use them at your own risk.
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">3. Account Registration and Security</h2>
+    <p>To access certain Services, you may be required to register an account. You agree to:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Provide accurate and complete information,</li>
+      <li>Keep your login credentials secure and confidential,</li>
+      <li>Notify us immediately of any unauthorized use or breach.</li>
+    </ul>
+    <p>You are solely responsible for all activity that occurs under your account.</p>
 
-  <h2>7. Termination</h2>
-  <p>
-    We may terminate or suspend your access to the Site at any time, without notice, for any reason, including if you breach these Terms.
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">4. Client Data and Inputs</h2>
+    <p>You may provide data, documents, or other content (“Client Data”) for use with our Services. You retain full ownership of your Client Data.</p>
+    <p>You grant [Your Company Name] a non-exclusive, royalty-free, worldwide license to:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Use, store, process, and display Client Data to provide the Services,</li>
+      <li>Create AI outputs or models (only as permitted by your plan and privacy settings),</li>
+      <li>Analyze anonymized or aggregated Client Data for service improvements (only where authorized).</li>
+    </ul>
+    <p>You represent and warrant that:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>You have the legal right and necessary permissions to share Client Data,</li>
+      <li>Your use of the Services and submission of Client Data does not violate any law or third-party rights.</li>
+    </ul>
 
-  <h2>8. Changes to These Terms</h2>
-  <p>
-    We may update these Terms from time to time. Any changes will be posted on this page with an updated effective date.
-    Continued use of the Site after changes are made indicates your acceptance of the new Terms.
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">5. Acceptable Use Policy</h2>
+    <p>You agree <strong>not to use the Services</strong> to:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Violate any local, national, or international law or regulation,</li>
+      <li>Infringe upon the rights of any individual or organization,</li>
+      <li>Transmit or upload viruses, malware, or harmful content,</li>
+      <li>Use automated systems (bots, scrapers) without authorization,</li>
+      <li>Generate or disseminate false, harmful, or illegal content,</li>
+      <li>Reverse-engineer, decompile, or attempt to extract the source code of any software.</li>
+    </ul>
+    <p>We reserve the right to investigate and suspend accounts engaged in abusive or unlawful behavior.</p>
 
-  <h2>9. Governing Law</h2>
-  <p>
-    These Terms are governed by the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England.
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">6. Use of AI Systems and Outputs</h2>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Outputs may contain inaccuracies, hallucinations, or content unsuitable for your intended use.</li>
+      <li>AI-generated content is not a substitute for professional advice (e.g., legal, financial, medical).</li>
+      <li>You are responsible for verifying and validating any output before using it.</li>
+      <li>You retain any IP rights you are entitled to over the AI outputs, subject to third-party rights and applicable law.</li>
+    </ul>
+    <p>We disclaim all responsibility for consequences arising from reliance on AI outputs.</p>
 
-  <h2>10. Contact Us</h2>
-  <p>
-    If you have any questions about these Terms, please contact us at:<br>
-    <strong>Email:</strong> [Insert Your Email]<br>
-    <strong>Address:</strong> [Insert Business Address]
-  </p>
+    <h2 class="text-2xl font-semibold text-white mt-6">7. Subscription Plans and Payments</h2>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Pay all fees associated with your chosen plan (plus applicable taxes),</li>
+      <li>Maintain valid billing information,</li>
+      <li>Comply with the terms of your selected payment method.</li>
+    </ul>
+    <h3 class="text-xl font-semibold mt-4 text-white">Billing Terms:</h3>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Plans may renew automatically unless cancelled before the renewal date,</li>
+      <li>You may cancel your subscription via your account settings or by contacting support,</li>
+      <li>All fees are non-refundable except as required by law or under our refund policy.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">8. Intellectual Property</h2>
+    <p>All intellectual property in our Services (including code, models, designs, logos, and documentation) is owned by or licensed to [Your Company Name].</p>
+    <p><strong>You May Not:</strong></p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Copy, modify, or distribute any part of the Services without written consent,</li>
+      <li>Use our trademarks without authorization,</li>
+      <li>Create derivative works of our software or models.</li>
+    </ul>
+    <p>You retain all rights to your Client Data and, where applicable, to outputs generated by our AI tools (subject to your use case and applicable law).</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">9. Confidentiality</h2>
+    <p>We agree to keep your Client Data confidential and use it only to provide and improve the Services, in accordance with our Privacy Policy.</p>
+    <p>You agree not to disclose any non-public technical, commercial, or operational information about [Your Company Name] shared with you during service provision.</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">10. Third-Party Services and Integrations</h2>
+    <p>The Services may integrate or interact with third-party tools (e.g., OpenAI, Google Cloud, Zapier). We do not control these services and are not responsible for their performance, availability, or legal compliance.</p>
+    <p>Use of third-party services is subject to their own terms and privacy policies. We recommend reviewing them before use.</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">11. Termination and Suspension</h2>
+    <p>We may suspend or terminate your access to the Services if:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>You violate these Terms or any applicable law,</li>
+      <li>You fail to pay for services on time,</li>
+      <li>Your use of the Services poses a security risk or legal threat,</li>
+      <li>We discontinue the Service (with reasonable notice where possible).</li>
+    </ul>
+    <p>You may terminate your account at any time. Upon termination, your access to the Services will end, and we may delete your stored data in accordance with our retention policies.</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">12. Disclaimers</h2>
+    <p><strong>The Services are provided “as is” and “as available.”</strong> We make no warranties, express or implied, including:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>That the Services will be error-free, secure, or uninterrupted,</li>
+      <li>That outputs will be accurate, complete, or useful for your specific case,</li>
+      <li>That the Services will meet your expectations or business requirements.</li>
+    </ul>
+    <p>We disclaim all liability for any loss or damage arising from use of the Services.</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">13. Limitation of Liability</h2>
+    <p>To the fullest extent permitted by law:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>[Your Company Name] will not be liable for any indirect, incidental, punitive, or consequential damages (including lost profits, loss of business, or data loss),</li>
+      <li>Our total liability for any claim arising out of or related to the Services will not exceed the amount paid by you to us in the preceding 12 months.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">14. Indemnification</h2>
+    <p>You agree to indemnify and hold harmless [Your Company Name], its affiliates, employees, and agents from any claims, damages, or expenses (including legal fees) arising from:</p>
+    <ul class="list-disc list-inside space-y-1">
+      <li>Your use or misuse of the Services,</li>
+      <li>Your violation of these Terms or any applicable law,</li>
+      <li>Your infringement of any third-party rights (including intellectual property or data protection laws).</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">15. Modifications to These Terms</h2>
+    <p>We may update these Terms from time to time. We will notify you of material changes by email or platform notice. Continued use of the Services after the effective date of changes constitutes your acceptance.</p>
+    <p>If you do not agree with the updated Terms, you must stop using the Services.</p>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">16. Governing Law and Dispute Resolution</h2>
+    <p>These Terms are governed by the laws of [Insert Jurisdiction, e.g., England and Wales, State of California], without regard to conflict of law principles.</p>
+    <h3 class="text-xl font-semibold mt-4 text-white">Dispute Resolution:</h3>
+    <ul class="list-disc list-inside space-y-1">
+      <li>In the event of a dispute, both parties agree to attempt resolution through informal negotiation.</li>
+      <li>If unresolved, disputes will be submitted to <strong>[arbitration or courts, specify jurisdiction]</strong>.</li>
+      <li>You agree to waive class actions and bring claims only in your individual capacity.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">17. Miscellaneous</h2>
+    <ul class="list-disc list-inside space-y-1">
+      <li><strong>Entire Agreement:</strong> These Terms and our Privacy Policy constitute the full agreement between you and [Your Company Name].</li>
+      <li><strong>Severability:</strong> If any part of these Terms is found invalid, the rest remains enforceable.</li>
+      <li><strong>Force Majeure:</strong> We are not liable for delays or failure due to events beyond our control (e.g., natural disasters, war, internet outages).</li>
+      <li><strong>No Waiver:</strong> Our failure to enforce any provision does not waive our right to do so later.</li>
+    </ul>
+
+    <h2 class="text-2xl font-semibold text-white mt-6">18. Contact Information</h2>
+    <p><strong>Company Name:</strong> [Your Company Name]<br>
+    <strong>Email:</strong> [your@email.com]<br>
+    <strong>Business Address:</strong> [Your Business Address]<br>
+    <strong>Legal Contact or DPO (if applicable):</strong> [Insert Name]</p>
+  </section>
+</main>
+
+<footer class="text-center text-sm text-gray-500 mt-16 border-t border-gray-700 pt-6">
+  <div class="mb-4">
+    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div>© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Script: Mobile Menu Toggle -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
+  });
+</script>
 
 </body>
 </html>
