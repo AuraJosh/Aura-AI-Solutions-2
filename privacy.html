@@ -18,22 +18,21 @@
     }
   </script>
 </head>
-<body class="bg-gray-900 text-gray-200 px-6 py-10 max-w-4xl mx-auto space-y-6">
+<body class="bg-gray-900 text-gray-200 px-6 py-10 pt-28 max-w-4xl mx-auto space-y-6">
+
 
 <!-- Header -->
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
-  <div class="container mx-auto flex items-center justify-between p-4">
-    <!-- Left: Logo + Text -->
+  <div class="max-w-screen-xl mx-auto flex items-center justify-between p-4 w-full">
     <div class="flex items-center space-x-4 flex-1">
       <a href="index.html" class="flex items-center space-x-4">
         <div class="relative h-20 w-[150px]">
-          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain dark:hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain hidden dark:block">
         </div>
         <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
       </a>
     </div>
-    <!-- Center: Navigation -->
     <nav class="hidden md:flex justify-center space-x-6 flex-1">
       <a href="index.html" class="hover:text-primary">Home</a>
       <a href="services.html" class="hover:text-primary">Services</a>
@@ -41,12 +40,12 @@
       <a href="review.html" class="hover:text-primary">Review</a>
       <a href="contact.html" class="hover:text-primary">Contact</a>
     </nav>
-    <!-- Right: Mobile button -->
     <div class="flex items-center justify-end space-x-4 flex-1">
       <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
     </div>
   </div>
 </header>
+
   
   <h1 class="text-4xl font-bold text-white">Privacy Policy</h1>
   <p><strong>Effective Date:</strong> [Insert Date]<br>
