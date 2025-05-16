@@ -228,7 +228,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     const toggle = document.getElementById('billing-toggle');
     const prices = {
-      essential: { monthly: 50, discounted: 25, annualMonthly: 43 }
+      essential: { monthly: 50, discounted: 25, annualMonthly: 43 },
       elite: { monthly: 150, discounted: 123 },
       executive: { monthly: 500, discounted: 400 }
     };
@@ -272,13 +272,13 @@
         discountedPriceEl.classList.add('hidden');
         originalPriceEl.classList.remove('line-through');
         animatePrice(originalPriceEl, getPriceValue(originalPriceEl), prices.essential.annualMonthly);
-      }
-       else {
+      } else {
         discountedPriceEl.classList.remove('hidden');
         originalPriceEl.classList.add('line-through');
         originalPriceEl.textContent = `£${prices.essential.monthly}`;
         discountedPriceEl.textContent = `£${prices.essential.discounted}`;
       }
+
 
       animatePrice(priceEls.elite, getPriceValue(priceEls.elite), isYearly ? prices.elite.discounted : prices.elite.monthly);
       animatePrice(priceEls.executive, getPriceValue(priceEls.executive), isYearly ? prices.executive.discounted : prices.executive.monthly);
