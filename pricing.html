@@ -81,8 +81,33 @@
 <img src="fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
 <div class="fixed inset-0 bg-black/60 z-[-5]"></div>
 
-<!-- Header (unchanged) -->
-<!-- ...Header and Navigation code here... -->
+<!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <!-- Center: Navigation -->
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="review.html" class="hover:text-primary">Review</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <!-- Right: Mobile button -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
+  </div>
+</header>
 
 <!-- Pricing Section -->
 <main class="pt-32 container mx-auto px-4 pb-4 text-center text-white">
