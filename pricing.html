@@ -312,10 +312,10 @@
 <!-- Stripe Scripts -->
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-  const stripe = Stripe('pk_test_YOUR_PUBLIC_KEY'); // Replace with your real Stripe public key
+  const stripe = Stripe('pk_test_51RPZ7YCOIG8iILAlIkl1sFKlwAOwt4dJNxKg8rO8Mebv7SG9bR36IZUyp5ZfhWyFlzHZW226ZU7Om3wiMfeOPQZD00jlw3BVBn'); 
 
   document.getElementById('checkout-button-essential').addEventListener('click', function () {
-    fetch('/create-checkout-session', {
+    fetch('http://localhost:4242/create-checkout-session', {
       method: 'POST',
     })
     .then(response => response.json())
