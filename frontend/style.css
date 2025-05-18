@@ -1,7 +1,7 @@
 /* Apply a clean default font stack (optional, as Tailwind can handle this) */
 @font-face {
   font-family: 'SF Pro Display';
-  src: url('media/SFProDisplay-Black.woff2') format('woff2');
+  src: url('frontend/media/SFProDisplay-Black.woff2') format('woff2');
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -9,7 +9,7 @@
 
 @font-face {
   font-family: 'SF Pro Text';
-  src: url('media/SFProText-Regular.woff2') format('woff2');
+  src: url('frontend/media/SFProText-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
   font-display: swap;
