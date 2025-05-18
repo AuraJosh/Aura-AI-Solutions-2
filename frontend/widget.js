@@ -108,7 +108,7 @@ class BusinessChatWidget {
     disclaimerContainer.className = 'widget-disclaimer';
     disclaimerContainer.innerHTML = `
       <div class="footer-content">
-        <img class="footer-logo" src="media/logo-no-bg.png" alt="Aura Logo" style="cursor:pointer; margin-right: 10px; height: 36px; max-height: 36px; width: auto; float: left; display: inline-block;" />
+        <img class="footer-logo" src="frontend/media/logo-no-bg.png" alt="Aura Logo" style="cursor:pointer; margin-right: 10px; height: 36px; max-height: 36px; width: auto; float: left; display: inline-block;" />
         <div class="footer-text">
           <p style="color: #fff; text-align: left; margin: 4px 0 0 0; font-size: 12px; line-height: 1.05;">By chatting, you agree to this <a href=\"#\" class=\"disclaimer-link\" style=\"color: #fff; text-decoration: underline;\">disclaimer</a>.</p>
           <p class="powered-by" style="text-align: left; margin: 2px 0 0 0; font-size: 13px; line-height: 1.05; color: #fff;">Powered by <span class="aura-brand" style="cursor:pointer; color: #fff; background: none; -webkit-background-clip: initial; -webkit-text-fill-color: initial;">Aura</span></p>
