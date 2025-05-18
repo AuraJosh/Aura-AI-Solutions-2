@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | Aura AI Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="widget.css" />
+  <script src="widget.js"></script>
+
+  <style>
+    .fade-in {
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .fade-out {
+      animation: fadeOut 0.4s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; transform: scale(1); }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+  </style>
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
+
+<!-- Background Video -->
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
+  <source src="background.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+  
+<!-- Static fallback image for mobile -->
+  <img src="fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+  
+<!-- Dark Overlay -->
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
+
+<!-- Thank You Banner -->
+<div id="thank-you-banner" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+  <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
+    ✅ Thank you! Your form has been submitted.<br>The Aura team will contact you shortly.
+    <div class="mt-4">
+      <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+
+    <!-- Center: Navigation -->
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <!-- <a href="review.html" class="hover:text-primary">Review</a> -->
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+
+    <!-- Right: Mobile button -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<!-- Mobile Menu -->
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
+  <nav class="flex flex-col space-y-2">
+    <a href="index.html" class="hover:text-primary">Home</a>
+    <a href="services.html" class="hover:text-primary">Services</a>
+    <a href="pricing.html" class="hover:text-primary">Pricing</a>
+    <a href="review.html" class="hover:text-primary">Review</a>
+    <a href="contact.html" class="hover:text-primary font-bold">Contact</a>
+  </nav>
+</div>
+
+<!-- Contact Form Section -->
+<main class="pt-32 container mx-auto px-4 py-20 relative z-10 flex-grow">
+  <h1 class="text-5xl font-bold mb-12 text-center text-white">Get In Touch With Our Team</h1>
+  <form id="contact-form" action="https://formspree.io/f/mkgrovkp" method="POST" class="max-w-2xl mx-auto bg-gray-800 p-10 rounded-3xl shadow-xl space-y-6">
+    <input type="text" name="name" placeholder="Your Name" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" required>
+    <input type="email" name="email" placeholder="Your Email" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" required>
+    <textarea name="message" placeholder="Your Message" class="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white" rows="5" required></textarea>
+    <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700 transition">Send Message</button>
+  </form>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
+  <div class="mb-4">
+    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Scripts -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+
+    const form = document.getElementById('contact-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: { "Accept": "application/json" }
+        }).then(response => {
+          if (response.ok) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const banner = document.getElementById('thank-you-banner');
+            const content = document.getElementById('thank-you-content');
+
+            banner.classList.remove('hidden');
+            content.classList.remove('fade-out');
+            content.classList.add('fade-in');
+
+            setTimeout(() => {
+              content.classList.remove('fade-in');
+              content.classList.add('fade-out');
+              setTimeout(() => {
+                banner.classList.add('hidden');
+              }, 400);
+            }, 4000);
+
+            form.reset();
+          } else {
+            alert("There was a problem submitting the form. Please try again.");
+          }
+        }).catch(() => {
+          alert("There was a problem sending your message.");
+        });
+      });
+    }
+
+    // Chatbot
+    const chatWidget = new BusinessChatWidget({
+      apiKey: 'your-api-key-here',
+      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
+      widgetTitle: 'Business Assistant',
+      primaryColor: '#4a90e2'
+    });
+  });
+
+  function closeBanner() {
+    const banner = document.getElementById('thank-you-banner');
+    const content = document.getElementById('thank-you-content');
+
+    content.classList.remove('fade-in');
+    content.classList.add('fade-out');
+
+    setTimeout(() => {
+      banner.classList.add('hidden');
+    }, 400);
+  }
+</script>
+<script>
+  const defaultTitle = document.title;
+  const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
+  let blinkInterval;
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      let i = 0;
+      blinkInterval = setInterval(() => {
+        document.title = awayMessages[i % awayMessages.length];
+        i++;
+      }, 1000); // Change every 1 second
+    } else {
+      clearInterval(blinkInterval);
+      document.title = defaultTitle;
+    }
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const typingEl = document.querySelector('.typing-text');
+    if (typingEl) {
+      setTimeout(() => {
+        typingEl.classList.add('finished');
+      }, 4500);
+    }
+  });
+</script>
+
+</body>
+</html>

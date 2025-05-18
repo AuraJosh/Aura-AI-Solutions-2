@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Chatbot Service | Aura AI Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    .parallax {
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+    .gradient-divider {
+      background: linear-gradient(to right, #6366F1, #8B5CF6);
+      height: 6px;
+      width: 100%;
+      margin: 4rem 0;
+    }
+    .typing-text {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
+      border-right: 2px solid;
+    }
+    .typing-text.finished {
+      border-right: none;
+    }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-900 text-gray-100 overflow-x-hidden">
+
+<!-- Background Video -->
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
+  <source src="background.mp4" type="video/mp4">
+</video>
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
+
+<!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <!-- Left: Logo + Text -->
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white font-semibold drop-shadow-sm">Aura AI Solutions</span>
+      </a>
+    </div>
+
+    <!-- Center: Navigation -->
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <!-- <a href="review.html" class="hover:text-primary">Review</a> -->
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+
+    <!-- Right: Mobile button -->
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+
+<main class="pt-40">
+  <!-- Hero -->
+  <section class="text-center px-6 py-48">
+    <h1 class="text-5xl font-bold mb-6 text-white">Aura AI Solutions Services</h1>
+    <p class="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+      Services designed by us to improve the quality and functionality of your business, through the use of AI.
+    </p>
+    <a href="#features" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Explore Features</a>
+  </section>
+
+  <!-- Parallax Overview -->
+  <section class="parallax h-[450px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');">
+    <div class="bg-black bg-opacity-60 p-10 rounded-xl">
+      <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Transform Your Customer Experience with AI</h2>
+      <p class="text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="py-20 bg-gray-800 px-6" id="features">
+    <div class="max-w-6xl mx-auto space-y-16">
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Key Features</h3>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>🤖 Context-aware responses trained on your FAQs, docs, or databases</li>
+            <li>🌐 Multilingual support for international audiences</li>
+            <li>📊 Real-time analytics dashboard to track engagement & performance</li>
+            <li>🔌 Integration with CRM, Shopify, Calendly, and more</li>
+            <li>🎨 Fully customizable UI and tone to match your brand</li>
+          </ul>
+        </div>
+        <img src="chat-ui-preview.png" alt="Chat UI" class="rounded-xl shadow-xl" />
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-up">
+        <img src="insights-dashboard.png" alt="Analytics Dashboard" class="rounded-xl shadow-xl" />
+        <div>
+          <h3 class="text-3xl font-bold text-primary mb-4">Business Impact</h3>
+          <p class="text-lg text-gray-300 mb-4">Our clients report an average 85% reduction in support workload, and a 25% increase in customer satisfaction within 60 days.</p>
+          <ul class="text-lg text-gray-300 space-y-2">
+            <li>📈 Convert more leads with instant answers</li>
+            <li>⏱ Save thousands of hours annually on live chat</li>
+            <li>🧠 Provide personalized support with smart memory</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN INFORMATION SECTIONS -->
+  <section class="bg-gray-950 py-20 px-6 text-gray-200">
+    <div class="max-w-6xl mx-auto space-y-24">
+
+      <!-- Essential Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-primary mb-4">Essential Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">An ideal starting point for entrepreneurs and small teams. The Essential Plan offers a streamlined chatbot with just the right tools to start automating responses and engaging visitors around the clock.</p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>1,000 monthly messages with usage tracking</li>
+            <li>1 customizable chatbot for your site or product</li>
+            <li>Aura AI branding — clearly communicate it's powered by us</li>
+            <li>Support available within 7 business days</li>
+          </ul>
+          <p class="mt-4 text-gray-400">This is perfect for basic customer service, simple FAQ handling, and early-stage validation of chatbot engagement. Easily upgrade as your needs evolve.</p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="essential-plan.png" alt="Essential Plan" class="w-full max-w-md mx-auto">
+        </div>
+      </div>
+
+      <div class="gradient-divider"></div>
+
+      <!-- Elite Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-left">
+        <div class="text-center md:order-2" data-aos="zoom-in">
+          <img src="elite-plan.png" alt="Elite Plan" class="w-full max-w-md mx-auto">
+        </div>
+        <div>
+          <h2 class="text-3xl font-bold text-pink-400 mb-4">Elite Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">Tailored for growing businesses, the Elite Plan unlocks real operational efficiency. Deploy multiple bots, answer FAQs more intelligently, and analyze performance trends with ease.</p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>5,000 monthly messages with smart scaling</li>
+            <li>3 simultaneous chatbot instances for varied use cases</li>
+            <li>Custom answers, FAQ templates, and multilingual support</li>
+            <li>Analytics dashboard with traffic, questions, & usage summaries</li>
+            <li>Priority support with faster turnaround</li>
+          </ul>
+          <p class="mt-4 text-gray-400">Perfect for companies with diverse offerings or regional operations. Match tone, automate across multiple sites, and continuously improve based on real data.</p>
+        </div>
+      </div>
+
+      <div class="gradient-divider"></div>
+
+      <!-- Executive Plan -->
+      <div class="grid md:grid-cols-2 gap-12 items-center" data-aos="fade-right">
+        <div>
+          <h2 class="text-3xl font-bold text-yellow-400 mb-4">Executive Plan</h2>
+          <p class="text-lg text-gray-300 mb-4">Designed for large-scale operations and teams that demand full autonomy, the Executive Plan delivers complete flexibility and white-label control over every interaction.</p>
+          <ul class="space-y-2 text-gray-400 list-disc list-inside">
+            <li>Unlimited chatbot messages and usage</li>
+            <li>White-label support — your brand, fully represented</li>
+            <li>Custom-designed personalities and advanced tone control</li>
+            <li>Comprehensive analytics suite + exportable insights</li>
+            <li>24-hour response SLA with dedicated support</li>
+          </ul>
+          <p class="mt-4 text-gray-400">You’ll have full command over chatbot workflows, deep integration with enterprise tools, and premium support to meet mission-critical demands.</p>
+        </div>
+        <div class="text-center" data-aos="zoom-in">
+          <img src="executive-plan.png" alt="Executive Plan" class="w-full max-w-md mx-auto">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Coming Soon Section -->
+  <section class="py-24 bg-gray-800 px-6 text-center">
+    <div class="max-w-4xl mx-auto" data-aos="fade-up">
+      <h2 class="text-4xl font-bold text-primary mb-4">What’s Next for Aura AI?</h2>
+      <p class="text-lg text-gray-300 mb-6">We’re building even more tools to supercharge your chatbot experience.</p>
+      <ul class="text-left list-disc list-inside text-gray-400 space-y-2 max-w-2xl mx-auto">
+        <li>🧠 AI training on your entire website or document library</li>
+        <li>📅 Smart scheduling + calendar integration</li>
+        <li>📥 Custom CRM integrations and contact syncing</li>
+        <li>🔄 Omnichannel support (email, chat, socials)</li>
+        <li>🔐 User role-based control for team access</li>
+      </ul>
+      <p class="text-gray-400 mt-6">These features are currently in development and will be available to Elite and Executive users soon.</p>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-950 text-gray-500 py-8 text-center">
+  <div class="mb-4">
+    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <p class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</p>
+</footer>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ once: true, duration: 1000 });
+</script>
+</body>
+</html>
