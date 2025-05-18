@@ -57,7 +57,7 @@
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "frontend/analytics.html";
+        window.location.href = "analytics.html";
       } catch (error) {
         alert("Login failed: " + error.message);
       }
