@@ -19,7 +19,7 @@
   </script>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="widget.css" />
-  <script src="widget.js"></script>
+  <script src="frontend/widget.js"></script>
 
   <style>
     .fade-in {
@@ -46,12 +46,12 @@
 
 <!-- Background Video -->
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
-  <source src="media/background.mp4" type="video/mp4">
+  <source src="frontend/media/background.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
   
 <!-- Static fallback image for mobile -->
-  <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+  <img src="frontend/media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
   
 <!-- Dark Overlay -->
 <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
@@ -73,8 +73,8 @@
     <div class="flex items-center space-x-4 flex-1">
       <a href="index.html" class="flex items-center space-x-4">
         <div class="relative h-20 w-[150px]">
-          <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+          <img src="frontend/media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="frontend/media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
         </div>
         <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
       </a>
