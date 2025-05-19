@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs"]
+
+[phases.install]
+cmds = ["cd stripe-backend && npm install"]
+
+[phases.build]
+cmds = []
+
+[phases.start]
+cmd = "cd stripe-backend && node index.js"
