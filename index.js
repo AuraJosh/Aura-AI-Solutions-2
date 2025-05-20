@@ -1,33 +1,44 @@
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
-require('dotenv').config();
+const stripe = require('stripe')('sk_test_your_secret_key'); // Replace with your real secret key
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // To parse JSON body
 
 app.post('/create-checkout-session', async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'payment',
-    line_items: [
-      {
-        price_data: {
-          currency: 'gbp',
-          product_data: { name: 'Essential Plan' },
-          unit_amount: 2500, // £25 in pence
-        },
-        quantity: 1,
-      },
-    ],
-    success_url: 'https://auraai.uk',
-    cancel_url: 'https://auraai.uk/frontend/pricing.html',
-  });
+  const { plan } = req.body;
 
-  res.json({ id: session.id });
+  const PRICE_IDS = {
+    monthly: 'prod_SKDg3M1fARmgaJ', // e.g., Essential Monthly
+    annual: 'prod_SLdzQAUlhAHgyV'    // e.g., Essential Annual
+  };
+
+  const priceId = PRICE_IDS[plan];
+
+  if (!priceId) {
+    return res.status(400).json({ error: 'Invalid plan selected' });
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'subscription',
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      success_url: 'https://yourdomain.com/success',
+      cancel_url: 'https://yourdomain.com/cancel',
+    });
+
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error('Stripe error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-app.listen(process.env.PORT || 4242, () =>
-  console.log('Server running on port 4242')
-);
+app.listen(3000, () => console.log('Server running on port 3000'));
