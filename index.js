@@ -10,8 +10,8 @@ app.post('/create-checkout-session', async (req, res) => {
   const { plan } = req.body;
 
   const PRICE_IDS = {
-    monthly: 'prod_SKDg3M1fARmgaJ', // e.g., Essential Monthly
-    annual: 'prod_SLdzQAUlhAHgyV'    // e.g., Essential Annual
+    monthly: 'price_1RPZF4COIG8iILAlrhMjoLJp', // e.g., Essential Monthly
+    annual: 'price_1RQwhtCOIG8iILAlosgcMJWH'    // e.g., Essential Annual
   };
 
   const priceId = PRICE_IDS[plan];
