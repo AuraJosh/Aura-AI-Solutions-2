@@ -1,44 +1,47 @@
 const express = require('express');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const cors = require('cors');
-const stripe = require('stripe')('sk_test_your_secret_key'); // Replace with your real secret key
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // To parse JSON body
+app.use(express.json());
 
 app.post('/create-checkout-session', async (req, res) => {
   const { plan } = req.body;
 
+  // ✅ Replace these with your actual Stripe Price IDs from dashboard
   const PRICE_IDS = {
-    monthly: 'price_1RPZF4COIG8iILAlrhMjoLJp', // e.g., Essential Monthly
-    annual: 'price_1RQwhtCOIG8iILAlosgcMJWH'    // e.g., Essential Annual
+    monthly: 'price_1RPZF4COIG8iILAlrhMjoLJp',
+    annual: 'price_1RQwhtCOIG8iILAlosgcMJWH'
   };
 
   const priceId = PRICE_IDS[plan];
 
   if (!priceId) {
-    return res.status(400).json({ error: 'Invalid plan selected' });
+    return res.status(400).json({ error: 'Invalid billing plan selected.' });
   }
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      mode: 'subscription',
+      mode: 'subscription', // 🔁 Required for recurring billing
       line_items: [
         {
           price: priceId,
-          quantity: 1,
-        },
+          quantity: 1
+        }
       ],
-      success_url: 'https://yourdomain.com/success',
-      cancel_url: 'https://yourdomain.com/cancel',
+      success_url: 'https://auraai.uk',
+      cancel_url: 'https://auraai.uk/frontend/pricing.html'
     });
 
     res.json({ id: session.id });
-  } catch (error) {
-    console.error('Stripe error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  } catch (err) {
+    console.error('Stripe error:', err);
+    res.status(500).json({ error: 'Failed to create checkout session' });
   }
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+const PORT = process.env.PORT || 4242;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
