@@ -1,1 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome | Aura AI Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366F1',
+            accent: '#8B5CF6',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="icon" href="media/favicon.png" type="image/png">
+  <style>
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -10;
+    }
+    .popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #10b981;
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 1000;
+    }
+    .popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+<!-- Background Video -->
+<video autoplay muted loop playsinline class="video-background">
+  <source src="media/background.mp4" type="video/mp4">
+</video>
+<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+<div class="fixed inset-0 bg-black/60 z-[-5]"></div>
+
+<!-- Header -->
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+  <div class="container mx-auto flex items-center justify-between p-4">
+    <div class="flex items-center space-x-4 flex-1">
+      <a href="../index.html" class="flex items-center space-x-4">
+        <div class="relative h-20 w-[150px]">
+          <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+          <img src="media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+        </div>
+        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+      </a>
+    </div>
+    <nav class="hidden md:flex justify-center space-x-6 flex-1">
+      <a href="../index.html" class="hover:text-primary">Home</a>
+      <a href="services.html" class="hover:text-primary">Services</a>
+      <a href="pricing.html" class="hover:text-primary">Pricing</a>
+      <a href="contact.html" class="hover:text-primary">Contact</a>
+    </nav>
+    <div class="flex items-center justify-end space-x-4 flex-1">
+      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
+    </div>
+  </div>
+</header>
+
+<!-- Success Notification -->
+<div id="popup" class="popup">
+  ✅ Purchase successful! Thank you very much for choosing Aura.
+</div>
+
+<!-- Main Content -->
+<main class="pt-32 container mx-auto px-4 pb-16 text-center">
+  <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow">Welcome to Aura!</h1>
+  <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+    We're excited to have you on board. You now have full access to your chosen plan. If you need any support, feel free to reach out via our contact page.
+  </p>
+  <a href="pricing.html" class="inline-block mt-8 px-6 py-3 bg-primary hover:bg-accent transition text-white font-semibold rounded-xl shadow-lg">Return to Pricing</a>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+  <div class="mb-4">
+    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+  </div>
+  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<!-- Show popup on load -->
+<script>
+  window.addEventListener('load', () => {
+    const popup = document.getElementById('popup');
+    popup.classList.add('show');
+    setTimeout(() => {
+      popup.classList.remove('show');
+    }, 5000);
+  });
+</script>
+</body>
+</html>
 
