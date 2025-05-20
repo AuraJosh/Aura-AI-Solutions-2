@@ -318,7 +318,7 @@
     const isYearly = document.getElementById('billing-toggle').checked;
 
     const billingType = isYearly ? 'annual' : 'monthly';
-
+    console.log('Billing Type Sent:', billingType);
     fetch(`https://charismatic-nourishment-production.up.railway.app/create-checkout-session`, {
       method: 'POST',
       headers: {
