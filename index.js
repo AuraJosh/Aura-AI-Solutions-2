@@ -32,7 +32,7 @@ app.post('/create-checkout-session', async (req, res) => {
           quantity: 1
         }
       ],
-      success_url: 'auraai.uk/frontend/welcome.html',
+      success_url: 'https://auraai.uk/frontend/welcome.html',
       cancel_url: 'https://auraai.uk/frontend/pricing.html'
     });
 
