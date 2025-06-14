@@ -19,7 +19,6 @@
   </script>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="widget.css" />
-  <script src="widget.js"></script>
 
   <style>
     .fade-in {
@@ -41,16 +40,15 @@
     }
   </style>
   <link rel="icon" href="media/favicon.png" type="image/png">
-    <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-  
+
     gtag('config', 'G-03MPB9XG9B');
   </script>
-  
 </head>
 <body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
 
@@ -59,10 +57,10 @@
   <source src="media/background.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
-  
+
 <!-- Static fallback image for mobile -->
-  <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-  
+<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+
 <!-- Dark Overlay -->
 <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
@@ -105,7 +103,6 @@
     </div>
   </div>
 </header>
-
 
 <!-- Mobile Menu -->
 <div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
@@ -184,14 +181,6 @@
         });
       });
     }
-
-    // Chatbot
-    const chatWidget = new BusinessChatWidget({
-      apiKey: 'your-api-key-here',
-      apiEndpoint: 'https://your-lambda-api-endpoint.amazonaws.com/prod/chat',
-      widgetTitle: 'Business Assistant',
-      primaryColor: '#4a90e2'
-    });
   });
 
   function closeBanner() {
@@ -217,7 +206,7 @@
       blinkInterval = setInterval(() => {
         document.title = awayMessages[i % awayMessages.length];
         i++;
-      }, 1000); // Change every 1 second
+      }, 1000);
     } else {
       clearInterval(blinkInterval);
       document.title = defaultTitle;
