@@ -22,7 +22,6 @@
   </script>
   <link rel="stylesheet" href="frontend/style.css">
   <link rel="stylesheet" href="frontend/widget.css">
-  <script src="frontend/widget.js"></script>
 
   <style>
     html, body { margin: 0; padding: 0; }
@@ -44,10 +43,10 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-  
+
     gtag('config', 'G-03MPB9XG9B');
   </script>
-  
+
 </head>
 <body class="bg-gray-900 text-gray-200">
 
@@ -80,7 +79,6 @@
     </div>
   </div>
 </header>
-
 
 <!-- Mobile Menu -->
 <div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg">
@@ -115,7 +113,7 @@
     <!-- CTA Button -->
     <!-- <button id="try-bot-btn" class="bg-white text-primary font-bold px-6 py-3 rounded-full shadow-lg hover:scale-105 transition transform duration-300">
       👉 Try Our Bot Now
-    </button>
+    </button> -->
 
     <!-- Scroll Cue -->
     <div class="mt-16">
@@ -141,37 +139,6 @@
     const menuBtn = document.getElementById('menu-btn');
     const menu = document.getElementById('menu');
     menuBtn.addEventListener('click', () => menu.classList.toggle('hidden'));
-
-    const tryBtn = document.getElementById('try-bot-btn');
-    let chatbotLaunched = false;
-
-    tryBtn.addEventListener('click', () => {
-      if (chatbotLaunched) {
-        if (window.myChatWidget && typeof window.myChatWidget.open === 'function') {
-          window.myChatWidget.open();
-        }
-        return;
-      }
-
-      chatbotLaunched = true;
-      tryBtn.style.transition = 'opacity 0.4s ease';
-      tryBtn.style.opacity = '0';
-
-      setTimeout(() => {
-        tryBtn.style.display = 'none';
-
-        window.myChatWidget = new BusinessChatWidget({
-          apiEndpoint: 'https://384f8lmpn2.execute-api.eu-north-1.amazonaws.com/prod/AURA-chatbot',
-          widgetTitle: 'Aura AI Assistant',
-          primaryColor: '#4a90e2',
-          initialMessage: "Hello! I'm your AI assistant. How can I help you today?"
-        });
-
-        setTimeout(() => {
-          window.myChatWidget.open();
-        }, 100);
-      }, 400);
-    });
   });
 </script>
 
@@ -206,14 +173,5 @@
     }
   });
 </script>
-<iframe
-  src="https://d2yqj3k2c4m8s1.cloudfront.net/chatbot-frontend/chatbot-widget.html"
-  width="384px"
-  height="540px"
-  frameborder="0"
-  scrolling="no"
-  style="border:none; position:fixed; bottom:24px; right:24px; z-index:9999; width:384px; height:540px; overflow:hidden;"
-  title="Aura AI Chatbot"
-></iframe>
 </body>
 </html>
