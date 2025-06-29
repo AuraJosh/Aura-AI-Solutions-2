@@ -175,7 +175,7 @@
 </script>
 <iframe
   id="aura-chatbot-iframe"
-  src="https://d2yqj3k2c4m8s1.cloudfront.net/chatbot-frontend/chatbot-widget.html"
+  src="https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/chatbot-widget.html"
   frameborder="0"
   scrolling="no"
   title="Aura AI Chatbot"
@@ -194,42 +194,42 @@
 ></iframe>
 
 <script>
-    const chatbotConfig = {
-        accountId: 'AUR000', // Replace with the actual account ID if customized
-        themeColor: '#124a1b' // Customize the theme color if needed
-    };
+  const chatbotConfig = {
+      accountId: 'AUR000',
+      apiKey: 'r3m2dP9EwH8PoXANYgNZV6JCOcRiOOTGaIdKVR63',
+      apiEndpoint: 'https://uxa8aixawk.execute-api.eu-west-2.amazonaws.com/default/chat',
+      themeColor: '#adab11'
+  };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        const chatbotIframe = document.getElementById('aura-chatbot-iframe');
+  document.addEventListener('DOMContentLoaded', function() {
+      const chatbotIframe = document.getElementById('aura-chatbot-iframe');
 
-        if (chatbotIframe) {
-            const fullWidth = 420;
-            const fullHeight = 540;
-            const toggleButtonWidth = 90;
-            const toggleButtonHeight = 90;
+      if (chatbotIframe) {
+          const fullWidth = 420;
+          const fullHeight = 540;
+          const toggleButtonWidth = 90;
+          const toggleButtonHeight = 90;
 
-            chatbotIframe.addEventListener('load', function() {
-                chatbotIframe.contentWindow.postMessage({
-                    type: 'init',
-                    config: chatbotConfig
-                }, '*');
-            });
+          chatbotIframe.addEventListener('load', function() {
+              chatbotIframe.contentWindow.postMessage({
+                  type: 'init',
+                  config: chatbotConfig
+              }, '*');
+          });
 
-            window.addEventListener('message', function(event) {
-                if (event.data && event.data.type === 'chatbotState') {
-                    if (event.data.isOpen) {
-                        chatbotIframe.style.width = `${fullWidth}px`;
-                        chatbotIframe.style.height = `${fullHeight}px`;
-                        chatbotIframe.style.transition = 'width 0.3s ease-out, height 0.3s ease-out';
-                    } else {
-                        chatbotIframe.style.width = `${toggleButtonWidth}px`;
-                        chatbotIframe.style.height = `${toggleButtonHeight}px`;
-                        chatbotIframe.style.transition = 'width 0.3s ease-in, height 0.3s ease-in';
-                    }
-                }
-            });
-        }
-    });
+          window.addEventListener('message', function(event) {
+              if (event.data && event.data.type === 'chatbotState') {
+                  if (event.data.isOpen) {
+                      chatbotIframe.style.width = `${fullWidth}px`;
+                      chatbotIframe.style.height = `${fullHeight}px`;
+                  } else {
+                      chatbotIframe.style.width = `${toggleButtonWidth}px`;
+                      chatbotIframe.style.height = `${toggleButtonHeight}px`;
+                  }
+              }
+          });
+      }
+  });
 </script>
 
 </body>
