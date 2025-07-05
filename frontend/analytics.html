@@ -136,12 +136,7 @@
 
                 const data = await response.json(); // Parse the JSON response from the Apps Script
 
-                // Handle errors returned from the Apps Script itself
-                if (data.error) {
-                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
-                    return;
-                }
-                
+              
                 // If no data is returned (e.g., user is not mapped, or no analytics for their ID)
                // Handle errors returned from the Apps Script itself
                 if (data.error) {
