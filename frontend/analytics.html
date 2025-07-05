@@ -34,8 +34,8 @@
 
   <!-- Main Content -->
   <main class="pt-40 px-4 flex justify-center relative z-10">
-    <div class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg">
-      <!-- Future analytics will go here -->
+    <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg overflow-y-auto">
+      <p class="text-white text-center">Loading your analytics data...</p> 
     </div>
   </main>
 
@@ -86,5 +86,95 @@
       }
     });
   </script>
+  <script type="module">
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+        // IMPORTANT: REPLACE THIS WITH THE "Web app URL" YOU COPIED IN STEP 3!
+        // Example: const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz123ABCDEF456XYZ/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE'; // <--- **PASTE YOUR URL HERE**
+
+        const auth = getAuth(); // Get the Firebase Auth instance
+
+        // --- Data Loading Logic ---
+        // This function listens for Firebase authentication state changes
+        // and loads data when a user is signed in.
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in. We can now get their unique ID.
+                const userIdentifier = user.uid; // This is the unique Firebase User ID (e.g., k9tY2XzPqL8oN3rJ1sV7uA)
+                console.log("Logged-in user ID (Firebase UID):", userIdentifier);
+
+                // Call the function to fetch data using this identifier
+                await loadCustomerData(userIdentifier);
+
+            } else {
+                // User is signed out. Redirect to login.
+                // (Your existing onAuthStateChanged already handles this redirect to login.html)
+                console.log("User is signed out. Redirecting to login.");
+            }
+        });
+
+        // Function to fetch data from the Google Apps Script
+        async function loadCustomerData(userIdentifier) {
+            const dataTableContainer = document.getElementById('data-table-container');
+            if (!dataTableContainer) {
+                console.error("Error: Element with ID 'data-table-container' not found.");
+                return;
+            }
+
+            // Show a loading message while data is being fetched
+            dataTableContainer.innerHTML = '<p class="text-white text-center">Loading your analytics data...</p>';
+
+            try {
+                // Construct the URL to your Apps Script, including the Firebase User ID
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+                
+                // Check if the network request was successful
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json(); // Parse the JSON response from the Apps Script
+
+                // Handle errors returned from the Apps Script itself
+                if (data.error) {
+                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
+                    return;
+                }
+                
+                // If no data is returned (e.g., user is not mapped, or no analytics for their ID)
+                if (data.length === 0) {
+                     dataTableContainer.innerHTML = '<p class="text-white text-center">No analytics data found for your account.</p>';
+                     return;
+                }
+
+                // --- Render the data into an HTML table ---
+                const headers = Object.keys(data[0]); // Get headers from the first data object
+                let tableHTML = '<table class="min-w-full bg-white/5 rounded-lg overflow-hidden shadow-lg">';
+                tableHTML += '<thead><tr>';
+                headers.forEach(header => { 
+                    // Basic styling for headers
+                    tableHTML += `<th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">${header}</th>`; 
+                });
+                tableHTML += '</tr></thead><tbody>';
+
+                data.forEach(row => {
+                    tableHTML += '<tr>';
+                    headers.forEach(header => { 
+                        // Basic styling for data cells
+                        tableHTML += `<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-200 border-t border-gray-700">${row[header]}</td>`; 
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody></table>';
+                
+                dataTableContainer.innerHTML = tableHTML; // Display the generated table
+
+            } catch (error) {
+                console.error('Error fetching or parsing data:', error);
+                dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
+            }
+        }
+    </script>
 </body>
 </html>
