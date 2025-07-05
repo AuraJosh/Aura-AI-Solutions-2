@@ -143,32 +143,48 @@
                 }
                 
                 // If no data is returned (e.g., user is not mapped, or no analytics for their ID)
-                if (data.length === 0) {
-                     dataTableContainer.innerHTML = '<p class="text-white text-center">No analytics data found for your account.</p>';
-                     return;
+               // Handle errors returned from the Apps Script itself
+                if (data.error) {
+                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
+                    return;
                 }
-
-                // --- Render the data into an HTML table ---
-                const headers = Object.keys(data[0]); // Get headers from the first data object
-                let tableHTML = '<table class="min-w-full bg-white/5 rounded-lg overflow-hidden shadow-lg">';
-                tableHTML += '<thead><tr>';
-                headers.forEach(header => { 
-                    // Basic styling for headers
-                    tableHTML += `<th class="px-4 py-2 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">${header}</th>`; 
-                });
-                tableHTML += '</tr></thead><tbody>';
-
-                data.forEach(row => {
-                    tableHTML += '<tr>';
-                    headers.forEach(header => { 
-                        // Basic styling for data cells
-                        tableHTML += `<td class="px-4 py-2 whitespace-nowrap text-sm text-gray-200 border-t border-gray-700">${row[header]}</td>`; 
-                    });
-                    tableHTML += '</tr>';
-                });
-                tableHTML += '</tbody></table>';
                 
-                dataTableContainer.innerHTML = tableHTML; // Display the generated table
+                // Now, we expect 'data' to be an object like { totalMessagesSent: X, monthlyLimit: Y }
+                // Check if the received data has the expected structure
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number') {
+                    const totalSent = data.totalMessagesSent;
+                    const monthlyLimit = data.monthlyLimit;
+                
+                    // Calculate percentage for the progress bar, ensuring it doesn't exceed 100%
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+                
+                
+                    let displayHTML = `
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-6">
+                            <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                            <div class="flex items-center justify-between">
+                                <p class="text-gray-300 text-lg">Messages Used:</p>
+                                <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                                <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                            </div>
+                            <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
+                            ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
+                        </div>
+                    `;
+                
+                    // This is where you would add more "boxes" for other metrics in the future
+                    // For now, it will only display the message usage box.
+                
+                    dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
+                
+                } else {
+                    // If the data structure is not what's expected from the Apps Script, show an error
+                    dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
+                    console.error("Received unexpected data format:", data);
+                }
 
             } catch (error) {
                 console.error('Error fetching or parsing data:', error);
