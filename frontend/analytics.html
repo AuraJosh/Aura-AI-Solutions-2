@@ -36,6 +36,29 @@
         </div>
     </main>
 
+    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <form id="business-info-form">
+                <div class="mb-4">
+                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
+                        Please describe the changes you would like to make to your AI's business information:
+                    </label>
+                    <textarea id="update-details" name="updateDetails" rows="8" 
+                              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                              placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        Send Update Request
+                    </button>
+                    <p id="form-message" class="text-sm text-gray-400"></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="fixed inset-0 -z-10 pointer-events-none">
         <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
             <source src="media/background.mp4" type="video/mp4" />
@@ -142,10 +165,8 @@
 
                     const totalSent = data.totalMessagesSent;
                     const monthlyLimit = data.monthlyLimit;
-                    // --- ADDED progressBarColor AND percentageUsed DEFINITIONS ---
                     const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
                     const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-                    // -----------------------------------------------------------
 
                     const tier = data.tier;
                     const paymentTerm = data.paymentTerm;
@@ -303,7 +324,7 @@
                                 </button>
                                 <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
                             </div>
-                        </div>`; // This `</div>` correctly closes the main `grid` container.
+                        </div>`;
                     
                     dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
 
@@ -357,6 +378,103 @@
                 console.error('Error fetching or parsing data:', error);
                 dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
             }
+        }
+        // --- NEW: Add functionality for the new buttons ---
+
+        // Get references to buttons and modal elements
+        const feedbackBtn = document.getElementById('feedback-btn');
+        const updateInfoBtn = document.getElementById('update-info-btn');
+        const updateInfoModal = document.getElementById('update-info-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const businessInfoForm = document.getElementById('business-info-form');
+        const formMessage = document.getElementById('form-message');
+        const updateDetailsTextArea = document.getElementById('update-details');
+
+        // 1. Feedback Button Functionality
+        if (feedbackBtn) { // Ensure button exists
+            feedbackBtn.addEventListener('click', () => {
+                // *** REPLACE THIS URL with your actual Google Form link! ***
+                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
+            });
+        }
+
+        // 2. Update Business Info Modal Show/Hide
+        if (updateInfoBtn) { // Ensure button exists
+            updateInfoBtn.addEventListener('click', () => {
+                updateInfoModal.classList.remove('hidden'); // Show the modal
+            });
+        }
+
+        if (closeModalBtn) { // Ensure button exists
+            closeModalBtn.addEventListener('click', () => {
+                updateInfoModal.classList.add('hidden'); // Hide the modal
+                formMessage.textContent = ''; // Clear any previous messages
+                businessInfoForm.reset(); // Reset the form fields
+            });
+        }
+
+        // Hide modal if clicked outside (optional, but good UX)
+        if (updateInfoModal) {
+            updateInfoModal.addEventListener('click', (event) => {
+                if (event.target === updateInfoModal) { // Check if click was directly on the overlay
+                    updateInfoModal.classList.add('hidden');
+                    formMessage.textContent = '';
+                    businessInfoForm.reset();
+                }
+            });
+        }
+
+        // 3. Update Business Info Form Submission
+        if (businessInfoForm) { // Ensure form exists
+            businessInfoForm.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Prevent default form submission
+
+                formMessage.textContent = 'Sending request...';
+                formMessage.className = 'text-sm text-gray-400'; // Reset class
+
+                const requestedChanges = updateDetailsTextArea.value;
+
+                // Get the current user's UID (auth is available from the outer scope)
+                const currentUser = auth.currentUser;
+                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER'; // Fallback if no user is found (shouldn't happen on this protected page)
+
+                if (!requestedChanges.trim()) { // Check if the text area is empty or just whitespace
+                    formMessage.textContent = 'Please describe the changes.';
+                    formMessage.className = 'text-sm text-red-400';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST', // Use POST for submitting data
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded', // Standard form encoding
+                        },
+                        body: new URLSearchParams({ // Prepare data for POST request
+                            action: 'sendBusinessInfoUpdate', // A new 'action' to tell Apps Script what to do
+                            userId: submitterUserId,
+                            changes: requestedChanges
+                        })
+                    });
+
+                    const result = await response.json(); // Apps Script will return JSON {success: true/false, error: ...}
+
+                    if (result.success) {
+                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
+                        formMessage.className = 'text-sm text-green-400';
+                        businessInfoForm.reset(); // Clear the form
+                        // Optionally, hide the modal after a delay for good UX
+                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
+                    } else {
+                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
+                        formMessage.className = 'text-sm text-red-400';
+                    }
+                } catch (error) {
+                    console.error('Error submitting business info update:', error);
+                    formMessage.textContent = 'Failed to send request. Please try again later.';
+                    formMessage.className = 'text-sm text-red-400';
+                }
+            });
         }
     </script>
 </body>
