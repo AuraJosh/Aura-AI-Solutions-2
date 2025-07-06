@@ -153,7 +153,20 @@
                     const monthlyLimit = data.monthlyLimit;
                     const tier = data.tier; // ADD THIS
                     const paymentTerm = data.paymentTerm; // ADD THIS
-                    const nextPaymentDate = data.nextPaymentDate; // ADD THIS (This will be YYYY-MM-DD string)
+                    let formattedNextPaymentDate = 'N/A'; // Initialize with default
+                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
+                        // Create a Date object from the YYYY-MM-DD string
+                        // Using new Date('YYYY-MM-DD') creates the date in UTC, which avoids timezone issues
+                        const dateObj = new Date(data.nextPaymentDate);
+                        if (!isNaN(dateObj.getTime())) { // Check if dateObj is a valid date
+                            // Format for UK locale (DD/MM/YYYY)
+                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit'
+                            });
+                        }
+                    }
                 
                     const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
                     const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
@@ -185,7 +198,7 @@
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <p class="text-gray-300">Next Payment Date:</p>
-                                        <p class="text-white font-medium">${nextPaymentDate}</p>
+                                        <p class="text-white font-medium">${formattedNextPaymentDate}</p>
                                     </div>
                                 </div>
                             </div>
