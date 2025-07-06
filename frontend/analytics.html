@@ -146,6 +146,8 @@
                     const paymentTerm = data.paymentTerm;
                     const dailyUsageDataReal = data.dailyUsageData; // Real daily usage data
                     const chatLogsReal = data.chatLogs;           // Real chat logs
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
 
                     let formattedNextPaymentDate = 'N/A';
                     if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
