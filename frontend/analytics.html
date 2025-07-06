@@ -310,14 +310,9 @@
                             <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
-                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog"
-                                   id="feedback-btn"
-                                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                  Provide Feedback
-                                </a>
-
+                                <button id="feedback-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                    Provide Feedback
+                                </button>
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
                             </div>
 
@@ -387,6 +382,7 @@
         // --- NEW: Add functionality for the new buttons ---
 
         // Get references to buttons and modal elements
+        // Moved here to be called *after* displayHTML is rendered
         const feedbackBtn = document.getElementById('feedback-btn');
         const updateInfoBtn = document.getElementById('update-info-btn');
         const updateInfoModal = document.getElementById('update-info-modal');
