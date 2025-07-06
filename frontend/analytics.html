@@ -146,34 +146,52 @@
                 
                 // Now, we expect 'data' to be an object like { totalMessagesSent: X, monthlyLimit: Y }
                 // Check if the received data has the expected structure
-                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number') {
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' && // Keep these existing checks
+                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string') { // ADD THESE NEW CHECKS
+                
                     const totalSent = data.totalMessagesSent;
                     const monthlyLimit = data.monthlyLimit;
+                    const tier = data.tier; // ADD THIS
+                    const paymentTerm = data.paymentTerm; // ADD THIS
+                    const nextPaymentDate = data.nextPaymentDate; // ADD THIS (This will be YYYY-MM-DD string)
                 
-                    // Calculate percentage for the progress bar, ensuring it doesn't exceed 100%
                     const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
                     const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
                 
-                
                     let displayHTML = `
-                        <div class="bg-gray-800 p-6 rounded-lg shadow-xl mb-6">
-                            <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
-                            <div class="flex items-center justify-between">
-                                <p class="text-gray-300 text-lg">Messages Used:</p>
-                                <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-gray-300 text-lg">Messages Used:</p>
+                                    <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                                    <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                </div>
+                                <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
+                                ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
                             </div>
-                            <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
-                                <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Current Tier:</p>
+                                        <p class="text-white font-medium">${tier}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Payment Term:</p>
+                                        <p class="text-white font-medium">${paymentTerm}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Next Payment Date:</p>
+                                        <p class="text-white font-medium">${nextPaymentDate}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
-                            ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
-                        </div>
-                    `;
+                        </div> `;
                 
-                    // This is where you would add more "boxes" for other metrics in the future
-                    // For now, it will only display the message usage box.
-                
-                    dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
+                    dataTableContainer.innerHTML = displayHTML;
                 
                 } else {
                     // If the data structure is not what's expected from the Apps Script, show an error
