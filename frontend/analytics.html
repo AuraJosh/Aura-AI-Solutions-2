@@ -1,97 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Analytics Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-  
-    gtag('config', 'G-03MPB9XG9B');
-  </script>
-  
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
-  <!-- Header -->
-  <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
-    <div class="container mx-auto flex items-center justify-between p-4">
-      <div class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg">Analytics Dashboard</h1>
+            <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
         </div>
-        <span class="text-white text-base">Aura AI Solutions</span>
-      </div>
-      <h1 class="text-white font-semibold text-lg">Analytics Dashboard</h1>
-      <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+    </header>
+
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg overflow-y-auto">
+            <p class="text-white text-center">Loading your analytics data...</p>
+        </div>
+    </main>
+
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+        </video>
+
+        <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+        
+        <div class="absolute inset-0 bg-black/60"></div>
     </div>
-  </header>
 
-  <!-- Main Content -->
-  <main class="pt-40 px-4 flex justify-center relative z-10">
-    <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-10 rounded-xl shadow-lg overflow-y-auto">
-      <p class="text-white text-center">Loading your analytics data...</p> 
-    </div>
-  </main>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-  <!-- Background Video -->
-  <div class="fixed inset-0 -z-10 pointer-events-none">
-    <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-      <source src="media/background.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
+        };
 
-    <!-- Static fallback image for mobile -->
-    <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-    
-    <div class="absolute inset-0 bg-black/60"></div>
-  </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-  <!-- Firebase Auth -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        // Protect this page
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+            }
+        });
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-      authDomain: "aura-ai-85b65.firebaseapp.com",
-      projectId: "aura-ai-85b65",
-      storageBucket: "aura-ai-85b65.appspot.com",
-      messagingSenderId: "492492484793",
-      appId: "1:492492484793:web:7f9038d50f523241536b68"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // Protect this page
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
-    });
-
-    // Logout button
-    document.getElementById("logout-btn").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        window.location.href = "login.html";
-      } catch (err) {
-        alert("Logout failed: " + err.message);
-      }
-    });
-  </script>
-  <script type="module">
+        // Logout button
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (err) {
+                alert("Logout failed: " + err.message);
+            }
+        });
+    </script>
+    <script type="module">
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-        // IMPORTANT: REPLACE THIS WITH THE "Web app URL" YOU COPIED IN STEP 3!
-        // Example: const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz123ABCDEF456XYZ/exec';
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec'; // <--- **PASTE YOUR URL HERE**
+        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec'; 
 
         const auth = getAuth(); // Get the Firebase Auth instance
 
@@ -135,30 +128,29 @@
                 }
 
                 const data = await response.json(); // Parse the JSON response from the Apps Script
-
-              
-                // If no data is returned (e.g., user is not mapped, or no analytics for their ID)
-               // Handle errors returned from the Apps Script itself
+                
+                // Handle errors returned from the Apps Script itself
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
                     return;
                 }
                 
-                // Now, we expect 'data' to be an object like { totalMessagesSent: X, monthlyLimit: Y }
                 // Check if the received data has the expected structure
-                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' && // Keep these existing checks
-                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string') { // ADD THESE NEW CHECKS
-                
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
+                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
+                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
+
                     const totalSent = data.totalMessagesSent;
                     const monthlyLimit = data.monthlyLimit;
-                    const tier = data.tier; // ADD THIS
-                    const paymentTerm = data.paymentTerm; // ADD THIS
-                    let formattedNextPaymentDate = 'N/A'; // Initialize with default
+                    const tier = data.tier;
+                    const paymentTerm = data.paymentTerm;
+                    const dailyUsageDataReal = data.dailyUsageData; // Real daily usage data
+                    const chatLogsReal = data.chatLogs;           // Real chat logs
+
+                    let formattedNextPaymentDate = 'N/A';
                     if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
-                        // Create a Date object from the YYYY-MM-DD string
-                        // Using new Date('YYYY-MM-DD') creates the date in UTC, which avoids timezone issues
                         const dateObj = new Date(data.nextPaymentDate);
-                        if (!isNaN(dateObj.getTime())) { // Check if dateObj is a valid date
+                        if (!isNaN(dateObj.getTime())) {
                             // Format for UK locale (DD/MM/YYYY)
                             formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
                                 year: 'numeric',
@@ -167,12 +159,49 @@
                             });
                         }
                     }
-                
-                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
-                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-                
+                    
+                    // --- Tier Access Logic ---
+                    // Tiers: Beta, Essential, Elite, Executive. Elite and Executive have additional features.
+                    const hasEliteOrExecutiveAccess = (tier === 'Elite' || tier === 'Executive');
+
+                    // --- Prepare data for charts and chat logs based on access ---
+                    let chartLabels = [];
+                    let chartData = [];
+                    let chatContentHTML = '';
+
+                    if (hasEliteOrExecutiveAccess) {
+                        // Use real data for Elite/Executive
+                        chartLabels = dailyUsageDataReal.map(item => item.date);
+                        chartData = dailyUsageDataReal.map(item => item.count);
+                        
+                        // Generate HTML for real chat logs
+                        if (chatLogsReal.length > 0) {
+                            chatLogsReal.forEach(log => {
+                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
+                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
+                                chatContentHTML += `<p class="mb-2"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
+                            });
+                        } else {
+                            chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
+                        }
+
+                    } else {
+                        // Use example data for Beta/Essential (blurred tiers)
+                        // Static example data for blurred graph
+                        chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+                        chartData = [10, 15, 8, 20, 12, 25, 18];
+
+                        // Static example chat log content for blurred display
+                        chatContentHTML = `
+                            <p class="mb-2"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                            <p class="mb-2"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p class="mb-2"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                            <p class="mb-2"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        `;
+                    }
+                    
                     let displayHTML = `
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6"> <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
                                     <p class="text-gray-300 text-lg">Messages Used:</p>
@@ -184,7 +213,7 @@
                                 <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
                                 ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
                             </div>
-                
+
                             <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
                                 <div class="space-y-3">
@@ -202,10 +231,90 @@
                                     </div>
                                 </div>
                             </div>
-                        </div> `;
-                
-                    dataTableContainer.innerHTML = displayHTML;
-                
+
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="h-60">
+                                        <canvas id="dailyUsageChart"></canvas>
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
+                                            <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Upgrade Now</button>
+                                        </div>
+                                    </div>
+                                    <div class="h-60 opacity-20">
+                                        <canvas id="dailyUsageChartDummy"></canvas>
+                                    </div>
+                                `}
+                            </div>
+
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="h-60 text-gray-300 overflow-y-auto">
+                                        ${chatContentHTML}
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Access your complete chat history.</p>
+                                            <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Upgrade Now</button>
+                                        </div>
+                                    </div>
+                                    <div class="h-60 opacity-20 text-gray-300 overflow-y-auto">
+                                        ${chatContentHTML}
+                                    </div>
+                                `}
+                            </div>
+                        </div>`;
+                    
+                    dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
+
+                    // Initialize Chart.js if user has access (or dummy chart)
+                    const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
+                    const ctx = document.getElementById(chartId);
+
+                    if (ctx) { // Ensure canvas element exists
+                        new Chart(ctx, {
+                            type: 'line', // Line chart for usage over time
+                            data: {
+                                labels: chartLabels, // Use dynamically set labels
+                                datasets: [{
+                                    label: 'Messages Sent',
+                                    data: chartData, // Use dynamically set data
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    fill: true, // Fill area under the line
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false, // Allow custom height
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    },
+                                    x: {
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' }
+                                    }
+                                }
+                            }
+                        });
+                    }
                 } else {
                     // If the data structure is not what's expected from the Apps Script, show an error
                     dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
