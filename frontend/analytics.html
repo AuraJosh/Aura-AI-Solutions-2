@@ -276,34 +276,36 @@
                                     </div>
                                 `}
                             </div>
+                        </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"> <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
-                                <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
+                        <div class="w-full mt-6 space-y-4"> <div class="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                                <h2 class="text-lg font-semibold text-white mb-2">Manage Subscription</h2>
+                                <p class="text-gray-400 text-sm mb-3">Need to make a change to your plan?</p>
                                 <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
                                     Cancel Subscription
                                 </button>
                                 <p class="text-gray-500 text-xs mt-2">Cancellation functionality coming soon.</p>
                             </div>
-                    
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
-                                <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
+
+                            <div class="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                                <h2 class="text-lg font-semibold text-white mb-2">Your Feedback</h2>
+                                <p class="text-gray-400 text-sm mb-3">Help us improve Aura AI during beta!</p>
                                 <button id="feedback-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
                                     Provide Feedback
                                 </button>
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
                             </div>
-                    
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
-                                <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
+
+                            <div class="bg-gray-800 p-4 rounded-lg shadow-xl text-center">
+                                <h2 class="text-lg font-semibold text-white mb-2">Update Business Info</h2>
+                                <p class="text-gray-400 text-sm mb-3">Request changes to your AI's knowledge base.</p>
                                 <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
                                     Request Update
                                 </button>
                                 <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
                             </div>
-                        </div>`;
+
+                        </div> `;
                     
                     dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
 
