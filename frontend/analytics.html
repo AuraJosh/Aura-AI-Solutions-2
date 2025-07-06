@@ -142,12 +142,15 @@
 
                     const totalSent = data.totalMessagesSent;
                     const monthlyLimit = data.monthlyLimit;
+                    // --- ADDED progressBarColor AND percentageUsed DEFINITIONS ---
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+                    // -----------------------------------------------------------
+
                     const tier = data.tier;
                     const paymentTerm = data.paymentTerm;
                     const dailyUsageDataReal = data.dailyUsageData; // Real daily usage data
                     const chatLogsReal = data.chatLogs;           // Real chat logs
-                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
-                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
 
                     let formattedNextPaymentDate = 'N/A';
                     if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
@@ -203,7 +206,7 @@
                     }
                     
                     let displayHTML = `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
                                     <p class="text-gray-300 text-lg">Messages Used:</p>
@@ -216,7 +219,7 @@
                                 ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
                             </div>
 
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between">
@@ -234,7 +237,7 @@
                                 </div>
                             </div>
 
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
                                 <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="h-60">
@@ -254,7 +257,7 @@
                                 `}
                             </div>
 
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                            <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
                                 <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="h-60 text-gray-300 overflow-y-auto">
