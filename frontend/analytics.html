@@ -15,6 +15,21 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+        /* Custom CSS to make chat logs start from the bottom */
+        .chat-logs-container {
+            display: flex;
+            flex-direction: column-reverse; /* This is the key for order */
+            overflow-y: auto; /* Enable vertical scrolling */
+            max-height: 100%; /* Ensure it respects parent's height */
+            height: 100%; /* Take full height of its parent div */
+            justify-content: flex-start; /* Align items to the start (bottom) of the container */
+        }
+        .chat-log-message {
+            /* Optional: Add some padding or margin to individual messages if needed */
+            padding-bottom: 8px; /* Example spacing */
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
@@ -65,7 +80,7 @@
             <source src="media/background.mp4" type="video/mp4" />
             Your browser does not support the video tag.
         </video>
-
+        
         <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
         
         <div class="absolute inset-0 bg-black/60"></div>
@@ -108,7 +123,7 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
         // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec'; 
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XXvOTakvIg2V1eiHF5/exec'; 
 
         const auth = getAuth(); // Get the Firebase Auth instance
 
@@ -172,7 +187,7 @@
                     const tier = data.tier;
                     const paymentTerm = data.paymentTerm;
                     const dailyUsageDataReal = data.dailyUsageData; // Real daily usage data
-                    const chatLogsReal = data.chatLogs;           // Real chat logs
+                    const chatLogsReal = data.chatLogs;            // Real chat logs
 
                     let formattedNextPaymentDate = 'N/A';
                     if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
@@ -203,10 +218,11 @@
                         
                         // Generate HTML for real chat logs
                         if (chatLogsReal.length > 0) {
-                            chatLogsReal.forEach(log => {
+                            // Reverse the array so the most recent is rendered last in the flex-column-reverse setup
+                            chatLogsReal.slice().reverse().forEach(log => { 
                                 const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
                                 const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
-                                chatContentHTML += `<p class="mb-2"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
+                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
                             });
                         } else {
                             chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
@@ -220,10 +236,10 @@
 
                         // Static example chat log content for blurred display
                         chatContentHTML = `
-                            <p class="mb-2"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                            <p class="mb-2"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            <p class="mb-2"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-                            <p class="mb-2"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         `;
                     }
                     
@@ -282,7 +298,7 @@
                             <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
                                 <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
                                 ${hasEliteOrExecutiveAccess ? `
-                                    <div class="h-60 text-gray-300 overflow-y-auto">
+                                    <div id="chat-logs-display" class="h-60 text-gray-300 chat-logs-container">
                                         ${chatContentHTML}
                                     </div>
                                 ` : `
@@ -293,7 +309,7 @@
                                             <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
                                         </div>
                                     </div>
-                                    <div class="h-60 opacity-20 text-gray-300 overflow-y-auto">
+                                    <div class="h-60 opacity-20 text-gray-300 chat-logs-container">
                                         ${chatContentHTML}
                                     </div>
                                 `}
@@ -303,9 +319,9 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
                                 <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
                                 <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
-                                  <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300"> 
-                                    Cancel Subscription 
-                                  </button> 
+                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300"> 
+                                        Cancel Subscription 
+                                    </button> 
                                 </a>
                                 <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
                             </div>
@@ -314,11 +330,11 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
                                 <a href="https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog"
-                                   id="feedback-btn"
-                                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block"
-                                   target="_blank"
-                                   rel="noopener noreferrer">
-                                  Provide Feedback
+                                    id="feedback-btn"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block"
+                                    target="_blank"
+                                    rel="noopener noreferrer">
+                                    Provide Feedback
                                 </a>
 
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
@@ -376,6 +392,21 @@
                             }
                         });
                     }
+
+                    // --- Scroll to bottom of chat logs after content is loaded ---
+                    if (hasEliteOrExecutiveAccess) {
+                        const chatLogsDisplay = document.getElementById('chat-logs-display');
+                        if (chatLogsDisplay) {
+                            chatLogsDisplay.scrollTop = chatLogsDisplay.scrollHeight;
+                        }
+                    } else {
+                        // For dummy data, also ensure it's scrolled to the bottom
+                        const dummyChatLogsDisplay = dataTableContainer.querySelector('.h-60.opacity-20.text-gray-300.chat-logs-container');
+                        if (dummyChatLogsDisplay) {
+                            dummyChatLogsDisplay.scrollTop = dummyChatLogsDisplay.scrollHeight;
+                        }
+                    }
+
                 } else {
                     // If the data structure is not what's expected from the Apps Script, show an error
                     dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
