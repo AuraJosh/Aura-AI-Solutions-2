@@ -16,20 +16,20 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
     <style>
-    /* Custom CSS to make chat logs start from the bottom */
+    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
         overflow-y: auto;               /* Enables vertical scrolling */
-        max-height: 100%;               /* Ensures it fills parent height */
-        height: 100%;                   /* Takes full height of its parent div */
+        height: 240px;                  /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
+        /* Remove max-height: 100%; as it's not needed with a fixed height */
     }
     .chat-log-message {
         /* Optional: Add some padding to separate messages visually */
         padding-bottom: 8px; 
     }
-</style>
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
