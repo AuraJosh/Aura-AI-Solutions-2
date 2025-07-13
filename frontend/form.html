@@ -17,16 +17,15 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="widget.css" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../widget.css" />
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1a202c; /* Dark gray from your theme (bg-gray-900) */
             color: #e2e8f0; /* Light gray text for contrast */
-            min-height: 100vh;
-            overflow-y: auto;
+            /* min-height: 100vh; overflow-y: auto; removed due to body flexbox */
         }
         /* Custom styles for the message box (will transition to the banner) */
         .message-box { /* Keeping this for the script, but it will be replaced by the banner for showing messages */
@@ -68,7 +67,7 @@
             to { opacity: 0; transform: scale(0.95); }
         }
     </style>
-    <link rel="icon" href="media/favicon.png" type="image/png">
+    <link rel="icon" href="../media/favicon.png" type="image/png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -78,14 +77,14 @@
         gtag('config', 'G-03MPB9XG9B');
     </script>
 </head>
-<body class="bg-gray-900 text-gray-200 relative overflow-hidden flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen bg-gray-900 text-gray-200 relative overflow-auto">
 
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
-    <source src="media/background.mp4" type="video/mp4">
+    <source src="../media/background.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 
-<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+<img src="../media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
 
 <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
@@ -103,7 +102,7 @@
         <div class="flex items-center space-x-4 flex-1">
             <a href="../index.html" class="flex items-center space-x-4">
                 <div class="relative h-20 w-[150px]">
-                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
+                    <img src="../media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
                 </div>
                 <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
             </a>
@@ -196,8 +195,8 @@
 
 <footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
     <div class="mb-4">
-        <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
-        <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+        <a href="../privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+        <a href="../terms.html" class="mx-2 hover:text-white">Terms of Service</a>
     </div>
     <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
@@ -217,17 +216,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // There is no mobile menu button in the feedback page's original design,
-        // but if you add one (like on your contact page), this would enable it.
-        // const menuBtn = document.getElementById('menu-btn');
-        // const menu = document.getElementById('menu');
-        // if (menuBtn && menu) {
-        //     menuBtn.addEventListener('click', () => {
-        //         menu.classList.toggle('hidden');
-        //     });
-        // }
-
-        // Handle both forms using a single listener and event delegation or separate listeners
         const feedbackForm = document.getElementById('feedbackForm');
         const supportForm = document.getElementById('supportForm');
 
