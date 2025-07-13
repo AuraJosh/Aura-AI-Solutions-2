@@ -298,23 +298,18 @@
                                 `}
                             </div>
 
-                            <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
-                                ${hasEliteOrExecutiveAccess ? `
-                                    <div class="h-60 text-gray-300 chat-logs-container">                                         ${chatContentHTML}
-                                    </div>
-                                ` : `
-                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
-                                        <div class="text-center">
-                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                            <p class="text-gray-300 text-sm">Access your complete chat history.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
-                                        </div>
-                                    </div>
-                                    <div class="h-60 opacity-20 text-gray-300 chat-logs-container">                                         ${chatContentHTML}
-                                    </div>
-                                `}
-                            </div>
+                           <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        </div>
+                                    <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                `}
+                            </div>
 
                             <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
