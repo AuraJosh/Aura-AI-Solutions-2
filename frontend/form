@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Support</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark gray from your theme (bg-gray-900) */
+            color: #e2e8f0; /* Light gray text for contrast */
+            /* Ensure body takes full height and allows content to scroll */
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+        /* Custom styles for the message box */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50; /* Green for success */
+            color: white; /* White text for messages */
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow for dark theme */
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .message-box.show {
+            display: block;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen overflow-auto">
+
+    <!-- Header Section (Copied from your Aura Analytics Suite) -->
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4 relative">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="https://placehold.co/150x80/060d1f/ffffff?text=Aura+AI+Logo" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Feedback & Support</h1>
+            <!-- Logout button is kept for consistency, though it won't function without Firebase logic -->
+            <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+        </div>
+    </header>
+
+    <!-- Message Box for success/error messages -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- Main content container, positioned below the fixed header -->
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div class="w-full max-w-5xl space-y-10"> <!-- Increased max-w to accommodate two columns -->
+            <!-- Header Section for the form content -->
+            <header class="text-center bg-gray-800 p-8 rounded-xl shadow-lg">
+                <h1 class="text-4xl font-bold text-white mb-2">We'd Love Your Feedback!</h1>
+                <p class="text-gray-300 text-lg">Share your thoughts, suggestions, or request support.</p>
+            </header>
+
+            <!-- Grid container for the two forms -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Feedback & Suggestions Form -->
+                <section class="bg-gray-800 p-8 rounded-xl shadow-lg">
+                    <h2 class="text-3xl font-semibold text-white mb-6 text-center">Feedback & Suggestions</h2>
+                    <form id="feedbackForm" class="space-y-6" onsubmit="handleFormSubmit(event, 'Feedback')">
+                        <div>
+                            <label for="feedbackName" class="block text-gray-300 text-sm font-medium mb-2">Your Name (Optional)</label>
+                            <input type="text" id="feedbackName" name="feedbackName" placeholder="John Doe"
+                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="feedbackEmail" class="block text-gray-300 text-sm font-medium mb-2">Your Email (Optional)</label>
+                            <input type="email" id="feedbackEmail" name="feedbackEmail" placeholder="john.doe@example.com"
+                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="feedbackSubject" class="block text-gray-300 text-sm font-medium mb-2">Subject <span class="text-red-400">*</span></label>
+                            <input type="text" id="feedbackSubject" name="feedbackSubject" placeholder="New Feature Idea" required
+                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="feedbackMessage" class="block text-gray-300 text-sm font-medium mb-2">Your Feedback/Suggestion <span class="text-red-400">*</span></label>
+                            <textarea id="feedbackMessage" name="feedbackMessage" rows="6" placeholder="Describe your idea or feedback here..." required
+                                      class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out resize-y bg-gray-700 text-white placeholder-gray-400"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                            Submit Feedback
+                        </button>
+                    </form>
+                </section>
+
+                <!-- Support Request Form -->
+                <section class="bg-gray-800 p-8 rounded-xl shadow-lg">
+                    <h2 class="text-3xl font-semibold text-white mb-6 text-center">Request Support</h2>
+                    <form id="supportForm" class="space-y-6" onsubmit="handleFormSubmit(event, 'Support')">
+                        <div>
+                            <label for="supportName" class="block text-gray-300 text-sm font-medium mb-2">Your Name (Optional)</label>
+                            <input type="text" id="supportName" name="supportName" placeholder="John Doe"
+                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="supportEmail" class="block text-gray-300 text-sm font-medium mb-2">Your Email <span class="text-red-400">*</span></label>
+                            <input type="email" id="supportEmail" name="supportEmail" placeholder="john.doe@example.com" required
+                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label for="issueType" class="block text-gray-300 text-sm font-medium mb-2">Type of Issue <span class="text-red-400">*</span></label>
+                            <select id="issueType" name="issueType" required
+                                    class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white">
+                                <option value="" class="bg-gray-700 text-gray-400">Select an issue type</option>
+                                <option value="Bug Report" class="bg-gray-700">Bug Report</option>
+                                <option value="Technical Issue" class="bg-gray-700">Technical Issue</option>
+                                <option value="Account Issue" class="bg-gray-700">Account Issue</option>
+                                <option value="Billing Question" class="bg-gray-700">Billing Question</option>
+                                <option value="Other" class="bg-gray-700">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="issueDescription" class="block text-gray-300 text-sm font-medium mb-2">Describe Your Issue <span class="text-red-400">*</span></label>
+                            <textarea id="issueDescription" name="issueDescription" rows="6" placeholder="Please provide as much detail as possible about your issue..." required
+                                      class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 ease-in-out resize-y bg-gray-700 text-white placeholder-gray-400"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                            Submit Support Request
+                        </button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Background Video and Overlay (Copied from your Aura Analytics Suite) -->
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+        </video>
+        <!-- Fallback image for smaller screens or if video fails to load -->
+        <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+        
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
+
+    <script>
+        // Function to display messages
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = 'message-box show'; // Reset classes and show
+            if (type === 'success') {
+                messageBox.style.backgroundColor = '#4CAF50'; // Green
+            } else if (type === 'error') {
+                messageBox.style.backgroundColor = '#f44336'; // Red
+            }
+
+            // Hide after 3 seconds
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        // Function to handle form submissions
+        function handleFormSubmit(event, formType) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            console.log(`${formType} Form Submitted:`, data);
+            showMessage(`${formType} submitted successfully! Thank you.`);
+
+            form.reset(); // Clear the form after submission
+        }
+
+        // Placeholder for logout button functionality (from your analytics page)
+        // In a real app, you'd import Firebase auth and handle signOut here.
+        document.getElementById("logout-btn").addEventListener("click", () => {
+            console.log("Logout button clicked. (Firebase signOut logic would go here)");
+            // Example: window.location.href = "login.html";
+        });
+    </script>
+</body>
+</html>
