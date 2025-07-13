@@ -15,6 +15,21 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+    /* Custom CSS to make chat logs start from the bottom */
+    .chat-logs-container {
+        display: flex;
+        flex-direction: column-reverse; /* Stacks items from bottom to top */
+        overflow-y: auto;               /* Enables vertical scrolling */
+        max-height: 100%;               /* Ensures it fills parent height */
+        height: 100%;                   /* Takes full height of its parent div */
+        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
+    }
+    .chat-log-message {
+        /* Optional: Add some padding to separate messages visually */
+        padding-bottom: 8px; 
+    }
+</style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
@@ -27,8 +42,7 @@
                 </div>
                 <span class="text-white text-base">Aura AI Solutions</span>
             </div>
-            <h1 class="text-white font-semibold text-lg">Your Analytics Suite</h1>
-            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Analytics Suite</h1>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
             <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
         </div>
     </header>
@@ -230,7 +244,8 @@
                     }
                     
                     let displayHTML = `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> 
+                        <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
                                     <p class="text-gray-300 text-lg">Messages Used:</p>
