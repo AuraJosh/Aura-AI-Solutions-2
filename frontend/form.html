@@ -17,15 +17,15 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../widget.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="widget.css" />
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #1a202c; /* Dark gray from your theme (bg-gray-900) */
             color: #e2e8f0; /* Light gray text for contrast */
-            /* min-height: 100vh; overflow-y: auto; removed due to body flexbox */
+            /* Removed min-height: 100vh; overflow-y: auto; here for flexbox layout */
         }
         /* Custom styles for the message box (will transition to the banner) */
         .message-box { /* Keeping this for the script, but it will be replaced by the banner for showing messages */
@@ -67,7 +67,7 @@
             to { opacity: 0; transform: scale(0.95); }
         }
     </style>
-    <link rel="icon" href="../media/favicon.png" type="image/png">
+    <link rel="icon" href="media/favicon.png" type="image/png">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -80,11 +80,11 @@
 <body class="flex flex-col min-h-screen bg-gray-900 text-gray-200 relative overflow-auto">
 
 <video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
-    <source src="../media/background.mp4" type="video/mp4">
+    <source src="media/background.mp4" type="video/mp4">
     Your browser does not support the video tag.
 </video>
 
-<img src="../media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
 
 <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
 
@@ -92,7 +92,7 @@
     <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
         ✅ Thank you! Your message has been sent.<br>The Aura team will contact you shortly if a response is needed.
         <div class="mt-4">
-            <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
+            <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200">Close</button>
         </div>
     </div>
 </div>
@@ -102,7 +102,7 @@
         <div class="flex items-center space-x-4 flex-1">
             <a href="../index.html" class="flex items-center space-x-4">
                 <div class="relative h-20 w-[150px]">
-                    <img src="../media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
                 </div>
                 <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
             </a>
@@ -147,7 +147,7 @@
                                   class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 ease-in-out resize-y bg-gray-700 text-white placeholder-gray-400"></textarea>
                     </div>
                     <button type="submit"
-                            class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                            class="w-full bg-primary text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
                         Submit Feedback
                     </button>
                 </form>
@@ -195,8 +195,8 @@
 
 <footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
     <div class="mb-4">
-        <a href="../privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
-        <a href="../terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+        <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+        <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
     </div>
     <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
