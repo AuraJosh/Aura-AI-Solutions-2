@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Business Info Update | Aura AI Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        accent: '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="widget.css" />
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.4s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+    </style>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+</head>
+<body class="flex flex-col min-h-screen bg-gray-900 text-gray-200 relative overflow-auto">
+
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2]">
+    <source src="media/background.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
+
+<div class="fixed inset-0 bg-black/60 z-[-1]"></div>
+
+<div id="thank-you-banner" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+    <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
+        ✅ Thank you! Your update request has been sent.<br>The Aura team will review it shortly.
+        <div class="mt-4">
+            <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200">Close</button>
+        </div>
+    </div>
+</div>
+
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+    <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="flex items-center space-x-4 flex-1">
+            <a href="../index.html" class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
+                </div>
+                <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
+            </a>
+        </div>
+
+        <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Business Info Update</h1>
+
+        <div class="flex items-center justify-end space-x-4 flex-1">
+            <a href="analytics.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                Back to Analytics
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="pt-40 px-4 pb-20 flex justify-center relative z-10 flex-grow">
+    <div class="w-full max-w-2xl space-y-10"> <header class="text-center bg-gray-800 p-8 rounded-xl shadow-lg">
+            <h1 class="text-4xl font-bold text-white mb-2">Request Business Info Update</h1>
+            <p class="text-gray-300 text-lg">Tell us about any changes you want your AI chatbot to know.</p>
+        </header>
+
+        <section class="bg-gray-800 p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-semibold text-white mb-6 text-center">Your Business Details</h2>
+            <form id="businessUpdateForm" action="https://formspree.io/f/YOUR_BUSINESS_UPDATE_FORMSPREE_ID" method="POST" class="space-y-6">
+                <div>
+                    <label for="updateName" class="block text-gray-300 text-sm font-medium mb-2">Your Name (Optional)</label>
+                    <input type="text" id="updateName" name="name" placeholder="John Doe"
+                           class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                </div>
+                <div>
+                    <label for="updateEmail" class="block text-gray-300 text-sm font-medium mb-2">Your Email <span class="text-red-400">*</span></label>
+                    <input type="email" id="updateEmail" name="email" placeholder="john.doe@example.com" required
+                           class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                </div>
+                <div>
+                    <label for="updateSubject" class="block text-gray-300 text-sm font-medium mb-2">Subject (e.g., "Address Change", "New Service") <span class="text-red-400">*</span></label>
+                    <input type="text" id="updateSubject" name="subject" placeholder="Business Info Update Request" required
+                           class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-white placeholder-gray-400">
+                </div>
+                <div>
+                    <label for="updateDetails" class="block text-gray-300 text-sm font-medium mb-2">Please describe the changes you would like to make <span class="text-red-400">*</span></label>
+                    <textarea id="updateDetails" name="message" rows="8" placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Our operating hours are now 9 AM - 6 PM Mon-Fri.'" required
+                              class="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200 ease-in-out resize-y bg-gray-700 text-white placeholder-gray-400"></textarea>
+                </div>
+                <button type="submit"
+                        class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-200 ease-in-out shadow-md">
+                    Send Update Request
+                </button>
+            </form>
+        </section>
+    </div>
+</main>
+
+<footer class="bg-gray-900 text-gray-400 py-8 text-center relative z-10">
+    <div class="mb-4">
+        <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
+        <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
+    </div>
+    <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+</footer>
+
+<script>
+    // Close banner function
+    function closeBanner() {
+        const banner = document.getElementById('thank-you-banner');
+        const content = document.getElementById('thank-you-content');
+
+        content.classList.remove('fade-in');
+        content.classList.add('fade-out');
+
+        setTimeout(() => {
+            banner.classList.add('hidden');
+        }, 400);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const businessUpdateForm = document.getElementById('businessUpdateForm');
+
+        if (businessUpdateForm) {
+            businessUpdateForm.addEventListener('submit', handleFormspreeSubmit);
+        }
+
+        async function handleFormspreeSubmit(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            const form = e.target;
+            const formData = new FormData(form);
+
+            // Add a custom hidden field to Formspree to indicate the form type
+            // This is useful for filtering emails in your inbox
+            formData.append('_subject', 'Business Info Update Request from Aura AI'); 
+
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (response.ok) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const banner = document.getElementById('thank-you-banner');
+                    const content = document.getElementById('thank-you-content');
+
+                    banner.classList.remove('hidden');
+                    content.classList.remove('fade-out');
+                    content.classList.add('fade-in');
+
+                    // Automatically hide banner after 4 seconds
+                    setTimeout(() => {
+                        content.classList.remove('fade-in');
+                        content.classList.add('fade-out');
+                        setTimeout(() => {
+                            banner.classList.add('hidden');
+                        }, 400); // Duration of fade-out animation
+                    }, 4000); // Time to display banner
+
+                    form.reset(); // Clear the form
+                } else {
+                    const data = await response.json();
+                    if (data.errors) {
+                        const errorMessage = data.errors.map(error => error.message).join(", ");
+                        alert("There was a problem submitting your form: " + errorMessage);
+                    } else {
+                        alert("There was a problem submitting your form. Please try again.");
+                    }
+                }
+            } catch (error) {
+                console.error('Form submission error:', error);
+                alert("There was a problem sending your message. Please check your internet connection.");
+            }
+        }
+
+        // Title blinking effect from your contact page
+        const defaultTitle = document.title;
+        const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
+        let blinkInterval;
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                let i = 0;
+                blinkInterval = setInterval(() => {
+                    document.title = awayMessages[i % awayMessages.length];
+                    i++;
+                }, 1000);
+            } else {
+                clearInterval(blinkInterval);
+                document.title = defaultTitle;
+            }
+        });
+
+        // Typing effect for "Aura AI Solutions" (if applicable)
+        const typingEl = document.querySelector('.typing-text');
+        if (typingEl) {
+            setTimeout(() => {
+                typingEl.classList.add('finished');
+            }, 4500);
+        }
+    });
+</script>
+</body>
+</html>
