@@ -14,13 +14,6 @@
             background-repeat: no-repeat;
             background-size: cover;
         }
-        /* Adjusted for mobile: background-attachment: scroll on small screens */
-        @media (max-width: 767px) { /* Tailind's md breakpoint is 768px */
-            .parallax {
-                background-attachment: scroll;
-            }
-        }
-
         .gradient-divider {
             background: linear-gradient(to right, #6366F1, #8B5CF6);
             height: 6px;
@@ -45,44 +38,58 @@
         @keyframes blink {
             50% { border-color: transparent }
         }
+
+        /* Custom styles for mobile menu slide-in/out */
+        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
+            transition: transform 0.3s ease-out;
+        }
+        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
+            transform: translateY(-100%);
+        }
+        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
+            transform: translateY(0);
+        }
     </style>
 
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#6366F1',
-                        accent: '#8B5CF6',
-                    }
-                }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#6366F1',
+              accent: '#8B5CF6',
             }
+          }
         }
+      }
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
+      
       gtag('config', 'G-03MPB9XG9B');
     </script>
 </head>
 <body class="bg-gray-900 text-gray-100 overflow-x-hidden">
 
-<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2] hidden md:block">
+<video autoplay muted loop playsinline class="fixed top-0 left-0 w-full h-full object-cover z-[-2] hidden sm:block">
     <source src="media/background.mp4" type="video/mp4">
 </video>
+<img src="media/fallback.jpg" alt="Background" class="fixed inset-0 w-full h-full object-cover sm:hidden" />
 <div class="fixed inset-0 bg-black/60 z-[-1]"></div>
-<img src="media/fallback.jpg" alt="Background" class="fixed inset-0 w-full h-full object-cover z-[-2] md:hidden" />
-
 
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
     <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1"> <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4"> <div class="relative h-16 w-[120px] sm:h-20 sm:w-[150px]"> <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1">
+            <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4">
+                <div class="relative h-16 w-[120px] md:h-20 md:w-[150px]">
+                    <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
                     <img src="media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
                 </div>
-                <span class="typing-text text-sm sm:text-base text-white font-semibold drop-shadow-sm whitespace-nowrap">Aura AI Solutions</span> </a>
+                <span class="typing-text text-sm md:text-base text-white font-semibold drop-shadow-sm whitespace-nowrap">Aura AI Solutions</span>
+            </a>
         </div>
 
         <nav class="hidden md:flex justify-center space-x-6 flex-1">
@@ -92,11 +99,13 @@
             <a href="contact.html" class="hover:text-primary">Contact</a>
         </nav>
 
-        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1"> <button id="menu-btn" class="md:hidden text-3xl text-white">&#9776;</button> </div>
+        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1">
+            <button id="menu-btn" class="md:hidden text-3xl text-white">&#9776;</button>
+        </div>
     </div>
 </header>
 
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg" style="transform: translateY(-100%); transition: transform 0.3s ease-out;">
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg mobile-menu-slide-leave-to">
     <nav class="flex flex-col space-y-2 text-center">
         <a href="../index.html" class="hover:text-primary py-2 block">Home</a>
         <a href="services.html" class="hover:text-primary py-2 block">Services</a>
@@ -107,30 +116,30 @@
 </div>
 
 
-<main class="pt-24 sm:pt-40"> <section class="text-center px-4 py-24 sm:py-48"> <h1 class="text-4xl sm:text-5xl font-bold mb-4 sm:mb-6 text-white leading-tight">Aura AI Solution's Services</h1> <p class="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8"> Services designed by us to improve the quality and functionality of your business, through the use of AI.
+<main class="pt-24 md:pt-40"> <section class="text-center px-6 py-24 sm:py-48"> <h1 class="text-3xl sm:text-5xl font-bold mb-4 sm:mb-6 text-white leading-tight sm:leading-normal">Aura AI Solution's Services</h1> <p class="text-base sm:text-xl text-gray-300 max-w-3xl mx-auto mb-6 sm:mb-8"> Services designed by us to improve the quality and functionality of your business, through the use of AI.
         </p>
-        <a href="#features" class="px-5 py-2.5 bg-primary text-white rounded-lg text-base sm:text-lg hover:bg-accent transition">Explore Features</a> </section>
+        <a href="#features" class="px-6 py-3 bg-primary text-white rounded-lg text-lg hover:bg-accent transition">Explore Features</a>
+    </section>
     <div class="mt-8 sm:mt-16"> <svg class="w-6 h-6 mx-auto animate-bounce opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
         </svg>
     </div>
-    <section class="parallax h-[300px] sm:h-[450px] flex items-center justify-center text-center" style="background-image: url('media/ai-bg.jpg');"> <div class="bg-black bg-opacity-60 p-6 sm:p-10 rounded-xl mx-4"> <h2 class="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Transform Your Customer Experience with AI</h2> <p class="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p>
-        </div>
+    <section class="parallax h-[300px] sm:h-[450px] flex items-center justify-center text-center" style="background-image: url('ai-bg.jpg');"> <div class="bg-black bg-opacity-60 p-6 sm:p-10 rounded-xl mx-4"> <h2 class="text-2xl md:text-4xl font-bold text-white mb-2 sm:mb-4">Transform Your Customer Experience with AI</h2> <p class="text-sm sm:text-lg text-gray-300 max-w-2xl mx-auto">From lead generation to technical support, our AI chatbot adapts to your goals and scales with your business.</p> </div>
     </section>
 
-    <section class="py-16 sm:py-20 bg-gray-800 px-4 sm:px-6" id="features"> <div class="max-w-6xl mx-auto space-y-12 sm:space-y-16"> <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center" data-aos="fade-up"> <div>
-                    <h3 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Key Features</h3> <ul class="text-base sm:text-lg text-gray-300 space-y-1.5 sm:space-y-2"> <li>🤖 Context-aware responses trained on your business to answer any questions that may be asked</li>
+    <section class="py-12 sm:py-20 bg-gray-800 px-6" id="features"> <div class="max-w-6xl mx-auto space-y-12 sm:space-y-16"> <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center" data-aos="fade-up"> <div>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Key Features</h3> <ul class="text-base sm:text-lg text-gray-300 space-y-2"> <li>🤖 Context-aware responses trained on your business to answer any questions that may be asked</li>
                         <li>🌐 Multilingual support for interested international clients</li>
                         <li>📊 Real-time analytics dashboard to track engagement & performance</li>
                         <li>🔌 Integration with your current website with no extra hassle</li>
                         <li>🎨 Option to fully customize the UI and tone to match your brand</li>
                     </ul>
                 </div>
-                <img src="media/chatbotpreview.png" alt="Chat UI" class="rounded-xl shadow-xl w-full mx-auto md:max-w-none" /> </div>
+                <img src="media/chatbotpreview.png" alt="Chat UI" class="rounded-xl shadow-xl" />
+            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center" data-aos="fade-up"> <img src="media/analyticspreview.png" alt="Analytics Dashboard" class="rounded-xl shadow-xl w-full mx-auto md:max-w-none" /> <div>
-                    <h3 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Our Bespoke Analytics Suite</h3> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Real time tracking with all things chatbot. Have access to messages sent and questions asked while seeing day to day usage and access to support.</p>
-                    <ul class="text-base sm:text-lg text-gray-300 space-y-1.5 sm:space-y-2"> <li>📈 Convert more leads with instant answers</li>
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center" data-aos="fade-up"> <img src="media/analyticspreview.png" alt="Analytics Dashboard" class="rounded-xl shadow-xl order-first md:order-last" /> <div>
+                    <h3 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Our Bespoke Analytics Suite</h3> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Real time tracking with all things chatbot. Have access to messages sent and questions asked while seeing day to day usage and access to support.</p> <ul class="text-base sm:text-lg text-gray-300 space-y-2"> <li>📈 Convert more leads with instant answers</li>
                         <li>⏱ Save thousands of hours and wages annually using our AI chatbot</li>
                         <li>🧠 Provide personalized support with smart memory, the future of customer support</li>
                     </ul>
@@ -139,9 +148,8 @@
         </div>
     </section>
 
-    <section class="bg-gray-950 py-16 sm:py-20 px-4 sm:px-6 text-gray-200"> <div class="max-w-6xl mx-auto space-y-16 sm:space-y-24"> <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center" data-aos="fade-right"> <div>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Essential Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">An ideal starting point for entrepreneurs and small teams. The Essential Plan offers a streamlined chatbot with just the right tools to start automating responses and engaging visitors around the clock.</p>
-                    <ul class="space-y-1.5 sm:space-y-2 text-gray-400 list-disc list-inside text-sm sm:text-base"> <li>1,000 monthly messages with usage tracking</li>
+    <section class="bg-gray-950 py-12 sm:py-20 px-6 text-gray-200"> <div class="max-w-6xl mx-auto space-y-16 sm:space-y-24"> <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center" data-aos="fade-right"> <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-primary mb-3 sm:mb-4">Essential Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">An ideal starting point for entrepreneurs and small teams. The Essential Plan offers a streamlined chatbot with just the right tools to start automating responses and engaging visitors around the clock.</p> <ul class="space-y-2 text-gray-400 list-disc list-inside text-base sm:text-lg"> <li>1,000 monthly messages with usage tracking</li>
                         <li>1 customizable chatbot for your site or product</li>
                         <li>Aura AI branding — clearly communicate it's powered by us</li>
                         <li>Support available within 7 business days</li>
@@ -149,12 +157,16 @@
                     </ul>
                     <p class="mt-3 sm:mt-4 text-gray-400 text-sm sm:text-base">This is perfect for basic customer service, simple FAQ handling, and early-stage validation of chatbot engagement. Easily upgrade as your needs evolve.</p> </div>
                 <div class="text-center" data-aos="zoom-in">
-                    <img src="media/lockedanalyticspreview.png" alt="Essential Plan" class="w-full max-w-sm mx-auto sm:max-w-md"> <figcaption class="text-xs sm:text-sm mt-2">The basic analytics page for the essential tier chatbot</figcaption> </div>
+                    <img src="media/lockedanalyticspreview.png" alt="Essential Plan" class="w-full max-w-md mx-auto">
+                    <figcaption class="text-sm sm:text-base">The basic analytics page for the essential tier chatbot</figcaption> </div>
             </div>
 
-            <div class="gradient-divider my-12 sm:my-16"></div> <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center" data-aos="fade-left"> <div class="text-center order-2 md:order-1" data-aos="zoom-in"> <img src="media/AuraAIChatBotBlue.png" alt="Elite Plan" class="w-full max-w-sm mx-auto sm:max-w-md"> <figcaption class="text-xs sm:text-sm mt-2">Example of a blue colour theme for our chatbot</figcaption> </div>
-                <div class="order-1 md:order-2"> <h2 class="text-2xl sm:text-3xl font-bold text-pink-400 mb-3 sm:mb-4">Elite Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Tailored for growing businesses, the Elite Plan unlocks real operational efficiency. Deploy multiple bots, answer FAQs more intelligently, and analyze performance trends with ease.</p>
-                    <ul class="space-y-1.5 sm:space-y-2 text-gray-400 list-disc list-inside text-sm sm:text-base"> <li>5,000 monthly messages with smart scaling</li>
+            <div class="gradient-divider"></div>
+
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center" data-aos="fade-left"> <div class="text-center order-first md:order-last" data-aos="zoom-in"> <img src="media/AuraAIChatBotBlue.png" alt="Elite Plan" class="w-full max-w-md mx-auto">
+                    <figcaption class="text-sm sm:text-base">Example of a blue colour theme for our chatbot</figcaption> </div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-pink-400 mb-3 sm:mb-4">Elite Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Tailored for growing businesses, the Elite Plan unlocks real operational efficiency. Deploy multiple bots, answer FAQs more intelligently, and analyze performance trends with ease.</p> <ul class="space-y-2 text-gray-400 list-disc list-inside text-base sm:text-lg"> <li>5,000 monthly messages with smart scaling</li>
                         <li>3 simultaneous chatbot instances for varied use cases</li>
                         <li>Different colour options to help match your website's aesthetics better</li>
                         <li>Custom answers, FAQ templates, and multilingual support</li>
@@ -164,25 +176,25 @@
                     <p class="mt-3 sm:mt-4 text-gray-400 text-sm sm:text-base">Perfect for companies with diverse offerings or regional operations. Match tone, automate across multiple sites, and continuously improve based on real data.</p> </div>
             </div>
 
-            <div class="gradient-divider my-12 sm:my-16"></div> <div class="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center" data-aos="fade-right"> <div>
-                    <h2 class="text-2xl sm:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4">Executive Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Designed for large-scale operations and teams that demand full autonomy, the Executive Plan delivers complete flexibility and white-label control over every interaction.</p>
-                    <ul class="space-y-1.5 sm:space-y-2 text-gray-400 list-disc list-inside text-sm sm:text-base"> <li>Unlimited chatbot messages and usage</li>
+            <div class="gradient-divider"></div>
+
+            <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center" data-aos="fade-right"> <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-yellow-400 mb-3 sm:mb-4">Executive Plan</h2> <p class="text-base sm:text-lg text-gray-300 mb-3 sm:mb-4">Designed for large-scale operations and teams that demand full autonomy, the Executive Plan delivers complete flexibility and white-label control over every interaction.</p> <ul class="space-y-2 text-gray-400 list-disc list-inside text-base sm:text-lg"> <li>Unlimited chatbot messages and usage</li>
                         <li>White-label support — your brand, fully represented</li>
                         <li>Custom-designed personalities and advanced tone control</li>
                         <li>Comprehensive analytics suite + exportable insights</li>
                         <li>24-hour response SLA with dedicated support</li>
                     </ul>
                     <p class="mt-3 sm:mt-4 text-gray-400 text-sm sm:text-base">You’ll have full command over chatbot workflows, deep integration with enterprise tools, and premium support to meet mission-critical demands.</p> </div>
-                <div class="text-center" data-aos="zoom-in">
-                    <img src="media/applechatbotpreview.png" alt="Executive Plan" class="w-full max-w-sm mx-auto sm:max-w-md"> <figcaption class="text-xs sm:text-sm mt-2">Image mock-up example for Apple, not a real product</figcaption> </div>
+                <div class="text-center order-first md:order-last" data-aos="zoom-in"> <img src="media/applechatbotpreview.png" alt="Executive Plan" class="w-full max-w-md mx-auto">
+                    <figcaption class="text-sm sm:text-base">Image mock-up example for Apple, not a real product</figcaption> </div>
             </div>
 
         </div>
     </section>
 
-    <section class="py-16 sm:py-24 bg-gray-800 px-4 sm:px-6 text-center"> <div class="max-w-4xl mx-auto" data-aos="fade-up">
-            <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3 sm:mb-4">What’s Next for Aura AI?</h2> <p class="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6">We’re building even more tools to supercharge your chatbot experience.</p>
-            <ul class="text-left list-disc list-inside text-gray-400 space-y-1.5 sm:space-y-2 max-w-2xl mx-auto text-sm sm:text-base"> <li>🧠 AI training on your entire website or document library</li>
+    <section class="py-12 sm:py-24 bg-gray-800 px-6 text-center"> <div class="max-w-4xl mx-auto" data-aos="fade-up">
+            <h2 class="text-3xl sm:text-4xl font-bold text-primary mb-3 sm:mb-4">What’s Next for Aura AI?</h2> <p class="text-base sm:text-lg text-gray-300 mb-4 sm:mb-6">We’re building even more tools to supercharge your chatbot experience.</p> <ul class="text-left list-disc list-inside text-gray-400 space-y-2 max-w-2xl mx-auto text-base sm:text-lg"> <li>🧠 AI training on your entire website or document library</li>
                 <li>📅 Smart scheduling + calendar integration</li>
                 <li>📥 Custom CRM integrations and contact syncing</li>
                 <li>🔄 Omnichannel support (email, chat, socials)</li>
@@ -194,13 +206,16 @@
 </main>
 
 <footer class="bg-gray-950 text-gray-500 py-8 text-center">
-    <div class="mb-4 text-sm sm:text-base"> <a href="privacy.html" class="mx-1 sm:mx-2 hover:text-white">Privacy Policy</a> <a href="terms.html" class="mx-1 sm:mx-2 hover:text-white">Terms of Service</a> </div>
+    <div class="mb-4 text-sm sm:text-base"> <a href="privacy.html" class="mx-1 sm:mx-2 hover:text-white">Privacy Policy</a>
+        <a href="terms.html" class="mx-1 sm:mx-2 hover:text-white">Terms of Service</a>
+    </div>
     <p class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</p> </footer>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
     AOS.init({ once: true, duration: 1000 });
 
+    // Mobile menu toggle script (moved from previous response for consistency)
     document.addEventListener('DOMContentLoaded', function () {
         const menuBtn = document.getElementById('menu-btn');
         const menu = document.getElementById('menu');
@@ -208,34 +223,20 @@
         menuBtn.addEventListener('click', () => {
             if (menu.classList.contains('hidden')) {
                 menu.classList.remove('hidden');
+                menu.classList.remove('mobile-menu-slide-leave-to');
+                menu.classList.add('mobile-menu-slide-enter-active');
                 setTimeout(() => {
-                    menu.style.transform = 'translateY(0)';
-                }, 10); // Small delay to allow 'hidden' to be removed
+                    menu.classList.remove('mobile-menu-slide-enter-active');
+                }, 300); // Should match transition duration
             } else {
-                menu.style.transform = 'translateY(-100%)';
+                menu.classList.add('mobile-menu-slide-leave-active');
                 setTimeout(() => {
+                    menu.classList.remove('mobile-menu-slide-leave-active');
                     menu.classList.add('hidden');
-                }, 300); // Matches transition duration
+                    menu.classList.add('mobile-menu-slide-leave-to'); // Ensure it slides up before hiding
+                }, 300); // Should match transition duration
             }
         });
-    });
-
-    // Optional: Make typing-text animation finish instantly on mobile to prevent overflow
-    // You might need to add a check for screen size if you only want this for mobile.
-    document.addEventListener("DOMContentLoaded", () => {
-        const typingEl = document.querySelector('.typing-text');
-        if (typingEl) {
-            // Check if on a mobile-like screen size (e.g., less than md breakpoint)
-            if (window.innerWidth < 768) {
-                typingEl.classList.add('finished'); // Instantly apply finished state
-                typingEl.style.animation = 'none'; // Stop typing animation
-                typingEl.style.width = 'auto'; // Let content take natural width
-            } else {
-                setTimeout(() => {
-                    typingEl.classList.add('finished');
-                }, 4500);
-            }
-        }
     });
 </script>
 </body>
