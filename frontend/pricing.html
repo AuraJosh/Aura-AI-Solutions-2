@@ -1,281 +1,293 @@
 <!DOCTYPE html>
 <html lang="en" class="dark scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pricing | Aura AI Solutions</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#6366F1',
-            accent: '#8B5CF6',
-          }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Pricing | Aura AI Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        accent: '#8B5CF6',
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    .discount-badge {
-      transition: opacity 0.3s ease, transform 0.3s ease;
-    }
-    .discount-badge.hidden {
-      opacity: 0;
-      transform: scale(0.95);
-      pointer-events: none;
-    }
-    .discount-badge.visible {
-      opacity: 1;
-      transform: scale(1);
-    }
-    @keyframes shimmer {
-      0% { background-position: -100% 0; }
-      100% { background-position: 100% 0; }
-    }
-    .shimmer-text {
-      background-size: 200% auto;
-      animation: shimmer 2.5s linear infinite;
-    }
-    .video-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -10;
-    }
-    .typing-text {
-      display: inline-block;
-      overflow: hidden;
-      white-space: nowrap;
-      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-      animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
-      border-right: 2px solid;
-    }
-    .typing-text.finished {
-      border-right: none;
-    }
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-    @keyframes blink {
-      50% { border-color: transparent }
-    }
-  </style>
-  <link rel="icon" href="media/favicon.png" type="image/png">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-03MPB9XG9B');
-  </script>
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .discount-badge {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .discount-badge.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+        .discount-badge.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        @keyframes shimmer {
+            0% { background-position: -100% 0; }
+            100% { background-position: 100% 0; }
+        }
+        .shimmer-text {
+            background-size: 200% auto;
+            animation: shimmer 2.5s linear infinite;
+        }
+        /* Adjusted z-index for video-background to be lower than content */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -20; /* Made z-index lower */
+        }
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            animation: typing 4s steps(30, end) forwards, blink 0.75s step-end 6;
+            border-right: 2px solid;
+        }
+        .typing-text.finished {
+            border-right: none;
+        }
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        @keyframes blink {
+            50% { border-color: transparent }
+        }
+
+        /* Custom styles for mobile menu slide-in/out */
+        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
+            transition: transform 0.3s ease-out;
+        }
+        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
+            transform: translateY(-100%);
+        }
+        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
+            transform: translateY(0);
+        }
+    </style>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-03MPB9XG9B');
+    </script>
 </head>
 <body class="bg-gray-900 text-gray-200">
 
-<video autoplay muted loop playsinline class="video-background">
-  <source src="media/background.mp4" type="video/mp4">
+<video autoplay muted loop playsinline class="video-background hidden sm:block"> <source src="media/background.mp4" type="video/mp4">
 </video>
-<img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-<div class="fixed inset-0 bg-black/60 z-[-5]"></div>
+<img src="media/fallback.jpg" alt="Background" class="fixed inset-0 w-full h-full object-cover z-[-20] sm:hidden" /> <div class="fixed inset-0 bg-black/60 z-[-5]"></div>
 
 <header class="fixed w-full bg-[#060d1f] shadow z-50">
-  <div class="container mx-auto flex items-center justify-between p-4">
-    <div class="flex items-center space-x-4 flex-1">
-      <a href="../index.html" class="flex items-center space-x-4">
-        <div class="relative h-20 w-[150px]">
-          <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-          <img src="media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+    <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1"> <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4"> <div class="relative h-16 w-[120px] md:h-20 md:w-[150px]"> <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+                </div>
+                <span class="typing-text text-sm md:text-base text-white whitespace-nowrap">Aura AI Solutions</span> </a>
         </div>
-        <span class="typing-text text-sm md:text-base text-white">Aura AI Solutions</span>
-      </a>
+        <nav class="hidden md:flex justify-center space-x-6 flex-1">
+            <a href="../index.html" class="hover:text-primary">Home</a>
+            <a href="services.html" class="hover:text-primary">Services</a>
+            <a href="pricing.html" class="hover:text-primary">Pricing</a>
+            <a href="contact.html" class="hover:text-primary">Contact</a>
+        </nav>
+        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1"> <button id="menu-btn" class="md:hidden text-3xl text-white">&#9776;</button> </div>
     </div>
-    <nav class="hidden md:flex justify-center space-x-6 flex-1">
-      <a href="../index.html" class="hover:text-primary">Home</a>
-      <a href="services.html" class="hover:text-primary">Services</a>
-      <a href="pricing.html" class="hover:text-primary">Pricing</a>
-      <a href="contact.html" class="hover:text-primary">Contact</a>
-    </nav>
-    <div class="flex items-center justify-end space-x-4 flex-1">
-      <button id="menu-btn" class="md:hidden text-3xl ml-4 text-white">&#9776;</button>
-    </div>
-  </div>
 </header>
 
-<main class="pt-32 container mx-auto px-4 pb-4 text-center text-white">
-  <h1 class="mt-4 text-4xl font-bold mb-4">Our Pricing</h1>
-  <p class="text-lg mb-2">Flexible plans designed to meet your business needs and scale as you grow.</p>
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg mobile-menu-slide-leave-to">
+    <nav class="flex flex-col space-y-2 text-center">
+        <a href="../index.html" class="hover:text-primary py-2 block">Home</a>
+        <a href="services.html" class="hover:text-primary py-2 block">Services</a>
+        <a href="pricing.html" class="hover:text-primary py-2 block">Pricing</a>
+        <a href="contact.html" class="hover:text-primary py-2 block">Contact</a>
+    </nav>
+</div>
 
-  <div class="flex items-center justify-center mb-2 space-x-4">
-    <span class="text-sm font-medium text-white">Billed Monthly</span>
-    <label class="inline-flex relative items-center cursor-pointer">
-      <input type="checkbox" id="billing-toggle" class="sr-only peer">
-      <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:bg-primary transition-all"></div>
-      <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-full transition-transform"></div>
-    </label>
-    <span class="text-sm font-medium text-white">Billed Annually</span>
-  </div>
-
-  <section class="relative py-20">
-    <div class="container mx-auto px-4 text-center">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-        <!-- Essential Plan -->
-        <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300">
-          <span id="beta-badge-essential" class="absolute top-4 left-4 text-xs bg-red-500 text-white px-3 py-1 rounded-full font-semibold ring-1 ring-red-300 shadow">50% OFF – Beta</span>
-          <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save more yearly</span>
-          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3>
-          <div class="mb-4 flex flex-col items-center gap-1">
-            <div class="flex items-baseline space-x-2">
-              <span id="original-price-essential" class="text-2xl line-through text-gray-400">£50</span>
-              <span id="discounted-price-essential" class="text-4xl font-extrabold text-white">£25</span>
-            </div>
-            <span class="block text-sm text-gray-400">per month</span>
-          </div>
-          <a href="https://buy.stripe.com/8x200i8t1eWX9374tn0VO00" class="w-full">
-            <button id="checkout-button" class="w-full bg-blue-700 text-white font-semibold py-2 rounded hover:bg-blue-600 transition">Get Started</button>
-          </a>
-          <ul class="mt-6 space-y-3 text-left text-sm text-gray-300">
-            <li>✔ Basic support tools</li>
-            <li>✔ 1,000 interactions / month</li>
-            <li>✔ 1 hosted instance</li>
-            <li>✔ Support response: within 1 week</li>
-            <li>✔ Includes Aura AI branding</li>
-          </ul>
-        </div>
-
-        <!-- Elite Plan -->
-        <div class="relative bg-[#8ac6ff] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-8 ring-1 ring-purple-400/10 transform hover:-translate-y-2 hover:shadow-2xl transition duration-300 opacity-90 grayscale">
-          <span class="absolute top-4 left-4 text-xs bg-yellow-400 text-gray-900 px-3 py-1 rounded-full font-semibold ring-1 ring-yellow-200 shadow">Coming Soon</span>
-          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text drop-shadow-md">Elite</h3>
-          <div class="mb-4">
-            <span id="price-elite" class="text-4xl font-extrabold text-purple-400">£150</span>
-            <span class="block text-sm text-purple-300">per month</span>
-          </div>
-          <button class="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white font-semibold py-2 rounded transition opacity-70 cursor-not-allowed">Start Elite</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-purple-300">
-            <li>✔ Everything in Essential</li>
-            <li>✔ Example content templates</li>
-            <li>✔ Multilingual interface support</li>
-            <li>✔ 5,000 interactions / month</li>
-            <li>✔ 3 hosted instances</li>
-            <li>✔ Priority support</li>
-            <li>✔ Style & tone presets</li>
-            <li>✔ Analytics dashboard access</li>
-            <li>✔ Includes Aura AI branding</li>
-          </ul>
-        </div>
-
-        <!-- Executive Plan -->
-        <div class="relative bg-[#2f2f2f] dark:bg-gradient-to-br dark:from-[#1f1f1f] dark:via-[#212222] dark:to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-8 transform hover:-translate-y-2 hover:ring-2 hover:ring-yellow-400/30 transition duration-300 opacity-90 grayscale">
-          <span class="absolute top-4 left-4 text-xs bg-yellow-400 text-gray-900 px-3 py-1 rounded-full font-semibold ring-1 ring-yellow-200 shadow">Coming Soon</span>
-          <h3 class="text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3>
-          <div class="mb-4">
-            <span id="price-executive" class="text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span>
-            <span class="block text-sm text-yellow-200">per month</span>
-          </div>
-          <button class="w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-gray-900 font-semibold py-2 rounded transition opacity-70 cursor-not-allowed">Contact Sales</button>
-          <ul class="mt-6 space-y-3 text-left text-sm text-yellow-200">
-            <li>✔ Everything in Elite & Essential</li>
-            <li>✔ Unlimited usage</li>
-            <li>✔ 24-hour support turnaround</li>
-            <li>✔ Custom design & deployment</li>
-            <li>✔ Personalized branding (white-label)</li>
-            <li>✔ Advanced analytics suite</li>
-            <li>✔ Full integration control</li>
-          </ul>
-        </div>
-
-        <!-- Installation Fee -->
-        <div class="md:col-span-3 bg-blue-800/70 dark:bg-blue-900/80 text-white rounded-2xl p-6 mt-4 shadow-lg border border-blue-400/30">
-          <h4 class="text-xl font-semibold text-blue-200 mb-2">One-Time Installation Fee</h4>
-          <p class="text-base text-gray-200">Normally <span class="line-through text-gray-400">£20</span>, now <span class="font-semibold text-blue-100">free</span> during early access.</p>
-        </div>
-
-      </div>
+<main class="pt-[88px] sm:pt-32 container mx-auto px-4 pb-4 text-center text-white relative z-10"> <h1 class="mt-4 text-3xl sm:text-4xl font-bold mb-3 sm:mb-4">Our Pricing</h1> <p class="text-base sm:text-lg mb-4 sm:mb-2">Flexible plans designed to meet your business needs and scale as you grow.</p> <div class="flex items-center justify-center mb-6 sm:mb-2 space-x-2 sm:space-x-4"> <span class="text-sm font-medium text-white">Billed Monthly</span>
+        <label class="inline-flex relative items-center cursor-pointer">
+            <input type="checkbox" id="billing-toggle" class="sr-only peer">
+            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-accent rounded-full peer peer-checked:bg-primary transition-all"></div>
+            <div class="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-full transition-transform"></div>
+        </label>
+        <span class="text-sm font-medium text-white">Billed Annually</span>
     </div>
-  </section>
+
+    <section class="relative py-12 sm:py-20"> <div class="container mx-auto px-4 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8"> <div class="relative bg-gray-800 border border-gray-700 rounded-2xl shadow p-6 sm:p-8 hover:shadow-lg transform hover:-translate-y-2 transition duration-300"> <span id="beta-badge-essential" class="absolute top-4 left-4 text-xs bg-red-500 text-white px-3 py-1 rounded-full font-semibold ring-1 ring-red-300 shadow">50% OFF – Beta</span>
+                    <span id="discount-essential" class="discount-badge hidden absolute top-4 right-4 text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium ring-1 ring-green-300">Save more yearly</span>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text drop-shadow-sm">Essential</h3> <div class="mb-4 flex flex-col items-center gap-1">
+                        <div class="flex items-baseline space-x-2">
+                            <span id="original-price-essential" class="text-xl sm:text-2xl line-through text-gray-400">£50</span> <span id="discounted-price-essential" class="text-3xl sm:text-4xl font-extrabold text-white">£25</span> </div>
+                        <span class="block text-sm text-gray-400">per month</span>
+                    </div>
+                    <a href="https://buy.stripe.com/8x200i8t1eWX9374tn0VO00" class="w-full">
+                        <button id="checkout-button" class="w-full bg-blue-700 text-white font-semibold py-2 rounded hover:bg-blue-600 transition">Get Started</button>
+                    </a>
+                    <ul class="mt-4 sm:mt-6 space-y-3 text-left text-sm text-gray-300"> <li>✔ Basic support tools</li>
+                        <li>✔ 1,000 interactions / month</li>
+                        <li>✔ 1 hosted instance</li>
+                        <li>✔ Support response: within 1 week</li>
+                        <li>✔ Includes Aura AI branding</li>
+                    </ul>
+                </div>
+
+                <div class="relative bg-[#8ac6ff] dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border border-purple-300/10 shadow-xl rounded-2xl p-6 sm:p-8 ring-1 ring-purple-400/10 transform hover:-translate-y-2 hover:shadow-2xl transition duration-300 opacity-90 grayscale"> <span class="absolute top-4 left-4 text-xs bg-yellow-400 text-gray-900 px-3 py-1 rounded-full font-semibold ring-1 ring-yellow-200 shadow">Coming Soon</span>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-purple-400 via-indigo-500 to-purple-600 text-transparent bg-clip-text drop-shadow-md">Elite</h3> <div class="mb-4">
+                        <span id="price-elite" class="text-3xl sm:text-4xl font-extrabold text-purple-400">£150</span> <span class="block text-sm text-purple-300">per month</span>
+                    </div>
+                    <button class="w-full bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 text-white font-semibold py-2 rounded transition opacity-70 cursor-not-allowed">Start Elite</button>
+                    <ul class="mt-4 sm:mt-6 space-y-3 text-left text-sm text-purple-300"> <li>✔ Everything in Essential</li>
+                        <li>✔ Example content templates</li>
+                        <li>✔ Multilingual interface support</li>
+                        <li>✔ 5,000 interactions / month</li>
+                        <li>✔ 3 hosted instances</li>
+                        <li>✔ Priority support</li>
+                        <li>✔ Style & tone presets</li>
+                        <li>✔ Analytics dashboard access</li>
+                        <li>✔ Includes Aura AI branding</li>
+                    </ul>
+                </div>
+
+                <div class="relative bg-[#2f2f2f] dark:bg-gradient-to-br dark:from-[#1f1f1f] dark:via-[#212222] dark:to-[#1a1a1a] border border-yellow-500/30 shadow-xl rounded-2xl p-6 sm:p-8 transform hover:-translate-y-2 hover:ring-2 hover:ring-yellow-400/30 transition duration-300 opacity-90 grayscale"> <span class="absolute top-4 left-4 text-xs bg-yellow-400 text-gray-900 px-3 py-1 rounded-full font-semibold ring-1 ring-yellow-200 shadow">Coming Soon</span>
+                    <h3 class="text-xl sm:text-2xl font-bold mb-1 bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-500 text-transparent bg-clip-text drop-shadow-md shimmer-text">Executive</h3> <div class="mb-4">
+                        <span id="price-executive" class="text-3xl sm:text-4xl font-extrabold bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-transparent bg-clip-text">£500</span> <span class="block text-sm text-yellow-200">per month</span>
+                    </div>
+                    <button class="w-full bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 text-gray-900 font-semibold py-2 rounded transition opacity-70 cursor-not-allowed">Contact Sales</button>
+                    <ul class="mt-4 sm:mt-6 space-y-3 text-left text-sm text-yellow-200"> <li>✔ Everything in Elite & Essential</li>
+                        <li>✔ Unlimited usage</li>
+                        <li>✔ 24-hour support turnaround</li>
+                        <li>✔ Custom design & deployment</li>
+                        <li>✔ Personalized branding (white-label)</li>
+                        <li>✔ Advanced analytics suite</li>
+                        <li>✔ Full integration control</li>
+                    </ul>
+                </div>
+
+                <div class="md:col-span-3 bg-blue-800/70 dark:bg-blue-900/80 text-white rounded-2xl p-4 sm:p-6 mt-4 shadow-lg border border-blue-400/30"> <h4 class="text-lg sm:text-xl font-semibold text-blue-200 mb-2">One-Time Installation Fee</h4> <p class="text-sm sm:text-base text-gray-200">Normally <span class="line-through text-gray-400">£20</span>, now <span class="font-semibold text-blue-100">free</span> during early access.</p> </div>
+
+            </div>
+        </div>
+    </section>
 </main>
 
 <footer class="bg-gray-900 text-gray-400 py-8 text-center">
-  <div class="mb-4">
-    <a href="privacy.html" class="mx-2 hover:text-white">Privacy Policy</a>
-    <a href="terms.html" class="mx-2 hover:text-white">Terms of Service</a>
-  </div>
-  <div class="text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
-</footer>
+    <div class="mb-4 text-sm sm:text-base"> <a href="privacy.html" class="mx-1 sm:mx-2 hover:text-white">Privacy Policy</a> <a href="terms.html" class="mx-1 sm:mx-2 hover:text-white">Terms of Service</a> </div>
+    <div class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</div> </footer>
 
 <script>
-// Billing logic
+// Mobile menu toggle script (added for consistency)
 document.addEventListener('DOMContentLoaded', function () {
-  const toggle = document.getElementById('billing-toggle');
-  const prices = {
-    essential: { monthly: 50, discounted: 25, annualMonthly: 43 },
-    elite: { monthly: 150, discounted: 123 },
-    executive: { monthly: 500, discounted: 400 }
-  };
-  const priceEls = {
-    elite: document.getElementById('price-elite'),
-    executive: document.getElementById('price-executive')
-  };
-  const discountEls = {
-    essential: document.getElementById('discount-essential')
-  };
-  const originalPriceEl = document.getElementById('original-price-essential');
-  const discountedPriceEl = document.getElementById('discounted-price-essential');
-  const betaBadgeEl = document.getElementById('beta-badge-essential');
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
 
-  function animatePrice(el, from, to, duration = 300) {
-    const start = performance.now();
-    function update(now) {
-      const progress = Math.min((now - start) / duration, 1);
-      el.textContent = `£${Math.round(from + (to - from) * progress)}`;
-      if (progress < 1) requestAnimationFrame(update);
-    }
-    requestAnimationFrame(update);
-  }
-
-  function updateDiscountBadges(show) {
-    Object.values(discountEls).forEach(el => {
-      if (!el) return;
-      el.classList.toggle('hidden', !show);
-      el.classList.toggle('visible', show);
-    });
-  }
-
-  toggle.addEventListener('change', () => {
-    const isYearly = toggle.checked;
-
-    if (isYearly) {
-      discountedPriceEl.classList.add('hidden');
-      originalPriceEl.classList.remove('line-through');
-      originalPriceEl.classList.remove('text-2xl');
-      originalPriceEl.classList.add('text-4xl', 'font-extrabold');
-      animatePrice(originalPriceEl, parseInt(originalPriceEl.textContent.replace(/[^\d]/g, '')), prices.essential.annualMonthly);
-      if (betaBadgeEl) betaBadgeEl.classList.add('hidden');
-    } else {
-      discountedPriceEl.classList.remove('hidden');
-      originalPriceEl.classList.add('line-through');
-      originalPriceEl.classList.remove('text-4xl', 'font-extrabold');
-      originalPriceEl.classList.add('text-2xl');
-      originalPriceEl.textContent = `£${prices.essential.monthly}`;
-      discountedPriceEl.textContent = `£${prices.essential.discounted}`;
-      if (betaBadgeEl) betaBadgeEl.classList.remove('hidden');
+    if (menuBtn && menu) { // Check if elements exist
+        menuBtn.addEventListener('click', () => {
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.remove('mobile-menu-slide-leave-to');
+                menu.classList.add('mobile-menu-slide-enter-active');
+                setTimeout(() => {
+                    menu.classList.remove('mobile-menu-slide-enter-active');
+                }, 300); // Should match transition duration
+            } else {
+                menu.classList.add('mobile-menu-slide-leave-active');
+                setTimeout(() => {
+                    menu.classList.remove('mobile-menu-slide-leave-active');
+                    menu.classList.add('hidden');
+                    menu.classList.add('mobile-menu-slide-leave-to'); // Ensure it slides up before hiding
+                }, 300); // Should match transition duration
+            }
+        });
     }
 
-    animatePrice(priceEls.elite, parseInt(priceEls.elite.textContent.replace(/[^\d]/g, '')), isYearly ? prices.elite.discounted : prices.elite.monthly);
-    animatePrice(priceEls.executive, parseInt(priceEls.executive.textContent.replace(/[^\d]/g, '')), isYearly ? prices.executive.discounted : prices.executive.monthly);
-    updateDiscountBadges(isYearly);
-  });
+    // Billing logic (original script)
+    const toggle = document.getElementById('billing-toggle');
+    if (toggle) { // Check if toggle exists
+        const prices = {
+            essential: { monthly: 50, discounted: 25, annualMonthly: 43 },
+            elite: { monthly: 150, discounted: 123 },
+            executive: { monthly: 500, discounted: 400 }
+        };
+        const priceEls = {
+            elite: document.getElementById('price-elite'),
+            executive: document.getElementById('price-executive')
+        };
+        const discountEls = {
+            essential: document.getElementById('discount-essential')
+        };
+        const originalPriceEl = document.getElementById('original-price-essential');
+        const discountedPriceEl = document.getElementById('discounted-price-essential');
+        const betaBadgeEl = document.getElementById('beta-badge-essential');
 
-  updateDiscountBadges(toggle.checked);
+        function animatePrice(el, from, to, duration = 300) {
+            const start = performance.now();
+            function update(now) {
+                const progress = Math.min((now - start) / duration, 1);
+                el.textContent = `£${Math.round(from + (to - from) * progress)}`;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function updateDiscountBadges(show) {
+            Object.values(discountEls).forEach(el => {
+                if (!el) return;
+                el.classList.toggle('hidden', !show);
+                el.classList.toggle('visible', show);
+            });
+        }
+
+        toggle.addEventListener('change', () => {
+            const isYearly = toggle.checked;
+
+            if (isYearly) {
+                if (discountedPriceEl) discountedPriceEl.classList.add('hidden');
+                if (originalPriceEl) {
+                    originalPriceEl.classList.remove('line-through');
+                    originalPriceEl.classList.remove('text-xl', 'sm:text-2xl'); // Use mobile breakpoint for removal
+                    originalPriceEl.classList.add('text-3xl', 'sm:text-4xl', 'font-extrabold'); // Use mobile breakpoint for add
+                    animatePrice(originalPriceEl, parseInt(originalPriceEl.textContent.replace(/[^\d]/g, '')), prices.essential.annualMonthly);
+                }
+                if (betaBadgeEl) betaBadgeEl.classList.add('hidden');
+            } else {
+                if (discountedPriceEl) discountedPriceEl.classList.remove('hidden');
+                if (originalPriceEl) {
+                    originalPriceEl.classList.add('line-through');
+                    originalPriceEl.classList.remove('text-3xl', 'sm:text-4xl', 'font-extrabold'); // Use mobile breakpoint for removal
+                    originalPriceEl.classList.add('text-xl', 'sm:text-2xl'); // Use mobile breakpoint for add
+                    originalPriceEl.textContent = `£${prices.essential.monthly}`;
+                }
+                if (discountedPriceEl) discountedPriceEl.textContent = `£${prices.essential.discounted}`;
+                if (betaBadgeEl) betaBadgeEl.classList.remove('hidden');
+            }
+
+            // Ensure priceEls exist before animating
+            if (priceEls.elite) animatePrice(priceEls.elite, parseInt(priceEls.elite.textContent.replace(/[^\d]/g, '')), isYearly ? prices.elite.discounted : prices.elite.monthly);
+            if (priceEls.executive) animatePrice(priceEls.executive, parseInt(priceEls.executive.textContent.replace(/[^\d]/g, '')), isYearly ? prices.executive.discounted : prices.executive.monthly);
+            updateDiscountBadges(isYearly);
+        });
+
+        // Initialize state on load
+        updateDiscountBadges(toggle.checked);
+    }
 });
 </script>
 
