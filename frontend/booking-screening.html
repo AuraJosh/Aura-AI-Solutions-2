@@ -149,45 +149,44 @@
         const cardCounterElement = document.getElementById('card-counter');
 
         // Function to render a single booking card
-        function renderBookingCard() {
-            if (bookingsData.length === 0) {
-                // If no bookings or no sheet, display the message from the server or a default one
-                if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
-                     bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
-                } else {
-                     bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
-                }
-               
-                prevButton.disabled = true;
-                nextButton.disabled = true;
-                cardCounterElement.textContent = '';
-                return;
-            }
-
-            const currentBooking = bookingsData[currentBookingIndex];
-            let cardHTML = ''; // This will build the HTML for the card's content
-
-            // Iterate through the booking fields configuration to get values
-            bookingFieldsConfig.forEach(fieldConfig => {
-                const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
-                
-                // Format as "Header: data" and wrap in a paragraph with minimal spacing
-                // Use mb-0.5 on the outer div for a tiny bit of space between different field entries
-                cardHTML += `
-                    <div class="w-full mb-0.5">
-                        <p class="text-white text-base leading-snug my-0">
-                            <span class="font-semibold">${fieldConfig.question}:</span> ${fieldValue}
-                        </p>
-                    </div>
-                `;
-            });
-
-            // Replace the entire content of the booking card
-            bookingCardElement.innerHTML = cardHTML;
-
-            updateNavigationButtons();
-            cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
-        }
+        // Function to render a single booking card
+        function renderBookingCard() {
+            if (bookingsData.length === 0) {
+                // If no bookings or no sheet, display the message from the server or a default one
+                if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
+                    bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
+                } else {
+                    bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                }
+        
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+                cardCounterElement.textContent = '';
+                return;
+            }
+        
+            const currentBooking = bookingsData[currentBookingIndex];
+            let cardContentArray = []; // Array to hold individual formatted field strings
+        
+            // Iterate through the booking fields configuration to get values
+            bookingFieldsConfig.forEach(fieldConfig => {
+                const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
+                // Format as "Header: data"
+                cardContentArray.push(`${fieldConfig.question}: ${fieldValue}`);
+            });
+        
+            // Join all formatted strings with a <br> tag for a new line
+            const combinedContent = cardContentArray.join('<br>');
+        
+            // Display the combined content in a single paragraph
+            // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
+            bookingCardElement.innerHTML = `
+                <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
+            `;
+        
+            updateNavigationButtons();
+            cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
+        }
 
         // Function to update the state of navigation buttons
         function updateNavigationButtons() {
