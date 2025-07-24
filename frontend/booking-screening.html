@@ -21,7 +21,7 @@
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
         overflow-y: auto;        /* Enables vertical scrolling */
-        height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        height: 240px;           /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
@@ -54,7 +54,7 @@
         <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex justify-center items-center">
             <div class="p-8 rounded-xl shadow-2xl bg-gray-900/70 w-full max-w-2xl h-[fit-content] flex items-center justify-center">
                 <div id="booking-screening-display" class="w-full max-w-2xl h-[fit-content] flex flex-col items-center">
-                    <h2 class="text-white font-semibold text-2xl mb-6">Booking Requests</h2>
+                    <h2 class="text-white text-2xl font-semibold mb-6">Booking Requests</h2>
                     <div class="flex items-center justify-between w-full px-4">
                         <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
                         <div id="booking-card" class="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 rounded-2xl shadow-xl w-full max-w-2xl h-[450px] overflow-y-auto flex flex-col justify-start items-start">
@@ -63,12 +63,12 @@
                         <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
                     </div>
                     <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
-                    <div class="flex space-x-4 mt-6">
-                        <button id="move-to-pending-btn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300">
-                            Move Booking to Pending
+                    <div class="flex justify-center space-x-4 mt-6 w-full">
+                        <button id="move-to-pending-btn" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 text-lg">
+                            Move booking to pending
                         </button>
-                        <button id="delete-booking-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300">
-                            Delete Booking
+                        <button id="delete-booking-btn" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline transition duration-300 text-lg">
+                            Delete booking
                         </button>
                     </div>
                 </div>
@@ -156,8 +156,6 @@
         const prevButton = document.getElementById('prev-booking-btn');
         const nextButton = document.getElementById('next-booking-btn');
         const cardCounterElement = document.getElementById('card-counter');
-        const moveToPendingBtn = document.getElementById('move-to-pending-btn');
-        const deleteBookingBtn = document.getElementById('delete-booking-btn');
 
         // Function to render a single booking card
         function renderBookingCard() {
@@ -172,8 +170,6 @@
                 prevButton.disabled = true;
                 nextButton.disabled = true;
                 cardCounterElement.textContent = '';
-                moveToPendingBtn.disabled = true; // Disable action buttons if no bookings
-                deleteBookingBtn.disabled = true; // Disable action buttons if no bookings
                 return;
             }
 
@@ -198,8 +194,6 @@
 
             updateNavigationButtons();
             cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
-            moveToPendingBtn.disabled = false; // Enable action buttons when bookings are present
-            deleteBookingBtn.disabled = false; // Enable action buttons when bookings are present
         }
 
         // Function to update the state of navigation buttons
@@ -255,8 +249,6 @@
                         prevButton.disabled = true;
                         nextButton.disabled = true;
                         cardCounterElement.textContent = '';
-                        moveToPendingBtn.disabled = true;
-                        deleteBookingBtn.disabled = true;
                         return;
                     }
 
@@ -278,17 +270,6 @@
             } else {
                 console.log("User is signed out. Redirecting to login.");
             }
-        });
-
-        // Event listeners for new buttons (functionality to be added later)
-        moveToPendingBtn.addEventListener('click', () => {
-            // Functionality to move booking to pending will go here
-            alert('Move booking to pending clicked!');
-        });
-
-        deleteBookingBtn.addEventListener('click', () => {
-            // Functionality to delete booking will go here
-            alert('Delete booking clicked!');
         });
 
         // The modal functionality (Update Business Info Form Submission) is intentionally left
