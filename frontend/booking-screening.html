@@ -171,9 +171,7 @@
             bookingFieldsConfig.forEach(fieldConfig => {
                 const fieldValue = currentBooking[fieldConfig.field] || 'N/A'; // Get value from booking data, default to 'N/A'
                 cardHTML += `
-                    <div class="mb-2 w-full">                         <p class="text-gray-300 font-semibold text-lg">${fieldConfig.question}</p>
-                        <p class="text-white text-xl ml-4">${fieldValue}</p>
-                    </div>
+                    <div class="mb-1 w-full">                         <p class="text-gray-300 font-semibold text-base">${fieldConfig.question}</p>                         <p class="text-white text-base ml-4">${fieldValue}</p>                     </div>
                 `;
             });
 
