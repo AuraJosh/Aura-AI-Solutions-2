@@ -175,8 +175,8 @@
                 cardContentArray.push(`${fieldConfig.question}: ${fieldValue}`);
             });
         
-            // Join all formatted strings with a <br> tag for a new line
-            const combinedContent = cardContentArray.join('<br>');
+            // Join all formatted strings with two <br> tags for a blank line between entries
+            const combinedContent = cardContentArray.join('<br><br>');
         
             // Display the combined content in a single paragraph
             // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
