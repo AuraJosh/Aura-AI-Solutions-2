@@ -139,17 +139,7 @@
         const auth = getAuth();
         let bookingsData = []; // Array to hold all booking records
         let currentBookingIndex = 0; // Current index of the displayed booking
-
-        // Hardcoded booking fields configuration for demonstration
-        // In a real scenario, this might also come from your Google Apps Script
-        const bookingFieldsConfig = [
-            { "field": "Contact Number", "question": "What is your contact number?" },
-            { "field": "Student Age", "question": "What is the student's age?" },
-            { "field": "Subject/s", "question": "Which subject(s) are you interested in?" },
-            { "field": "Level", "question": "What level is the student at?" },
-            { "field": "Special Needs", "question": "Does the student have any special needs?" },
-            { "field": "Availability", "question": "What is your availability for booking?" }
-        ];
+        let bookingFieldsConfig = []; // This will now be dynamically loaded from the Apps Script
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -159,7 +149,13 @@
         // Function to render a single booking card
         function renderBookingCard() {
             if (bookingsData.length === 0) {
-                bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                // If no bookings or no sheet, display the message from the server or a default one
+                if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
+                     bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
+                } else {
+                     bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                }
+               
                 prevButton.disabled = true;
                 nextButton.disabled = true;
                 cardCounterElement.textContent = '';
@@ -169,6 +165,7 @@
             const currentBooking = bookingsData[currentBookingIndex];
             let cardHTML = '';
 
+            // Use the dynamically loaded bookingFieldsConfig
             bookingFieldsConfig.forEach(fieldConfig => {
                 const fieldValue = currentBooking[fieldConfig.field] || 'N/A'; // Get value from booking data, default to 'N/A'
                 cardHTML += `
@@ -212,7 +209,7 @@
         // --- Data Loading Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userIdentifier = user.uid;
+                const userIdentifier = user.uid; // Firebase UID
                 console.log("Logged-in user ID (Firebase UID):", userIdentifier);
 
                 if (GOOGLE_APPS_SCRIPT_BOOKING_URL === 'YOUR_GOOGLE_APPS_SCRIPT_BOOKING_URL_HERE') {
@@ -227,8 +224,6 @@
                 bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
                 
                 try {
-                    // Make sure your Google Apps Script is deployed as a Web App and can handle GET requests
-                    // It should return JSON like: { bookings: [{ "Contact Number": "...", ... }] }
                     const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(userIdentifier)}`);
 
                     if (!response.ok) {
@@ -241,9 +236,19 @@
                         bookingCardElement.innerHTML = `<p style="color: red; text-align: center; w-full">Error: ${data.error}</p>`;
                         return;
                     }
+
+                    if (data.message) {
+                        // Display message if provided by the server (e.g., sheet not found)
+                        bookingCardElement.innerHTML = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
+                        prevButton.disabled = true;
+                        nextButton.disabled = true;
+                        cardCounterElement.textContent = '';
+                        return;
+                    }
                     
-                    if (Array.isArray(data.bookings)) {
+                    if (Array.isArray(data.bookings) && Array.isArray(data.bookingFieldsConfig)) {
                         bookingsData = data.bookings;
+                        bookingFieldsConfig = data.bookingFieldsConfig; // Store the dynamic config
                         currentBookingIndex = 0; // Start at the first booking
                         renderBookingCard(); // Display the first card
                     } else {
