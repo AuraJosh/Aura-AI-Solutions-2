@@ -16,17 +16,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
     <style>
-    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
+    /* Custom CSS from analytics page (kept for visual consistency, though chat logs not present here) */
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
         overflow-y: auto;        /* Enables vertical scrolling */
         height: 240px;           /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
-        /* Remove max-height: 100%; as it's not needed with a fixed height */
     }
     .chat-log-message {
-        /* Optional: Add some padding to separate messages visually */
         padding-bottom: 8px;
     }
     </style>
@@ -53,8 +51,17 @@
     </header>
 
     <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-            <p class="text-white text-center">Your booking screening content will go here.</p>
+        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex justify-center items-center">
+            <div id="booking-screening-display" class="w-full max-w-4xl h-[70vh] flex flex-col justify-center items-center">
+                <div class="flex items-center justify-between w-full px-4">
+                    <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
+                    <div id="booking-card" class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl min-h-[400px] flex flex-col justify-center items-start">
+                        <p class="text-white text-center w-full">Loading booking requests...</p>
+                    </div>
+                    <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
+                </div>
+                <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
+            </div>
         </div>
     </main>
 
@@ -124,11 +131,139 @@
         });
     </script>
     <script type="module">
-        // The data loading and chart rendering logic from the analytics page has been removed
-        // as you requested the container to be empty for future edits.
-        // The modal script has also been commented out as it's not relevant for an empty container.
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-        // You can add your specific JavaScript for booking screening here later.
+        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL for BOOKING DATA!
+        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'YOUR_GOOGLE_APPS_SCRIPT_BOOKING_URL_HERE'; // e.g., 'https://script.google.com/macros/s/ABC123xyz/exec';
+
+        const auth = getAuth();
+        let bookingsData = []; // Array to hold all booking records
+        let currentBookingIndex = 0; // Current index of the displayed booking
+
+        // Hardcoded booking fields configuration for demonstration
+        // In a real scenario, this might also come from your Google Apps Script
+        const bookingFieldsConfig = [
+            { "field": "Contact Number", "question": "What is your contact number?" },
+            { "field": "Student Age", "question": "What is the student's age?" },
+            { "field": "Subject/s", "question": "Which subject(s) are you interested in?" },
+            { "field": "Level", "question": "What level is the student at?" },
+            { "field": "Special Needs", "question": "Does the student have any special needs?" },
+            { "field": "Availability", "question": "What is your availability for booking?" }
+        ];
+
+        const bookingCardElement = document.getElementById('booking-card');
+        const prevButton = document.getElementById('prev-booking-btn');
+        const nextButton = document.getElementById('next-booking-btn');
+        const cardCounterElement = document.getElementById('card-counter');
+
+        // Function to render a single booking card
+        function renderBookingCard() {
+            if (bookingsData.length === 0) {
+                bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+                cardCounterElement.textContent = '';
+                return;
+            }
+
+            const currentBooking = bookingsData[currentBookingIndex];
+            let cardHTML = '';
+
+            bookingFieldsConfig.forEach(fieldConfig => {
+                const fieldValue = currentBooking[fieldConfig.field] || 'N/A'; // Get value from booking data, default to 'N/A'
+                cardHTML += `
+                    <div class="mb-3 w-full">
+                        <p class="text-gray-300 font-semibold text-lg">${fieldConfig.question}</p>
+                        <p class="text-white text-xl ml-4">${fieldValue}</p>
+                    </div>
+                `;
+            });
+
+            bookingCardElement.innerHTML = cardHTML;
+            updateNavigationButtons();
+            cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
+        }
+
+        // Function to update the state of navigation buttons
+        function updateNavigationButtons() {
+            prevButton.disabled = currentBookingIndex === 0;
+            nextButton.disabled = currentBookingIndex === bookingsData.length - 1;
+        }
+
+        // Navigation functions
+        function showNextCard() {
+            if (currentBookingIndex < bookingsData.length - 1) {
+                currentBookingIndex++;
+                renderBookingCard();
+            }
+        }
+
+        function showPrevCard() {
+            if (currentBookingIndex > 0) {
+                currentBookingIndex--;
+                renderBookingCard();
+            }
+        }
+
+        // Event Listeners for navigation
+        prevButton.addEventListener('click', showPrevCard);
+        nextButton.addEventListener('click', showNextCard);
+
+        // --- Data Loading Logic ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userIdentifier = user.uid;
+                console.log("Logged-in user ID (Firebase UID):", userIdentifier);
+
+                if (GOOGLE_APPS_SCRIPT_BOOKING_URL === 'YOUR_GOOGLE_APPS_SCRIPT_BOOKING_URL_HERE') {
+                    bookingCardElement.innerHTML = `
+                        <p class="text-red-400 text-center w-full">
+                            <strong>Error:</strong> Please update <code class="bg-gray-700 p-1 rounded">GOOGLE_APPS_SCRIPT_BOOKING_URL</code> in the JavaScript with your actual Apps Script URL for booking data.
+                        </p>
+                    `;
+                    return;
+                }
+
+                bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
+                
+                try {
+                    // Make sure your Google Apps Script is deployed as a Web App and can handle GET requests
+                    // It should return JSON like: { bookings: [{ "Contact Number": "...", ... }] }
+                    const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        bookingCardElement.innerHTML = `<p style="color: red; text-align: center; w-full">Error: ${data.error}</p>`;
+                        return;
+                    }
+                    
+                    if (Array.isArray(data.bookings)) {
+                        bookingsData = data.bookings;
+                        currentBookingIndex = 0; // Start at the first booking
+                        renderBookingCard(); // Display the first card
+                    } else {
+                        bookingCardElement.innerHTML = '<p class="text-red-400 text-center w-full">Unexpected data format received from booking server.</p>';
+                        console.error("Received unexpected data format:", data);
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching booking data:', error);
+                    bookingCardElement.innerHTML = '<p class="text-red-400 text-center w-full">Failed to load booking data. Please try again later.</p>';
+                }
+
+            } else {
+                console.log("User is signed out. Redirecting to login.");
+            }
+        });
+
+        // The modal functionality (Update Business Info Form Submission) is intentionally left
+        // out from this page's JavaScript as it's not relevant to booking screening.
+        // The modal HTML is still present, but it won't be interactive.
     </script>
 </body>
 </html>
