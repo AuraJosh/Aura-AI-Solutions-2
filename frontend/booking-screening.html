@@ -20,7 +20,7 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;        /* Enables vertical scrolling */
+        overflow-y: auto;         /* Enables vertical scrolling */
         height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
@@ -77,15 +77,15 @@
             <div class="flex flex-col w-full ml-8 space-y-8">
                 <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
                     <h2 class="text-white text-2xl font-semibold mb-4">Pending Bookings</h2>
-                    <div class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start">
-                        <p class="text-white text-center w-full">Pending booking details will go here.</p>
+                    <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
+                        <p class="text-white text-center w-full">No pending bookings.</p>
                     </div>
                 </div>
 
                 <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
                     <h2 class="text-white text-2xl font-semibold mb-4">Deleted Bookings</h2>
-                    <div class="bg-gradient-to-br from-red-800 to-orange-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start">
-                        <p class="text-white text-center w-full">Deleted booking details will go here.</p>
+                    <div id="deleted-bookings-list" class="bg-gradient-to-br from-red-800 to-orange-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
+                        <p class="text-white text-center w-full">No deleted bookings.</p>
                     </div>
                 </div>
             </div>
@@ -165,7 +165,10 @@
         const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // e.g., 'https://script.google.com/macros/s/ABC123xyz/exec';
 
         const auth = getAuth();
-        let bookingsData = []; // Array to hold all booking records
+        let bookingsData = []; // Array to hold all booking records (unprocessed/new requests)
+        let pendingBookings = []; // Array to hold pending booking records
+        let deletedBookings = []; // Array to hold deleted booking records
+
         let currentBookingIndex = 0; // Current index of the displayed booking
         let bookingFieldsConfig = []; // This will now be dynamically loaded from the Apps Script
 
@@ -173,13 +176,16 @@
         const prevButton = document.getElementById('prev-booking-btn');
         const nextButton = document.getElementById('next-booking-btn');
         const cardCounterElement = document.getElementById('card-counter');
-        const moveToPendingBtn = document.getElementById('move-to-pending-btn'); // New button
-        const deleteBookingBtn = document.getElementById('delete-booking-btn');   // New button
+        const moveToPendingBtn = document.getElementById('move-to-pending-btn');
+        const deleteBookingBtn = document.getElementById('delete-booking-btn');
 
-        // Function to render a single booking card
+        // New elements for pending and deleted lists
+        const pendingBookingsListElement = document.getElementById('pending-bookings-list');
+        const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
+
+        // Function to render a single booking card (main display)
         function renderBookingCard() {
             if (bookingsData.length === 0) {
-                // If no bookings or no sheet, display the message from the server or a default one
                 if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
                     bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
                 } else {
@@ -188,41 +194,83 @@
 
                 prevButton.disabled = true;
                 nextButton.disabled = true;
-                moveToPendingBtn.disabled = true; // Disable new buttons
-                deleteBookingBtn.disabled = true; // Disable new buttons
+                moveToPendingBtn.disabled = true;
+                deleteBookingBtn.disabled = true;
                 cardCounterElement.textContent = '';
                 return;
             }
 
             const currentBooking = bookingsData[currentBookingIndex];
-            let cardContentArray = []; // Array to hold individual formatted field strings
+            let cardContentArray = [];
 
-            // Iterate through the booking fields configuration to get values
             bookingFieldsConfig.forEach(fieldConfig => {
                 const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
-                // Format as "Header: data" - Header is bold and 1pt larger
                 cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
             });
 
-            // Join all formatted strings with two <br> tags for a blank line between entries
             const combinedContent = cardContentArray.join('<br><br>');
 
-            // Display the combined content in a single paragraph
-            // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
             bookingCardElement.innerHTML = `
                 <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
             `;
 
             updateNavigationButtons();
             cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
-            moveToPendingBtn.disabled = false; // Enable new buttons
-            deleteBookingBtn.disabled = false; // Enable new buttons
+            moveToPendingBtn.disabled = false;
+            deleteBookingBtn.disabled = false;
+        }
+
+        // Function to render a shortened booking item for lists
+        function renderShortenedBookingItem(booking, type) {
+            // Adjust these fields based on what you actually want to display
+            // E.g., date, phone number, a key identifier, etc.
+            // Assuming your booking object has properties like 'Timestamp', 'Phone Number', 'Quantity'
+            const date = booking.Timestamp ? new Date(booking.Timestamp).toLocaleDateString() : 'N/A';
+            const phoneNumber = booking['Phone Number'] || 'N/A';
+            const quantity = booking.Quantity || 'N/A'; // Assuming 'Quantity' is a field
+
+            return `
+                <div class="bg-white/10 p-3 rounded-lg flex justify-between items-center text-sm">
+                    <span class="font-medium">${date}</span>
+                    <span class="mx-2">|</span>
+                    <span>${phoneNumber}</span>
+                    <span class="mx-2">|</span>
+                    <span>${quantity}</span>
+                    ${type === 'pending' ? `<button class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-white text-xs" data-index="${pendingBookings.indexOf(booking)}" data-type="complete-pending">Complete</button>` : ''}
+                    ${type === 'pending' ? `<button class="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-white text-xs" data-index="${pendingBookings.indexOf(booking)}" data-type="delete-pending">Delete</button>` : ''}
+                </div>
+            `;
+        }
+
+        // Function to render the pending bookings list
+        function renderPendingBookings() {
+            if (pendingBookings.length === 0) {
+                pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
+            } else {
+                pendingBookingsListElement.innerHTML = pendingBookings.map(booking => renderShortenedBookingItem(booking, 'pending')).join('');
+                // Add event listeners to the new buttons
+                pendingBookingsListElement.querySelectorAll('[data-type="complete-pending"]').forEach(button => {
+                    button.addEventListener('click', handleCompletePending);
+                });
+                pendingBookingsListElement.querySelectorAll('[data-type="delete-pending"]').forEach(button => {
+                    button.addEventListener('click', handleDeletePending);
+                });
+            }
+        }
+
+        // Function to render the deleted bookings list
+        function renderDeletedBookings() {
+            if (deletedBookings.length === 0) {
+                deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
+            } else {
+                deletedBookingsListElement.innerHTML = deletedBookings.map(booking => renderShortenedBookingItem(booking, 'deleted')).join('');
+            }
         }
 
         // Function to update the state of navigation buttons
         function updateNavigationButtons() {
             prevButton.disabled = currentBookingIndex === 0;
-            nextButton.disabled = currentBookingIndex === bookingsData.length - 1;
+            nextButton.disabled = bookingsData.length === 0 || currentBookingIndex === bookingsData.length - 1;
         }
 
         // Navigation functions
@@ -244,17 +292,70 @@
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
 
-        // Placeholder event listeners for new buttons
-        moveToPendingBtn.addEventListener('click', () => {
-            alert('Move to Pending functionality will be added here!');
-        });
+        // --- Booking Action Functions ---
 
-        deleteBookingBtn.addEventListener('click', () => {
-            alert('Delete Booking functionality will be added here!');
-        });
+        function moveBookingToPending() {
+            if (bookingsData.length === 0) return;
 
+            const bookingToMove = bookingsData.splice(currentBookingIndex, 1)[0]; // Remove and get the current booking
+            pendingBookings.push(bookingToMove); // Add to pending array
 
-        // --- Data Loading Logic ---
+            // Adjust index if we removed the last item or we are at the end
+            if (currentBookingIndex >= bookingsData.length && bookingsData.length > 0) {
+                currentBookingIndex = bookingsData.length - 1;
+            } else if (bookingsData.length === 0) {
+                currentBookingIndex = 0; // Reset if no bookings left
+            }
+
+            renderBookingCard(); // Re-render the main card (will show next or empty)
+            renderPendingBookings(); // Re-render the pending list
+        }
+
+        function deleteBooking() {
+            if (bookingsData.length === 0) return;
+
+            const bookingToDelete = bookingsData.splice(currentBookingIndex, 1)[0]; // Remove and get the current booking
+            deletedBookings.push(bookingToDelete); // Add to deleted array
+
+            // Adjust index similarly
+            if (currentBookingIndex >= bookingsData.length && bookingsData.length > 0) {
+                currentBookingIndex = bookingsData.length - 1;
+            } else if (bookingsData.length === 0) {
+                currentBookingIndex = 0; // Reset if no bookings left
+            }
+
+            renderBookingCard(); // Re-render the main card
+            renderDeletedBookings(); // Re-render the deleted list
+        }
+
+        // Event listeners for the action buttons
+        moveToPendingBtn.addEventListener('click', moveBookingToPending);
+        deleteBookingBtn.addEventListener('click', deleteBooking);
+
+        // Function to handle completing a pending booking (optional, but good for completeness)
+        function handleCompletePending(event) {
+            const index = event.target.dataset.index;
+            if (index !== undefined) {
+                const [completedBooking] = pendingBookings.splice(index, 1);
+                alert(`Booking completed: ${completedBooking['Phone Number'] || 'N/A'}`);
+                renderPendingBookings(); // Re-render the pending list
+                // You might want to add this to another 'completed' array or send to backend
+            }
+        }
+
+        // Function to handle deleting a pending booking (optional)
+        function handleDeletePending(event) {
+            const index = event.target.dataset.index;
+            if (index !== undefined) {
+                const [deletedFromPending] = pendingBookings.splice(index, 1);
+                deletedBookings.push(deletedFromPending); // Move to deleted
+                alert(`Booking moved from pending to deleted: ${deletedFromPending['Phone Number'] || 'N/A'}`);
+                renderPendingBookings(); // Re-render the pending list
+                renderDeletedBookings(); // Re-render the deleted list
+            }
+        }
+
+        // --- Initial Data Loading Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userIdentifier = user.uid; // Firebase UID
@@ -277,21 +378,22 @@
                     }
 
                     if (data.message) {
-                        // Display message if provided by the server (e.g., sheet not found)
                         bookingCardElement.innerHTML = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
                         prevButton.disabled = true;
                         nextButton.disabled = true;
-                        moveToPendingBtn.disabled = true; // Disable new buttons
-                        deleteBookingBtn.disabled = true; // Disable new buttons
+                        moveToPendingBtn.disabled = true;
+                        deleteBookingBtn.disabled = true;
                         cardCounterElement.textContent = '';
                         return;
                     }
 
                     if (Array.isArray(data.bookings) && Array.isArray(data.bookingFieldsConfig)) {
                         bookingsData = data.bookings;
-                        bookingFieldsConfig = data.bookingFieldsConfig; // Store the dynamic config
-                        currentBookingIndex = 0; // Start at the first booking
+                        bookingFieldsConfig = data.bookingFieldsConfig;
+                        currentBookingIndex = 0;
                         renderBookingCard(); // Display the first card
+                        renderPendingBookings(); // Initialize pending list display
+                        renderDeletedBookings(); // Initialize deleted list display
                     } else {
                         bookingCardElement.innerHTML = '<p class="text-red-400 text-center w-full">Unexpected data format received from booking server.</p>';
                         console.error("Received unexpected data format:", data);
@@ -306,10 +408,6 @@
                 console.log("User is signed out. Redirecting to login.");
             }
         });
-
-        // The modal functionality (Update Business Info Form Submission) is intentionally left
-        // out from this page's JavaScript as it's not relevant to booking screening.
-        // The modal HTML is still present, but it won't be interactive.
     </script>
 </body>
 </html>
