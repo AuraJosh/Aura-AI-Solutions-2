@@ -212,15 +212,6 @@
                 const userIdentifier = user.uid; // Firebase UID
                 console.log("Logged-in user ID (Firebase UID):", userIdentifier);
 
-                if (GOOGLE_APPS_SCRIPT_BOOKING_URL === 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec') {
-                    bookingCardElement.innerHTML = `
-                        <p class="text-red-400 text-center w-full">
-                            <strong>Error:</strong> Please update <code class="bg-gray-700 p-1 rounded">GOOGLE_APPS_SCRIPT_BOOKING_URL</code> in the JavaScript with your actual Apps Script URL for booking data.
-                        </p>
-                    `;
-                    return;
-                }
-
                 bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
                 
                 try {
