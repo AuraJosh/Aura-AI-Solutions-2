@@ -54,15 +54,15 @@
         <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex justify-center items-center">
             <div class="p-8 rounded-xl shadow-2xl bg-gray-900/70 w-full max-w-5xl h-[75vh] flex items-center justify-center">
                 <div id="booking-screening-display" class="w-full max-w-2xl h-[fit-content] flex flex-col items-center">
-                  <div class="flex items-center justify-between w-full px-4">
-                      <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
-                      <div id="booking-card" class="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 rounded-2xl shadow-xl w-full max-w-2xl h-[450px] overflow-y-auto flex flex-col justify-start items-start">
-                          <p class="text-white text-center w-full">Loading booking requests...</p>
-                      </div>
-                      <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
-                  </div>
-                  <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
-              </div>
+                    <div class="flex items-center justify-between w-full px-4">
+                        <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
+                        <div id="booking-card" class="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 rounded-2xl shadow-xl w-full max-w-2xl h-[450px] overflow-y-auto flex flex-col justify-start items-start">
+                            <p class="text-white text-center w-full">Loading booking requests...</p>
+                        </div>
+                        <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
+                    </div>
+                    <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
+                </div>
             </div>
         </div>
     </main>
@@ -151,41 +151,41 @@
         // Function to render a single booking card
         function renderBookingCard() {
             if (bookingsData.length === 0) {
-            // If no bookings or no sheet, display the message from the server or a default one
-            if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
-                bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
-            } else {
-                bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                // If no bookings or no sheet, display the message from the server or a default one
+                if (bookingFieldsConfig.length === 0 && bookingsData.length === 0) {
+                    bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests or sheet found for this account.</p>';
+                } else {
+                    bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No booking requests found for this account.</p>';
+                }
+
+                prevButton.disabled = true;
+                nextButton.disabled = true;
+                cardCounterElement.textContent = '';
+                return;
             }
-    
-            prevButton.disabled = true;
-            nextButton.disabled = true;
-            cardCounterElement.textContent = '';
-            return;
+
+            const currentBooking = bookingsData[currentBookingIndex];
+            let cardContentArray = []; // Array to hold individual formatted field strings
+
+            // Iterate through the booking fields configuration to get values
+            bookingFieldsConfig.forEach(fieldConfig => {
+                const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
+                // Format as "Header: data" - Header is bold and 1pt larger
+                cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
+            });
+
+            // Join all formatted strings with two <br> tags for a blank line between entries
+            const combinedContent = cardContentArray.join('<br><br>');
+
+            // Display the combined content in a single paragraph
+            // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
+            bookingCardElement.innerHTML = `
+                <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
+            `;
+
+            updateNavigationButtons();
+            cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
         }
-    
-        const currentBooking = bookingsData[currentBookingIndex];
-        let cardContentArray = []; // Array to hold individual formatted field strings
-    
-        // Iterate through the booking fields configuration to get values
-        bookingFieldsConfig.forEach(fieldConfig => {
-            const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
-            // Format as "Header: data"
-            cardContentArray.push(`${fieldConfig.question}: ${fieldValue}`);
-        });
-    
-        // Join all formatted strings with two <br> tags for a blank line between entries
-        const combinedContent = cardContentArray.join('<br><br>');
-    
-        // Display the combined content in a single paragraph
-        // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
-        bookingCardElement.innerHTML = `
-            <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
-        `;
-    
-        updateNavigationButtons();
-        cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
-    }
 
         // Function to update the state of navigation buttons
         function updateNavigationButtons() {
