@@ -165,17 +165,23 @@
             }
 
             const currentBooking = bookingsData[currentBookingIndex];
-            let cardHTML = '';
+            let cardContentArray = []; // Array to hold individual field values
 
-            // Use the dynamically loaded bookingFieldsConfig
+            // Iterate through the booking fields configuration to get values
             bookingFieldsConfig.forEach(fieldConfig => {
-                const fieldValue = currentBooking[fieldConfig.field] || 'N/A'; // Get value from booking data, default to 'N/A'
-                cardHTML += `
-                    <div class="mb-px w-full">                         <p class="text-gray-300 font-semibold text-base">${fieldConfig.question}</p>                         <p class="text-white text-base ml-4">${fieldValue}</p>                     </div>
-                `;
+                const fieldValue = (currentBooking[fieldConfig.field] || 'N/A').toString().trim();
+                cardContentArray.push(fieldValue); // Add each value to the array
             });
 
-            bookingCardElement.innerHTML = cardHTML;
+            // Join all values with a comma and space
+            const combinedContent = cardContentArray.join(', ');
+
+            // Display the combined content in a single paragraph
+            // Keep the text-base, leading-snug, my-0 from previous iterations for compactness
+            bookingCardElement.innerHTML = `
+                <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
+            `;
+
             updateNavigationButtons();
             cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
         }
