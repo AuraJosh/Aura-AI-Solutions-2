@@ -161,16 +161,16 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
         // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL for BOOKING DATA!
-        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // This must be updated after redeploying your Apps Script!
+        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // <--- Make sure this URL is correct after your Apps Script redeployment!
 
         const auth = getAuth();
-        let bookingsData = []; // Array to hold all booking records (unprocessed/new requests)
+        let bookingsData = []; // Array to hold all booking records with 'New' status
         let pendingBookings = []; // Array to hold pending booking records
         let deletedBookings = []; // Array to hold deleted booking records
 
         let currentBookingIndex = 0; // Current index of the displayed booking
         let bookingFieldsConfig = []; // This will now be dynamically loaded from the Apps Script
-        let currentUserUid = null; // New: Store user UID for API calls
+        let currentUserUid = null; // Store user UID for API calls
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -182,7 +182,7 @@
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
 
-        // New Helper: Function to send updates to Google Apps Script
+        // Helper to send updates to Google Apps Script
         async function sendBookingUpdate(action, bookingId, newStatus = null, originalSource = null) {
             if (!currentUserUid) {
                 console.error("User not logged in, cannot send update.");
@@ -193,14 +193,14 @@
                 const response = await fetch(GOOGLE_APPS_SCRIPT_BOOKING_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded', // Apps Script expects this or raw JSON body
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: new URLSearchParams({
                         action: action,
                         userId: currentUserUid,
                         bookingId: bookingId,
                         newStatus: newStatus,
-                        originalSource: originalSource // Used for undoDeleted action
+                        originalSource: originalSource // Used for undoDeleted action in Apps Script
                     }).toString()
                 });
 
@@ -215,8 +215,7 @@
                 return { success: true, message: data.message };
             } catch (error) {
                 console.error('Error sending booking update:', error);
-                // Return a more user-friendly error if possible, e.g., for network issues
-                return { success: false, error: "Network error or server issue. Please try again." };
+                return { success: false, error: "Network error or server issue. Please try again: " + error.message };
             }
         }
 
@@ -371,11 +370,12 @@
             const bookingToDelete = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
             const bookingId = bookingToDelete.Timestamp.toString(); // Use Timestamp as ID
 
-            const result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+            // When deleting from 'requests', its previous status was 'New'
+            const result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted', 'New'); // <--- Pass 'New' as originalSource
 
             if (result.success) {
                 bookingsData.splice(currentBookingIndex, 1); // Now remove from current
-                bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
+                // No need to add _originalSource here on client, as it will be loaded from sheet on refresh
                 deletedBookings.push(bookingToDelete); // Add to deleted
 
                 adjustCurrentBookingIndex();
@@ -417,8 +417,7 @@
                 bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
 
                 if (action === 'complete') {
-                    // Note: 'Completed' status would ideally go to a separate completedBookings array or just be removed.
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'Completed');
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'Completed', 'Pending'); // Original status was 'Pending'
 
                     if (result.success) {
                         pendingBookings.splice(index, 1); // Remove from pending
@@ -428,11 +427,12 @@
                         alert("Failed to complete booking: " + result.error);
                     }
                 } else if (action === 'delete') {
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+                    // When deleting from 'pending', its previous status was 'Pending'
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted', 'Pending'); // <--- Pass 'Pending' as originalSource
 
                     if (result.success) {
                         const [movedBooking] = pendingBookings.splice(index, 1); // Remove from pending
-                        movedBooking._originalSource = 'pending'; // Tag it as coming from pending
+                        // No need to add _originalSource here on client, as it will be loaded from sheet on refresh
                         deletedBookings.push(movedBooking); // Add to deleted
                         renderPendingBookings();
                         renderDeletedBookings();
@@ -442,7 +442,7 @@
                     }
                 } else if (action === 'undo') {
                     // Undo from pending goes back to 'New' requests
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'New'); 
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'New', 'Pending'); // Undo from pending means it came from 'New'
 
                     if (result.success) {
                         const [undoneBooking] = pendingBookings.splice(index, 1); // Remove from pending
@@ -462,23 +462,27 @@
                 bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
 
                 if (action === 'undo') {
-                    let targetStatus = 'New'; // Default for _originalSource === 'requests'
-                    if (bookingToProcess._originalSource === 'pending') {
-                        targetStatus = 'Pending';
-                    }
-
-                    result = await sendBookingUpdate('undoDeleted', bookingId, targetStatus, bookingToProcess._originalSource);
+                    // When undoing from deleted, the Apps Script will now read Status_prev itself
+                    // We just need to tell it to perform the 'undoDeleted' action
+                    result = await sendBookingUpdate('undoDeleted', bookingId); // <--- No need to pass targetStatus or originalSource from client here
 
                     if (result.success) {
                         const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
 
-                        if (undoneBooking._originalSource === 'requests') {
+                        // This part needs to re-fetch the booking's actual current status from the server
+                        // For a clean solution after persistence, it's often best to re-fetch all data or the specific item.
+                        // However, to keep it simple and just rely on the UI lists for now:
+                        // The Apps Script now handles setting the right status (New or Pending)
+                        // on the sheet based on Status_prev. So, here, we simulate it moving back
+                        // to the correct array based on what _originalSource *was* when the client last loaded it.
+                        // This assumes _originalSource was set correctly during initial load from the sheet.
+                        if (undoneBooking._originalSource === 'requests' || undoneBooking._originalSource === 'New') { // 'New' is the status in sheet
                             bookingsData.push(undoneBooking); // Go back to main requests
                             if (bookingsData.length > 0) {
                                 currentBookingIndex = bookingsData.length - 1;
                             }
                             renderBookingCard();
-                        } else if (undoneBooking._originalSource === 'pending') {
+                        } else if (undoneBooking._originalSource === 'pending' || undoneBooking._originalSource === 'Pending') { // 'Pending' is the status in sheet
                             pendingBookings.push(undoneBooking); // Go back to pending
                             renderPendingBookings();
                         }
