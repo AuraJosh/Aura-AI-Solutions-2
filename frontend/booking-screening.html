@@ -275,7 +275,7 @@
             } else {
                 deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
                 // Attach event listeners after rendering
-                deletedBookatedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => { // Corrected ID here
+                deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
                     button.addEventListener('click', handleListButtonAction);
                 });
             }
@@ -350,28 +350,28 @@
             if (listType === 'pending') {
                 if (action === 'complete') {
                     pendingBookings.splice(index, 1);
+                    // If you had a 'completedBookings' array, you'd push it there
                 } else if (action === 'delete') {
-                    // *** MODIFIED LOGIC HERE ***
-                    const [deletedFromPending] = pendingBookings.splice(index, 1);
-                    deletedBookings.push(deletedFromPending);
-                    renderDeletedBookings(); // <--- RENDER THE DELETED LIST
+                    // Move from pending to deleted
+                    const [bookingToMove] = pendingBookings.splice(index, 1); // Remove from pending
+                    deletedBookings.push(bookingToMove); // Add to deleted
+                    renderDeletedBookings(); // Re-render deleted list
                 } else if (action === 'undo') {
+                    // Move from pending back to main requests
                     const [undoneBooking] = pendingBookings.splice(index, 1);
                     bookingsData.push(undoneBooking);
-                    if (bookingsData.length > 0) {
-                        currentBookingIndex = bookingsData.length - 1;
+                    if (bookingsData.length > 0 && currentBookingIndex === 0) {
+                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item if main was empty
                     }
                     renderBookingCard();
                 }
                 renderPendingBookings(); // Always re-render pending after an action
             } else if (listType === 'deleted') {
                 if (action === 'undo') {
+                    // Move from deleted back to pending
                     const [undoneBooking] = deletedBookings.splice(index, 1);
-                    bookingsData.push(undoneBooking);
-                    if (bookingsData.length > 0) {
-                        currentBookingIndex = bookingsData.length - 1;
-                    }
-                    renderBookingCard();
+                    pendingBookings.push(undoneBooking); // Add to pending
+                    renderPendingBookings(); // Re-render pending list
                 }
                 renderDeletedBookings(); // Always re-render deleted after an action
             }
