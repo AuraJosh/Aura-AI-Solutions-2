@@ -161,7 +161,7 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
         // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL for BOOKING DATA!
-        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec';
+        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // This must be updated after redeploying your Apps Script!
 
         const auth = getAuth();
         let bookingsData = []; // Array to hold all booking records (unprocessed/new requests)
@@ -170,6 +170,7 @@
 
         let currentBookingIndex = 0; // Current index of the displayed booking
         let bookingFieldsConfig = []; // This will now be dynamically loaded from the Apps Script
+        let currentUserUid = null; // New: Store user UID for API calls
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -180,6 +181,45 @@
 
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
+
+        // New Helper: Function to send updates to Google Apps Script
+        async function sendBookingUpdate(action, bookingId, newStatus = null, originalSource = null) {
+            if (!currentUserUid) {
+                console.error("User not logged in, cannot send update.");
+                return { success: false, error: "User not authenticated." };
+            }
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_BOOKING_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded', // Apps Script expects this or raw JSON body
+                    },
+                    body: new URLSearchParams({
+                        action: action,
+                        userId: currentUserUid,
+                        bookingId: bookingId,
+                        newStatus: newStatus,
+                        originalSource: originalSource // Used for undoDeleted action
+                    }).toString()
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                return { success: true, message: data.message };
+            } catch (error) {
+                console.error('Error sending booking update:', error);
+                // Return a more user-friendly error if possible, e.g., for network issues
+                return { success: false, error: "Network error or server issue. Please try again." };
+            }
+        }
+
 
         function renderBookingCard() {
             if (bookingsData.length === 0) {
@@ -304,28 +344,47 @@
         nextButton.addEventListener('click', showNextCard);
 
         // --- Core Booking Action Functions ---
-        function moveBookingToPending() {
+        async function moveBookingToPending() {
             if (bookingsData.length === 0) return;
 
-            const bookingToMove = bookingsData.splice(currentBookingIndex, 1)[0];
-            pendingBookings.push(bookingToMove);
+            const bookingToMove = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
+            const bookingId = bookingToMove.Timestamp.toString(); // Use Timestamp as ID
 
-            adjustCurrentBookingIndex();
-            renderBookingCard();
-            renderPendingBookings();
+            const result = await sendBookingUpdate('updateStatus', bookingId, 'Pending');
+
+            if (result.success) {
+                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
+                pendingBookings.push(bookingToMove); // Add to pending
+
+                adjustCurrentBookingIndex();
+                renderBookingCard();
+                renderPendingBookings();
+                console.log(result.message); // Log success
+            } else {
+                alert("Failed to move booking to pending: " + result.error); // Show error to user
+            }
         }
 
-        function deleteBooking() {
+        async function deleteBooking() {
             if (bookingsData.length === 0) return;
 
-            const bookingToDelete = bookingsData.splice(currentBookingIndex, 1)[0];
-            // *** ADD SOURCE TAG HERE ***
-            bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
-            deletedBookings.push(bookingToDelete);
+            const bookingToDelete = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
+            const bookingId = bookingToDelete.Timestamp.toString(); // Use Timestamp as ID
 
-            adjustCurrentBookingIndex();
-            renderBookingCard();
-            renderDeletedBookings();
+            const result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+
+            if (result.success) {
+                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
+                bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
+                deletedBookings.push(bookingToDelete); // Add to deleted
+
+                adjustCurrentBookingIndex();
+                renderBookingCard();
+                renderDeletedBookings();
+                console.log(result.message); // Log success
+            } else {
+                alert("Failed to delete booking: " + result.error); // Show error to user
+            }
         }
 
         function adjustCurrentBookingIndex() {
@@ -343,51 +402,92 @@
         deleteBookingBtn.addEventListener('click', deleteBooking);
 
         // --- Handlers for buttons within Pending/Deleted lists ---
-        function handleListButtonAction(event) {
+        async function handleListButtonAction(event) {
             const button = event.target;
             const index = parseInt(button.dataset.index);
             const listType = button.dataset.listType;
             const action = button.dataset.action;
 
-            if (listType === 'pending') {
-                if (action === 'complete') {
-                    pendingBookings.splice(index, 1);
-                    // If you had a 'completedBookings' array, you'd push it there
-                } else if (action === 'delete') {
-                    // Move from pending to deleted
-                    const [bookingToMove] = pendingBookings.splice(index, 1); // Remove from pending
-                    // *** ADD SOURCE TAG HERE ***
-                    bookingToMove._originalSource = 'pending'; // Tag it as coming from pending
-                    deletedBookings.push(bookingToMove); // Add to deleted
-                    renderDeletedBookings(); // Re-render deleted list
-                } else if (action === 'undo') {
-                    // Move from pending back to main requests
-                    const [undoneBooking] = pendingBookings.splice(index, 1);
-                    bookingsData.push(undoneBooking);
-                    if (bookingsData.length > 0) { // If main list wasn't empty before or just became non-empty
-                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
-                    }
-                    renderBookingCard();
-                }
-                renderPendingBookings(); // Always re-render pending after an action
-            } else if (listType === 'deleted') {
-                if (action === 'undo') {
-                    const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
+            let bookingToProcess;
+            let bookingId;
+            let result;
 
-                    // *** CHECK ORIGINAL SOURCE AND RETURN ACCORDINGLY ***
-                    if (undoneBooking._originalSource === 'requests') {
-                        bookingsData.push(undoneBooking); // Go back to main requests
+            if (listType === 'pending') {
+                bookingToProcess = pendingBookings[index];
+                bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
+
+                if (action === 'complete') {
+                    // Note: 'Completed' status would ideally go to a separate completedBookings array or just be removed.
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'Completed');
+
+                    if (result.success) {
+                        pendingBookings.splice(index, 1); // Remove from pending
+                        renderPendingBookings();
+                        console.log(result.message);
+                    } else {
+                        alert("Failed to complete booking: " + result.error);
+                    }
+                } else if (action === 'delete') {
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+
+                    if (result.success) {
+                        const [movedBooking] = pendingBookings.splice(index, 1); // Remove from pending
+                        movedBooking._originalSource = 'pending'; // Tag it as coming from pending
+                        deletedBookings.push(movedBooking); // Add to deleted
+                        renderPendingBookings();
+                        renderDeletedBookings();
+                        console.log(result.message);
+                    } else {
+                        alert("Failed to delete booking from pending: " + result.error);
+                    }
+                } else if (action === 'undo') {
+                    // Undo from pending goes back to 'New' requests
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'New'); 
+
+                    if (result.success) {
+                        const [undoneBooking] = pendingBookings.splice(index, 1); // Remove from pending
+                        bookingsData.push(undoneBooking); // Add to new requests
                         if (bookingsData.length > 0) {
                             currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
                         }
-                        renderBookingCard(); // Re-render main requests card
-                    } else if (undoneBooking._originalSource === 'pending') {
-                        pendingBookings.push(undoneBooking); // Go back to pending
-                        renderPendingBookings(); // Re-render pending list
+                        renderBookingCard();
+                        renderPendingBookings();
+                        console.log(result.message);
+                    } else {
+                        alert("Failed to undo booking from pending: " + result.error);
                     }
-                    // No need for else/default, as it must have come from one of these two
                 }
-                renderDeletedBookings(); // Always re-render deleted after an action
+            } else if (listType === 'deleted') {
+                bookingToProcess = deletedBookings[index];
+                bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
+
+                if (action === 'undo') {
+                    let targetStatus = 'New'; // Default for _originalSource === 'requests'
+                    if (bookingToProcess._originalSource === 'pending') {
+                        targetStatus = 'Pending';
+                    }
+
+                    result = await sendBookingUpdate('undoDeleted', bookingId, targetStatus, bookingToProcess._originalSource);
+
+                    if (result.success) {
+                        const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
+
+                        if (undoneBooking._originalSource === 'requests') {
+                            bookingsData.push(undoneBooking); // Go back to main requests
+                            if (bookingsData.length > 0) {
+                                currentBookingIndex = bookingsData.length - 1;
+                            }
+                            renderBookingCard();
+                        } else if (undoneBooking._originalSource === 'pending') {
+                            pendingBookings.push(undoneBooking); // Go back to pending
+                            renderPendingBookings();
+                        }
+                        renderDeletedBookings(); // Always re-render deleted after an action
+                        console.log(result.message);
+                    } else {
+                        alert("Failed to undo deleted booking: " + result.error);
+                    }
+                }
             }
         }
 
@@ -395,13 +495,16 @@
         // --- Initial Data Loading Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userIdentifier = user.uid;
-                console.log("Logged-in user ID (Firebase UID):", userIdentifier);
+                currentUserUid = user.uid; // Store the UID
+                console.log("Logged-in user ID (Firebase UID):", currentUserUid);
 
+                // Initial messages while loading
                 bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
+                pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading pending bookings...</p>';
+                deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading deleted bookings...</p>';
 
                 try {
-                    const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+                    const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(currentUserUid)}`);
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -410,12 +513,21 @@
                     const data = await response.json();
 
                     if (data.error) {
-                        bookingCardElement.innerHTML = `<p style="color: red; text-align: center; w-full">Error: ${data.error}</p>`;
+                        const errorMessage = `Error: ${data.error}`;
+                        bookingCardElement.innerHTML = `<p style="color: red; text-align: center; w-full">${errorMessage}</p>`;
+                        pendingBookingsListElement.innerHTML = `<p style="color: red; text-align: center; w-full">${errorMessage}</p>`;
+                        deletedBookingsListElement.innerHTML = `<p style="color: red; text-align: center; w-full">${errorMessage}</p>`;
                         return;
                     }
 
                     if (data.message) {
-                        bookingCardElement.innerHTML = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
+                        // This message implies no sheet or account found
+                        const infoMessage = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
+                        bookingCardElement.innerHTML = infoMessage;
+                        pendingBookingsListElement.innerHTML = infoMessage;
+                        deletedBookingsListElement.innerHTML = infoMessage;
+                        
+                        // Disable buttons since no data to process
                         prevButton.disabled = true;
                         nextButton.disabled = true;
                         moveToPendingBtn.disabled = true;
@@ -424,21 +536,41 @@
                         return;
                     }
 
-                    if (Array.isArray(data.bookings) && Array.isArray(data.bookingFieldsConfig)) {
-                        bookingsData = data.bookings;
+                    // *** UPDATED DATA ASSIGNMENT FOR INITIAL LOAD ***
+                    if (Array.isArray(data.bookings) && Array.isArray(data.pendingBookings) && Array.isArray(data.deletedBookings) && Array.isArray(data.bookingFieldsConfig)) {
+                        bookingsData = data.bookings; // These are your 'New' status bookings
+                        pendingBookings = data.pendingBookings;
+                        deletedBookings = data.deletedBookings;
                         bookingFieldsConfig = data.bookingFieldsConfig;
-                        currentBookingIndex = 0;
+                        
+                        // Set initial index for main bookings; if no new bookings, default to 0
+                        currentBookingIndex = 0; 
+                        if (bookingsData.length === 0 && (pendingBookings.length > 0 || deletedBookings.length > 0)) {
+                           // If no new bookings, but there are pending/deleted, the main card will just show 'no bookings' message
+                           // and the navigation buttons will correctly disable.
+                        } else if (bookingsData.length > 0) {
+                            // Ensure currentBookingIndex is valid if bookingsData has items
+                            currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
+                        }
+                        
                         renderBookingCard();
                         renderPendingBookings();
                         renderDeletedBookings();
+
                     } else {
-                        bookingCardElement.innerHTML = '<p class="text-red-400 text-center w-full">Unexpected data format received from booking server.</p>';
+                        const errorMessage = '<p class="text-red-400 text-center w-full">Unexpected data format received from booking server. Missing expected booking lists (bookings, pendingBookings, deletedBookings).</p>';
+                        bookingCardElement.innerHTML = errorMessage;
+                        pendingBookingsListElement.innerHTML = errorMessage;
+                        deletedBookingsListElement.innerHTML = errorMessage;
                         console.error("Received unexpected data format:", data);
                     }
 
                 } catch (error) {
-                    console.error('Error fetching booking data:', error);
-                    bookingCardElement.innerHTML = '<p class="text-red-400 text-center w-full">Failed to load booking data. Please try again later.</p>';
+                    console.error('Error fetching initial booking data:', error);
+                    const fetchErrorMessage = '<p class="text-red-400 text-center w-full">Failed to load booking data. Please check your internet connection or try again later.</p>';
+                    bookingCardElement.innerHTML = fetchErrorMessage;
+                    pendingBookingsListElement.innerHTML = fetchErrorMessage;
+                    deletedBookingsListElement.innerHTML = fetchErrorMessage;
                 }
 
             } else {
