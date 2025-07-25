@@ -442,13 +442,8 @@
                     }
                 } else if (action === 'undo') {
                     // Undo from pending goes back to 'New' requests
-                    // The client-side 'newStatus' for 'undo' actions should ideally be what the Apps Script will set.
-                    // However, for 'undoDeleted', the Apps Script now directly reads Status_prev,
-                    // so we can send a generic placeholder like 'undo' or 'revert' for newStatus,
-                    // or simply rely on the 'action' itself.
-                    // Let's explicitly tell it to revert to 'New' for pending undo.
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'New');
-    
+                    result = await sendBookingUpdate('updateStatus', bookingId, 'New'); 
+
                     if (result.success) {
                         const [undoneBooking] = pendingBookings.splice(index, 1); // Remove from pending
                         bookingsData.push(undoneBooking); // Add to new requests
@@ -465,20 +460,18 @@
             } else if (listType === 'deleted') {
                 bookingToProcess = deletedBookings[index];
                 bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
-    
+
                 if (action === 'undo') {
-                    // When undoing a deleted item, we send the specific action 'undoDeleted'
-                    // and the Apps Script will look up the Status_prev itself.
-                    // newStatus and originalSource are not strictly needed here for the *Apps Script logic*,
-                    // but keep them as null or send relevant values if your future Apps Script
-                    // ever needs them for other reasons.
-                    result = await sendBookingUpdate('undoDeleted', bookingId, null, bookingToProcess._originalSource); // Send originalSource as a hint, though Apps Script now reads from sheet
-    
+                    let targetStatus = 'New'; // Default for _originalSource === 'requests'
+                    if (bookingToProcess._originalSource === 'pending') {
+                        targetStatus = 'Pending';
+                    }
+
+                    result = await sendBookingUpdate('undoDeleted', bookingId, targetStatus, bookingToProcess._originalSource);
+
                     if (result.success) {
                         const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
-    
-                        // Based on the *client-side assumption* of where it came from
-                        // (which should align with Status_prev in the sheet)
+
                         if (undoneBooking._originalSource === 'requests') {
                             bookingsData.push(undoneBooking); // Go back to main requests
                             if (bookingsData.length > 0) {
