@@ -341,35 +341,39 @@
             let booking;
 
             if (listType === 'pending') {
-                booking = pendingBookings[index];
                 if (action === 'complete') {
                     const [completedBooking] = pendingBookings.splice(index, 1);
-                    alert(`Booking completed: ${completedBooking['Phone Number'] || 'N/A'}`);
+                    // alert(`Booking completed: ${completedBooking['Phone Number'] || 'N/A'}`); // Removed alert
                     // In a real app, you might move this to a 'completedBookings' array
                 } else if (action === 'delete') {
                     const [deletedFromPending] = pendingBookings.splice(index, 1);
                     deletedBookings.push(deletedFromPending);
-                    alert(`Booking moved from pending to deleted: ${deletedFromPending['Phone Number'] || 'N/A'}`);
+                    // alert(`Booking moved from pending to deleted: ${deletedFromPending['Phone Number'] || 'N/A'}`); // Removed alert
                 } else if (action === 'undo') {
                     const [undoneBooking] = pendingBookings.splice(index, 1);
                     bookingsData.push(undoneBooking); // Add back to main requests
-                    alert(`Booking moved back to requests: ${undoneBooking['Phone Number'] || 'N/A'}`);
+                    // alert(`Booking moved back to requests: ${undoneBooking['Phone Number'] || 'N/A'}`); // Removed alert
                     // After undoing, it's good practice to re-render the main card to show something if it was empty
-                    if (bookingsData.length === 1) { // If it was previously empty and now has 1 item
-                        currentBookingIndex = 0;
+                    if (bookingsData.length === 1 && currentBookingIndex === 0) { // If it was previously empty and now has 1 item and current index is 0
+                        // currentBookingIndex = 0; // Already 0 in this case
+                    } else if (bookingsData.length > 0) {
+                        // If there are other bookings, ensure index is valid, or perhaps jump to the new one
+                        // For simplicity, we can set currentBookingIndex to the newly added item's index
+                        currentBookingIndex = bookingsData.length - 1;
                     }
                     renderBookingCard();
                 }
                 renderPendingBookings(); // Always re-render pending after an action
             } else if (listType === 'deleted') {
-                booking = deletedBookings[index];
                 if (action === 'undo') {
                     const [undoneBooking] = deletedBookings.splice(index, 1);
                     bookingsData.push(undoneBooking); // Add back to main requests
-                    alert(`Booking moved back to requests: ${undoneBooking['Phone Number'] || 'N/A'}`);
+                    // alert(`Booking moved back to requests: ${undoneBooking['Phone Number'] || 'N/A'}`); // Removed alert
                     // After undoing, it's good practice to re-render the main card
-                    if (bookingsData.length === 1) {
-                        currentBookingIndex = 0;
+                    if (bookingsData.length === 1 && currentBookingIndex === 0) {
+                        // currentBookingIndex = 0; // Already 0
+                    } else if (bookingsData.length > 0) {
+                        currentBookingIndex = bookingsData.length - 1;
                     }
                     renderBookingCard();
                 }
