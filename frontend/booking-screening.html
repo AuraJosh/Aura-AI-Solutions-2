@@ -319,6 +319,8 @@
             if (bookingsData.length === 0) return;
 
             const bookingToDelete = bookingsData.splice(currentBookingIndex, 1)[0];
+            // *** ADD SOURCE TAG HERE ***
+            bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
             deletedBookings.push(bookingToDelete);
 
             adjustCurrentBookingIndex();
@@ -354,24 +356,36 @@
                 } else if (action === 'delete') {
                     // Move from pending to deleted
                     const [bookingToMove] = pendingBookings.splice(index, 1); // Remove from pending
+                    // *** ADD SOURCE TAG HERE ***
+                    bookingToMove._originalSource = 'pending'; // Tag it as coming from pending
                     deletedBookings.push(bookingToMove); // Add to deleted
                     renderDeletedBookings(); // Re-render deleted list
                 } else if (action === 'undo') {
                     // Move from pending back to main requests
                     const [undoneBooking] = pendingBookings.splice(index, 1);
                     bookingsData.push(undoneBooking);
-                    if (bookingsData.length > 0 && currentBookingIndex === 0) {
-                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item if main was empty
+                    if (bookingsData.length > 0) { // If main list wasn't empty before or just became non-empty
+                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
                     }
                     renderBookingCard();
                 }
                 renderPendingBookings(); // Always re-render pending after an action
             } else if (listType === 'deleted') {
                 if (action === 'undo') {
-                    // Move from deleted back to pending
-                    const [undoneBooking] = deletedBookings.splice(index, 1);
-                    pendingBookings.push(undoneBooking); // Add to pending
-                    renderPendingBookings(); // Re-render pending list
+                    const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
+
+                    // *** CHECK ORIGINAL SOURCE AND RETURN ACCORDINGLY ***
+                    if (undoneBooking._originalSource === 'requests') {
+                        bookingsData.push(undoneBooking); // Go back to main requests
+                        if (bookingsData.length > 0) {
+                            currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
+                        }
+                        renderBookingCard(); // Re-render main requests card
+                    } else if (undoneBooking._originalSource === 'pending') {
+                        pendingBookings.push(undoneBooking); // Go back to pending
+                        renderPendingBookings(); // Re-render pending list
+                    }
+                    // No need for else/default, as it must have come from one of these two
                 }
                 renderDeletedBookings(); // Always re-render deleted after an action
             }
