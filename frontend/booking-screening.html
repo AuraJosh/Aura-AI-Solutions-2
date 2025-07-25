@@ -219,11 +219,14 @@
 
         // Function to render a shortened booking item for lists
         function renderShortenedBookingItem(booking, type, indexInList) {
-            // *** UPDATED LOGIC HERE ***
-            // Access properties using bracket notation in case they have spaces
             const date = booking.Timestamp ? new Date(booking.Timestamp).toLocaleDateString() : 'N/A';
-            const contactNumber = booking['Phone Number'] || 'N/A'; // Assuming 'Phone Number' is the key
-            const age = booking['Age'] || 'N/A'; // Assuming 'Age' is the key
+
+            // *** IMPORTANT: CUSTOMIZE THESE FIELD NAMES ***
+            // Replace 'YOUR_ACTUAL_PHONE_FIELD_NAME' with the actual key from your booking data for phone number.
+            // Replace 'YOUR_ACTUAL_AGE_FIELD_NAME' with the actual key from your booking data for age.
+            // Examples: booking['Phone'], booking['Contact Number'], booking['CustomerAge'], booking['Age']
+            const contactNumber = booking['YOUR_ACTUAL_PHONE_FIELD_NAME'] || 'N/A';
+            const age = booking['YOUR_ACTUAL_AGE_FIELD_NAME'] || 'N/A';
 
             // Construct the display string for the shortened item
             const displayString = `${date} | ${contactNumber} | ${age}`;
@@ -320,10 +323,12 @@
         }
 
         function adjustCurrentBookingIndex() {
-             if (currentBookingIndex >= bookingsData.length && bookingsData.length > 0) {
-                currentBookingIndex = bookingsData.length - 1;
-            } else if (bookingsData.length === 0) {
-                currentBookingIndex = 0;
+             if (bookingsData.length > 0) {
+                if (currentBookingIndex >= bookingsData.length) {
+                    currentBookingIndex = bookingsData.length - 1;
+                }
+            } else {
+                currentBookingIndex = 0; // Reset index if no bookings left
             }
         }
 
@@ -348,7 +353,7 @@
                     const [undoneBooking] = pendingBookings.splice(index, 1);
                     bookingsData.push(undoneBooking);
                     if (bookingsData.length > 0) {
-                        currentBookingIndex = bookingsData.length - 1;
+                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
                     }
                     renderBookingCard();
                 }
@@ -358,7 +363,7 @@
                     const [undoneBooking] = deletedBookings.splice(index, 1);
                     bookingsData.push(undoneBooking);
                     if (bookingsData.length > 0) {
-                        currentBookingIndex = bookingsData.length - 1;
+                        currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
                     }
                     renderBookingCard();
                 }
