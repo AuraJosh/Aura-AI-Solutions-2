@@ -219,17 +219,21 @@
 
         // Function to render a shortened booking item for lists
         function renderShortenedBookingItem(booking, type, indexInList) {
-            const date = booking.Timestamp ? new Date(booking.Timestamp).toLocaleDateString() : 'N/A';
+            let displayValues = [];
+            // Get values from the first 3 fields based on bookingFieldsConfig order
+            for (let i = 0; i < Math.min(bookingFieldsConfig.length, 3); i++) {
+                const fieldName = bookingFieldsConfig[i].field;
+                let fieldValue = (booking[fieldName] || 'N/A').toString().trim();
 
-            // *** IMPORTANT: CUSTOMIZE THESE FIELD NAMES ***
-            // Replace 'YOUR_ACTUAL_PHONE_FIELD_NAME' with the actual key from your booking data for phone number.
-            // Replace 'YOUR_ACTUAL_AGE_FIELD_NAME' with the actual key from your booking data for age.
-            // Examples: booking['Phone'], booking['Contact Number'], booking['CustomerAge'], booking['Age']
-            const contactNumber = booking['YOUR_ACTUAL_PHONE_FIELD_NAME'] || 'N/A';
-            const age = booking['YOUR_ACTUAL_AGE_FIELD_NAME'] || 'N/A';
+                // Special handling for Timestamp to format it as a date
+                if (fieldName === 'Timestamp' && booking.Timestamp) {
+                    fieldValue = new Date(booking.Timestamp).toLocaleDateString();
+                }
 
-            // Construct the display string for the shortened item
-            const displayString = `${date} | ${contactNumber} | ${age}`;
+                displayValues.push(fieldValue);
+            }
+
+            const displayString = displayValues.join(' | '); // Joins values with ' | '
 
             let buttonsHtml = '';
             if (type === 'pending') {
@@ -406,7 +410,7 @@
 
                     if (Array.isArray(data.bookings) && Array.isArray(data.bookingFieldsConfig)) {
                         bookingsData = data.bookings;
-                        bookingFieldsConfig = data.bookingFieldsConfig;
+                        bookingFieldsConfig = data.bookingFieldsConfig; // This is crucial now!
                         currentBookingIndex = 0;
                         renderBookingCard();
                         renderPendingBookings();
