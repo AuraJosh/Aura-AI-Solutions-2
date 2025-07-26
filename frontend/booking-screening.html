@@ -33,46 +33,40 @@
         -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
     }
 
-    /* NEW: Custom "Techy Pulse" Spinner Animation */
-    .techy-pulse-spinner {
-        width: 64px; /* w-16 */
-        height: 64px; /* h-16 */
-        border-radius: 50%;
-        background-color: transparent;
-        position: relative;
-        overflow: hidden; /* Important for the inner pulse effect */
+    /* NEW: Monochrome Geometric Flip Loader CSS */
+    .geometric-loader {
+        width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
+        aspect-ratio: .5;
+        display: grid;
+        /* Center the loader visually if its parent uses flexbox like #loading-overlay */
+        justify-items: center; 
+        align-items: center;
     }
-
-    .techy-pulse-spinner::before,
-    .techy-pulse-spinner::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
+    .geometric-loader::before {
+        content: "";
+        width: 30%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        margin: auto auto 0;
+        background: #9CA3AF; /* Tailwind gray-400 - light gray/blue-gray */
+        animation: l9-0 .5s cubic-bezier(0,800,1,800) infinite;
+    }
+    .geometric-loader::after {
+        content: "";
         width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        background-color: rgba(59, 130, 246, 0.7); /* Tailwind blue-500 with transparency */
-        animation: techy-pulse 2s infinite ease-in-out;
+        aspect-ratio: 1/cos(30deg);
+        margin: 0 auto auto;
+        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
+        background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
+        animation: l9-1 .5s linear infinite;
     }
-
-    .techy-pulse-spinner::after {
-        animation-delay: -1s; /* Offset the second pulse */
+    @keyframes l9-0 {
+        0%,2%  {translate: 0   0%}
+        98%,to {translate: 0 -.2%}
     }
-
-    @keyframes techy-pulse {
-        0% {
-            transform: scale(0);
-            opacity: 1;
-        }
-        50% {
-            transform: scale(1);
-            opacity: 0.5;
-        }
-        100% {
-            transform: scale(1);
-            opacity: 0;
-        }
+    @keyframes l9-1 {
+        0%,5%  {rotate:  0deg}
+        95%,to {rotate:-60deg}
     }
     </style>
 </head>
@@ -173,7 +167,7 @@
 
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
         <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="techy-pulse-spinner mb-4"></div>
+            <div id="loading-spinner" class="geometric-loader mb-4"></div>
             <p id="loading-message" class="text-white text-lg font-semibold"></p>
         </div>
     </div>
@@ -218,7 +212,7 @@
 
         // Get the loading overlay elements
         const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingSpinner = document.getElementById('loading-spinner'); // Unused directly, but good to have a ref
+        const loadingSpinner = document.getElementById('loading-spinner');
         const loadingMessage = document.getElementById('loading-message');
 
         /**
