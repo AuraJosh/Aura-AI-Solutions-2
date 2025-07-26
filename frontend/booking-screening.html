@@ -33,18 +33,46 @@
         -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
     }
 
-    /* CUSTOM SPINNER ANIMATION */
-    @keyframes custom-spin {
-        from {
-            transform: rotate(0deg);
-        }
-        to {
-            transform: rotate(360deg);
-        }
+    /* NEW: Custom "Techy Pulse" Spinner Animation */
+    .techy-pulse-spinner {
+        width: 64px; /* w-16 */
+        height: 64px; /* h-16 */
+        border-radius: 50%;
+        background-color: transparent;
+        position: relative;
+        overflow: hidden; /* Important for the inner pulse effect */
     }
 
-    .custom-spinner {
-        animation: custom-spin 1s linear infinite; /* 1s duration, linear speed, repeats infinitely */
+    .techy-pulse-spinner::before,
+    .techy-pulse-spinner::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: rgba(59, 130, 246, 0.7); /* Tailwind blue-500 with transparency */
+        animation: techy-pulse 2s infinite ease-in-out;
+    }
+
+    .techy-pulse-spinner::after {
+        animation-delay: -1s; /* Offset the second pulse */
+    }
+
+    @keyframes techy-pulse {
+        0% {
+            transform: scale(0);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1);
+            opacity: 0.5;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 0;
+        }
     }
     </style>
 </head>
@@ -145,7 +173,7 @@
 
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
         <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full custom-spinner mb-4"></div>
+            <div id="loading-spinner" class="techy-pulse-spinner mb-4"></div>
             <p id="loading-message" class="text-white text-lg font-semibold"></p>
         </div>
     </div>
