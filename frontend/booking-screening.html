@@ -33,7 +33,7 @@
         -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
     }
 
-    /* NEW: Monochrome Geometric Flip Loader CSS */
+    /* NEW: Monochrome Geometric Flip Loader CSS - with Triangle */
     .geometric-loader {
         width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
         aspect-ratio: .5;
@@ -54,9 +54,12 @@
     .geometric-loader::after {
         content: "";
         width: 100%;
-        aspect-ratio: 1/cos(30deg);
+        /* Adjusted aspect-ratio for an equilateral triangle if width is the base */
+        /* height = width * sqrt(3) / 2 */
+        aspect-ratio: 1 / 0.866; /* approx 1 / (Math.sqrt(3) / 2) */
         margin: 0 auto auto;
-        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
+        /* Changed clip-path to a downward-pointing triangle */
+        clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
         background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
         animation: l9-1 .5s linear infinite;
     }
