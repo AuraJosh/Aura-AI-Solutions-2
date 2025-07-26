@@ -32,6 +32,20 @@
         backdrop-filter: blur(5px);
         -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
     }
+
+    /* CUSTOM SPINNER ANIMATION */
+    @keyframes custom-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .custom-spinner {
+        animation: custom-spin 1s linear infinite; /* 1s duration, linear speed, repeats infinitely */
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -124,14 +138,14 @@
         <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
             <source src="media/background.mp4" type="video/mp4" />
             Your browser does not support the video tag.
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
         </video>
-        <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
         <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
+            <div id="loading-spinner" class="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full custom-spinner mb-4"></div>
             <p id="loading-message" class="text-white text-lg font-semibold"></p>
         </div>
     </div>
