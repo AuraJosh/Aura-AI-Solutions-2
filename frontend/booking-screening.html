@@ -20,8 +20,8 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;         /* Enables vertical scrolling */
-        height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
@@ -102,8 +102,8 @@
                         Please describe the changes you would like to make to your AI's business information:
                     </label>
                     <textarea id="update-details" name="updateDetails" rows="8"
-                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
-                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                                 class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                 placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
@@ -160,17 +160,15 @@
     <script type="module">
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL for BOOKING DATA!
-        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // This must be updated after redeploying your Apps Script!
+        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywFSiZTmfc3dE/exec'; // Ensure this URL is correct after deploying the new Apps Script!
 
-        const auth = getAuth();
-        let bookingsData = []; // Array to hold all booking records (unprocessed/new requests)
-        let pendingBookings = []; // Array to hold pending booking records
-        let deletedBookings = []; // Array to hold deleted booking records
+        let bookingsData = [];
+        let pendingBookings = [];
+        let deletedBookings = [];
 
-        let currentBookingIndex = 0; // Current index of the displayed booking
-        let bookingFieldsConfig = []; // This will now be dynamically loaded from the Apps Script
-        let currentUserUid = null; // New: Store user UID for API calls
+        let currentBookingIndex = 0;
+        let bookingFieldsConfig = [];
+        let currentUserUid = null;
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -182,25 +180,31 @@
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
 
-        // New Helper: Function to send updates to Google Apps Script
-        async function sendBookingUpdate(action, bookingId, newStatus = null, originalSource = null) {
+        async function sendBookingUpdate(action, bookingObject, newStatus = null, originalSource = null) {
             if (!currentUserUid) {
                 console.error("User not logged in, cannot send update.");
                 return { success: false, error: "User not authenticated." };
+            }
+
+            // Crucial: Send the _rowIndex instead of bookingId
+            const bookingRowIndex = bookingObject._rowIndex;
+            if (!bookingRowIndex) {
+                console.error("Booking object missing _rowIndex for update.", bookingObject);
+                return { success: false, error: "Booking data is incomplete for update." };
             }
 
             try {
                 const response = await fetch(GOOGLE_APPS_SCRIPT_BOOKING_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded', // Apps Script expects this or raw JSON body
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: new URLSearchParams({
                         action: action,
                         userId: currentUserUid,
-                        bookingId: bookingId,
+                        bookingRowIndex: bookingRowIndex, // Send the row index!
                         newStatus: newStatus,
-                        originalSource: originalSource // Used for undoDeleted action
+                        originalSource: originalSource
                     }).toString()
                 });
 
@@ -215,11 +219,9 @@
                 return { success: true, message: data.message };
             } catch (error) {
                 console.error('Error sending booking update:', error);
-                // Return a more user-friendly error if possible, e.g., for network issues
                 return { success: false, error: "Network error or server issue. Please try again." };
             }
         }
-
 
         function renderBookingCard() {
             if (bookingsData.length === 0) {
@@ -257,15 +259,12 @@
             deleteBookingBtn.disabled = false;
         }
 
-        // Function to render a shortened booking item for lists
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
-            // Get values from the first 3 fields based on bookingFieldsConfig order
             for (let i = 0; i < Math.min(bookingFieldsConfig.length, 3); i++) {
                 const fieldName = bookingFieldsConfig[i].field;
                 let fieldValue = (booking[fieldName] || 'N/A').toString().trim();
 
-                // Special handling for Timestamp to format it as a date
                 if (fieldName === 'Timestamp' && booking.Timestamp) {
                     fieldValue = new Date(booking.Timestamp).toLocaleDateString();
                 }
@@ -273,7 +272,7 @@
                 displayValues.push(fieldValue);
             }
 
-            const displayString = displayValues.join(' | '); // Joins values with ' | '
+            const displayString = displayValues.join(' | ');
 
             let buttonsHtml = '';
             if (type === 'pending') {
@@ -302,7 +301,6 @@
                 pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
             } else {
                 pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
-                // Attach event listeners after rendering
                 pendingBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
                     button.addEventListener('click', handleListButtonAction);
                 });
@@ -314,7 +312,6 @@
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
             } else {
                 deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
-                // Attach event listeners after rendering
                 deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
                     button.addEventListener('click', handleListButtonAction);
                 });
@@ -343,65 +340,60 @@
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
 
-        // --- Core Booking Action Functions ---
         async function moveBookingToPending() {
             if (bookingsData.length === 0) return;
 
-            const bookingToMove = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
-            const bookingId = bookingToMove.Timestamp.toString(); // Use Timestamp as ID
-
-            const result = await sendBookingUpdate('updateStatus', bookingId, 'Pending');
+            const bookingToMove = bookingsData[currentBookingIndex];
+            // Pass the entire booking object, sendBookingUpdate will extract _rowIndex
+            const result = await sendBookingUpdate('updateStatus', bookingToMove, 'Pending');
 
             if (result.success) {
-                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
-                pendingBookings.push(bookingToMove); // Add to pending
+                bookingsData.splice(currentBookingIndex, 1);
+                pendingBookings.push(bookingToMove);
 
                 adjustCurrentBookingIndex();
                 renderBookingCard();
                 renderPendingBookings();
-                console.log(result.message); // Log success
+                console.log(result.message);
             } else {
-                alert("Failed to move booking to pending: " + result.error); // Show error to user
+                alert("Failed to move booking to pending: " + result.error);
             }
         }
 
         async function deleteBooking() {
             if (bookingsData.length === 0) return;
 
-            const bookingToDelete = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
-            const bookingId = bookingToDelete.Timestamp.toString(); // Use Timestamp as ID
-
-            const result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+            const bookingToDelete = bookingsData[currentBookingIndex];
+            const result = await sendBookingUpdate('updateStatus', bookingToDelete, 'Deleted');
 
             if (result.success) {
-                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
-                bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
-                deletedBookings.push(bookingToDelete); // Add to deleted
+                bookingsData.splice(currentBookingIndex, 1);
+                // Tag the booking with its original source so undo can restore it correctly
+                bookingToDelete._originalSource = 'requests';
+                deletedBookings.push(bookingToDelete);
 
                 adjustCurrentBookingIndex();
                 renderBookingCard();
                 renderDeletedBookings();
-                console.log(result.message); // Log success
+                console.log(result.message);
             } else {
-                alert("Failed to delete booking: " + result.error); // Show error to user
+                alert("Failed to delete booking: " + result.error);
             }
         }
 
         function adjustCurrentBookingIndex() {
-             if (bookingsData.length > 0) {
+            if (bookingsData.length > 0) {
                 if (currentBookingIndex >= bookingsData.length) {
                     currentBookingIndex = bookingsData.length - 1;
                 }
             } else {
-                currentBookingIndex = 0; // Reset index if no bookings left
+                currentBookingIndex = 0;
             }
         }
 
-        // Event listeners for the main action buttons
         moveToPendingBtn.addEventListener('click', moveBookingToPending);
         deleteBookingBtn.addEventListener('click', deleteBooking);
 
-        // --- Handlers for buttons within Pending/Deleted lists ---
         async function handleListButtonAction(event) {
             const button = event.target;
             const index = parseInt(button.dataset.index);
@@ -409,31 +401,28 @@
             const action = button.dataset.action;
 
             let bookingToProcess;
-            let bookingId;
             let result;
 
             if (listType === 'pending') {
                 bookingToProcess = pendingBookings[index];
-                bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
 
                 if (action === 'complete') {
-                    // Note: 'Completed' status would ideally go to a separate completedBookings array or just be removed.
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'Completed');
+                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Completed');
 
                     if (result.success) {
-                        pendingBookings.splice(index, 1); // Remove from pending
+                        pendingBookings.splice(index, 1);
                         renderPendingBookings();
                         console.log(result.message);
                     } else {
                         alert("Failed to complete booking: " + result.error);
                     }
                 } else if (action === 'delete') {
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'Deleted');
+                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Deleted');
 
                     if (result.success) {
-                        const [movedBooking] = pendingBookings.splice(index, 1); // Remove from pending
+                        const [movedBooking] = pendingBookings.splice(index, 1);
                         movedBooking._originalSource = 'pending'; // Tag it as coming from pending
-                        deletedBookings.push(movedBooking); // Add to deleted
+                        deletedBookings.push(movedBooking);
                         renderPendingBookings();
                         renderDeletedBookings();
                         console.log(result.message);
@@ -442,13 +431,13 @@
                     }
                 } else if (action === 'undo') {
                     // Undo from pending goes back to 'New' requests
-                    result = await sendBookingUpdate('updateStatus', bookingId, 'New'); 
+                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'New');
 
                     if (result.success) {
-                        const [undoneBooking] = pendingBookings.splice(index, 1); // Remove from pending
-                        bookingsData.push(undoneBooking); // Add to new requests
+                        const [undoneBooking] = pendingBookings.splice(index, 1);
+                        bookingsData.push(undoneBooking);
                         if (bookingsData.length > 0) {
-                            currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
+                            currentBookingIndex = bookingsData.length - 1;
                         }
                         renderBookingCard();
                         renderPendingBookings();
@@ -459,30 +448,30 @@
                 }
             } else if (listType === 'deleted') {
                 bookingToProcess = deletedBookings[index];
-                bookingId = bookingToProcess.Timestamp.toString(); // Use Timestamp as ID
 
                 if (action === 'undo') {
-                    let targetStatus = 'New'; // Default for _originalSource === 'requests'
+                    let targetStatus = 'New';
                     if (bookingToProcess._originalSource === 'pending') {
                         targetStatus = 'Pending';
                     }
 
-                    result = await sendBookingUpdate('undoDeleted', bookingId, targetStatus, bookingToProcess._originalSource);
+                    // For 'undoDeleted' action, we need to pass the originalSource if it exists
+                    result = await sendBookingUpdate('undoDeleted', bookingToProcess, targetStatus, bookingToProcess._originalSource);
 
                     if (result.success) {
-                        const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
+                        const [undoneBooking] = deletedBookings.splice(index, 1);
 
                         if (undoneBooking._originalSource === 'requests') {
-                            bookingsData.push(undoneBooking); // Go back to main requests
+                            bookingsData.push(undoneBooking);
                             if (bookingsData.length > 0) {
                                 currentBookingIndex = bookingsData.length - 1;
                             }
                             renderBookingCard();
                         } else if (undoneBooking._originalSource === 'pending') {
-                            pendingBookings.push(undoneBooking); // Go back to pending
+                            pendingBookings.push(undoneBooking);
                             renderPendingBookings();
                         }
-                        renderDeletedBookings(); // Always re-render deleted after an action
+                        renderDeletedBookings();
                         console.log(result.message);
                     } else {
                         alert("Failed to undo deleted booking: " + result.error);
@@ -491,14 +480,11 @@
             }
         }
 
-
-        // --- Initial Data Loading Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                currentUserUid = user.uid; // Store the UID
+                currentUserUid = user.uid;
                 console.log("Logged-in user ID (Firebase UID):", currentUserUid);
 
-                // Initial messages while loading
                 bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
                 pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading pending bookings...</p>';
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading deleted bookings...</p>';
@@ -521,13 +507,11 @@
                     }
 
                     if (data.message) {
-                        // This message implies no sheet or account found
                         const infoMessage = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
                         bookingCardElement.innerHTML = infoMessage;
                         pendingBookingsListElement.innerHTML = infoMessage;
                         deletedBookingsListElement.innerHTML = infoMessage;
-                        
-                        // Disable buttons since no data to process
+
                         prevButton.disabled = true;
                         nextButton.disabled = true;
                         moveToPendingBtn.disabled = true;
@@ -536,23 +520,33 @@
                         return;
                     }
 
-                    // *** UPDATED DATA ASSIGNMENT FOR INITIAL LOAD ***
                     if (Array.isArray(data.bookings) && Array.isArray(data.pendingBookings) && Array.isArray(data.deletedBookings) && Array.isArray(data.bookingFieldsConfig)) {
-                        bookingsData = data.bookings; // These are your 'New' status bookings
+                        bookingsData = data.bookings;
                         pendingBookings = data.pendingBookings;
                         deletedBookings = data.deletedBookings;
                         bookingFieldsConfig = data.bookingFieldsConfig;
-                        
-                        // Set initial index for main bookings; if no new bookings, default to 0
-                        currentBookingIndex = 0; 
-                        if (bookingsData.length === 0 && (pendingBookings.length > 0 || deletedBookings.length > 0)) {
-                           // If no new bookings, but there are pending/deleted, the main card will just show 'no bookings' message
-                           // and the navigation buttons will correctly disable.
-                        } else if (bookingsData.length > 0) {
-                            // Ensure currentBookingIndex is valid if bookingsData has items
+
+                        currentBookingIndex = 0;
+                        if (bookingsData.length > 0) {
                             currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                         }
                         
+                        // When loading deleted bookings, ensure _originalSource is set
+                        // This assumes the Apps Script doesn't explicitly send it.
+                        // If it came from 'requests' (i.e., new), then it's 'requests', else 'pending'.
+                        // This is an inference; for true persistence, add an '_OriginalStatus' column to your sheet.
+                        deletedBookings.forEach(booking => {
+                            if (!booking._originalSource) {
+                                // If the booking was previously 'New' (now 'Deleted') it was from requests.
+                                // If it was 'Pending' (now 'Deleted') it was from pending.
+                                // Since we don't have this info from the sheet, this is an assumption.
+                                // A better approach is to store original status in the sheet.
+                                // For now, we'll default to 'requests' if no info is present.
+                                booking._originalSource = 'requests'; // Default for deleted on load
+                            }
+                        });
+
+
                         renderBookingCard();
                         renderPendingBookings();
                         renderDeletedBookings();
