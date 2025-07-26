@@ -27,6 +27,11 @@
     .chat-log-message {
         padding-bottom: 8px;
     }
+    /* Optional: Add backdrop-filter for a subtle blur effect behind the overlay */
+    #loading-overlay {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -124,6 +129,13 @@
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
+        <div class="flex flex-col items-center">
+            <div id="loading-spinner" class="w-16 h-16 border-4 border-t-4 border-blue-500 border-solid rounded-full animate-spin mb-4"></div>
+            <p id="loading-message" class="text-white text-lg font-semibold"></p>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
@@ -162,6 +174,31 @@
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
 
+        // Get the loading overlay elements
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingSpinner = document.getElementById('loading-spinner'); // Unused directly, but good to have a ref
+        const loadingMessage = document.getElementById('loading-message');
+
+        /**
+         * Shows the loading overlay with a specific message.
+         * Optionally disables body scroll to prevent interaction.
+         * @param {string} message The message to display (e.g., "Loading data...", "Moving booking...").
+         */
+        function showLoading(message) {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Disable scroll
+        }
+
+        /**
+         * Hides the loading overlay.
+         * Re-enables body scroll.
+         */
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+            document.body.style.overflow = ''; // Re-enable scroll
+        }
+
         // Protect this page and initialize data
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -169,13 +206,10 @@
                 return; // Stop execution if not logged in
             }
 
-            currentUserUid = user.uid; // Store the UID
+            currentUserUid = user.uid;
             console.log("Logged-in user ID (Firebase UID):", currentUserUid);
 
-            // Initial messages while loading
-            bookingCardElement.innerHTML = '<p class="text-white text-center w-full">Loading booking requests...</p>';
-            pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading pending bookings...</p>';
-            deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">Loading deleted bookings...</p>';
+            showLoading("Loading your booking data..."); // Show loading for initial data fetch
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(currentUserUid)}`);
@@ -195,13 +229,11 @@
                 }
 
                 if (data.message) {
-                    // This message implies no sheet or account found
                     const infoMessage = `<p class="text-gray-400 text-center w-full">${data.message}</p>`;
                     bookingCardElement.innerHTML = infoMessage;
                     pendingBookingsListElement.innerHTML = infoMessage;
                     deletedBookingsListElement.innerHTML = infoMessage;
 
-                    // Disable buttons since no data to process
                     prevButton.disabled = true;
                     nextButton.disabled = true;
                     moveToPendingBtn.disabled = true;
@@ -210,27 +242,19 @@
                     return;
                 }
 
-                // *** UPDATED DATA ASSIGNMENT FOR INITIAL LOAD ***
                 if (Array.isArray(data.bookings) && Array.isArray(data.pendingBookings) && Array.isArray(data.deletedBookings) && Array.isArray(data.bookingFieldsConfig)) {
-                    bookingsData = data.bookings; // These are your 'New' status bookings
+                    bookingsData = data.bookings;
                     pendingBookings = data.pendingBookings;
                     deletedBookings = data.deletedBookings;
                     bookingFieldsConfig = data.bookingFieldsConfig;
 
-                    // Set initial index for main bookings; if no new bookings, default to 0
                     currentBookingIndex = 0;
                     if (bookingsData.length > 0) {
                         currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                     }
 
-                    // When loading deleted bookings, ensure _originalSource is set.
-                    // IMPORTANT: For true persistence, add an '_OriginalStatus' column to your sheet
-                    // and populate it in your Apps Script when a booking's status changes to 'Deleted'.
-                    // This is a client-side inference/default if the server doesn't provide it.
                     deletedBookings.forEach(booking => {
                         if (!booking._originalSource) {
-                            // Default to 'requests' if no original source is explicitly set
-                            // A better approach is to store original status in the sheet.
                             booking._originalSource = 'requests';
                         }
                     });
@@ -253,8 +277,9 @@
                 bookingCardElement.innerHTML = fetchErrorMessage;
                 pendingBookingsListElement.innerHTML = fetchErrorMessage;
                 deletedBookingsListElement.innerHTML = fetchErrorMessage;
+            } finally {
+                hideLoading(); // Always hide loading regardless of success or failure
             }
-
         });
 
         // Logout button
@@ -267,14 +292,13 @@
             }
         });
 
-        // New Helper: Function to send updates to Google Apps Script
+        // Function to send updates to Google Apps Script
         async function sendBookingUpdate(action, bookingObject, newStatus = null, originalSource = null) {
             if (!currentUserUid) {
                 console.error("User not logged in, cannot send update.");
                 return { success: false, error: "User not authenticated." };
             }
 
-            // Crucial: Send the _rowIndex instead of bookingId
             const bookingRowIndex = bookingObject._rowIndex;
             if (!bookingRowIndex) {
                 console.error("Booking object missing _rowIndex for update.", bookingObject);
@@ -290,7 +314,7 @@
                     body: new URLSearchParams({
                         action: action,
                         userId: currentUserUid,
-                        bookingRowIndex: bookingRowIndex, // Send the row index!
+                        bookingRowIndex: bookingRowIndex,
                         newStatus: newStatus,
                         originalSource: originalSource
                     }).toString()
@@ -348,15 +372,12 @@
             deleteBookingBtn.disabled = false;
         }
 
-        // Function to render a shortened booking item for lists
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
-            // Get values from the first 3 fields based on bookingFieldsConfig order
             for (let i = 0; i < Math.min(bookingFieldsConfig.length, 3); i++) {
                 const fieldName = bookingFieldsConfig[i].field;
                 let fieldValue = (booking[fieldName] || 'N/A').toString().trim();
 
-                // Special handling for Timestamp to format it as a date
                 if (fieldName === 'Timestamp' && booking.Timestamp) {
                     fieldValue = new Date(booking.Timestamp).toLocaleDateString();
                 }
@@ -364,7 +385,7 @@
                 displayValues.push(fieldValue);
             }
 
-            const displayString = displayValues.join(' | '); // Joins values with ' | '
+            const displayString = displayValues.join(' | ');
 
             let buttonsHtml = '';
             if (type === 'pending') {
@@ -393,7 +414,6 @@
                 pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
             } else {
                 pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
-                // Attach event listeners after rendering
                 pendingBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
                     button.addEventListener('click', handleListButtonAction);
                 });
@@ -405,7 +425,6 @@
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
             } else {
                 deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
-                // Attach event listeners after rendering
                 deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
                     button.addEventListener('click', handleListButtonAction);
                 });
@@ -438,41 +457,49 @@
         async function moveBookingToPending() {
             if (bookingsData.length === 0) return;
 
-            const bookingToMove = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
+            const bookingToMove = bookingsData[currentBookingIndex];
+            showLoading("Moving booking to pending..."); // Show loading for this action
 
-            const result = await sendBookingUpdate('updateStatus', bookingToMove, 'Pending');
+            try {
+                const result = await sendBookingUpdate('updateStatus', bookingToMove, 'Pending');
 
-            if (result.success) {
-                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
-                pendingBookings.push(bookingToMove); // Add to pending
-
-                adjustCurrentBookingIndex();
-                renderBookingCard();
-                renderPendingBookings();
-                console.log(result.message); // Log success
-            } else {
-                alert("Failed to move booking to pending: " + result.error); // Show error to user
+                if (result.success) {
+                    bookingsData.splice(currentBookingIndex, 1);
+                    pendingBookings.push(bookingToMove);
+                    adjustCurrentBookingIndex();
+                    renderBookingCard();
+                    renderPendingBookings();
+                    console.log(result.message);
+                } else {
+                    alert("Failed to move booking to pending: " + result.error);
+                }
+            } finally {
+                hideLoading(); // Always hide loading
             }
         }
 
         async function deleteBooking() {
             if (bookingsData.length === 0) return;
 
-            const bookingToDelete = bookingsData[currentBookingIndex]; // Get the booking (don't splice yet)
+            const bookingToDelete = bookingsData[currentBookingIndex];
+            showLoading("Deleting booking..."); // Show loading for this action
 
-            const result = await sendBookingUpdate('updateStatus', bookingToDelete, 'Deleted');
+            try {
+                const result = await sendBookingUpdate('updateStatus', bookingToDelete, 'Deleted');
 
-            if (result.success) {
-                bookingsData.splice(currentBookingIndex, 1); // Now remove from current
-                bookingToDelete._originalSource = 'requests'; // Tag it as coming from requests
-                deletedBookings.push(bookingToDelete); // Add to deleted
-
-                adjustCurrentBookingIndex();
-                renderBookingCard();
-                renderDeletedBookings();
-                console.log(result.message); // Log success
-            } else {
-                alert("Failed to delete booking: " + result.error); // Show error to user
+                if (result.success) {
+                    bookingsData.splice(currentBookingIndex, 1);
+                    bookingToDelete._originalSource = 'requests';
+                    deletedBookings.push(bookingToDelete);
+                    adjustCurrentBookingIndex();
+                    renderBookingCard();
+                    renderDeletedBookings();
+                    console.log(result.message);
+                } else {
+                    alert("Failed to delete booking: " + result.error);
+                }
+            } finally {
+                hideLoading(); // Always hide loading
             }
         }
 
@@ -482,7 +509,7 @@
                     currentBookingIndex = bookingsData.length - 1;
                 }
             } else {
-                currentBookingIndex = 0; // Reset index if no bookings left
+                currentBookingIndex = 0;
             }
         }
 
@@ -500,80 +527,90 @@
             let bookingToProcess;
             let result;
 
-            if (listType === 'pending') {
-                bookingToProcess = pendingBookings[index];
+            // Determine specific loading message
+            let loadingMsg = "Processing...";
+            if (action === 'complete') loadingMsg = "Completing booking...";
+            else if (action === 'delete') loadingMsg = "Deleting booking from list...";
+            else if (action === 'undo') loadingMsg = "Restoring booking...";
 
-                if (action === 'complete') {
-                    // Note: 'Completed' status would ideally go to a separate completedBookings array or just be removed.
-                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Completed');
+            showLoading(loadingMsg); // Show loading for all list actions
 
-                    if (result.success) {
-                        pendingBookings.splice(index, 1); // Remove from pending
-                        renderPendingBookings();
-                        console.log(result.message);
-                    } else {
-                        alert("Failed to complete booking: " + result.error);
-                    }
-                } else if (action === 'delete') {
-                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Deleted');
+            try {
+                if (listType === 'pending') {
+                    bookingToProcess = pendingBookings[index];
 
-                    if (result.success) {
-                        const [movedBooking] = pendingBookings.splice(index, 1); // Remove from pending
-                        movedBooking._originalSource = 'pending'; // Tag it as coming from pending
-                        deletedBookings.push(movedBooking); // Add to deleted
-                        renderPendingBookings();
-                        renderDeletedBookings();
-                        console.log(result.message);
-                    } else {
-                        alert("Failed to delete booking from pending: " + result.error);
-                    }
-                } else if (action === 'undo') {
-                    // Undo from pending goes back to 'New' requests
-                    result = await sendBookingUpdate('updateStatus', bookingToProcess, 'New');
+                    if (action === 'complete') {
+                        result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Completed');
 
-                    if (result.success) {
-                        const [undoneBooking] = pendingBookings.splice(index, 1); // Remove from pending
-                        bookingsData.push(undoneBooking); // Add to new requests
-                        if (bookingsData.length > 0) {
-                            currentBookingIndex = bookingsData.length - 1; // Show the newly re-added item
+                        if (result.success) {
+                            pendingBookings.splice(index, 1);
+                            renderPendingBookings();
+                            console.log(result.message);
+                        } else {
+                            alert("Failed to complete booking: " + result.error);
                         }
-                        renderBookingCard();
-                        renderPendingBookings();
-                        console.log(result.message);
-                    } else {
-                        alert("Failed to undo booking from pending: " + result.error);
-                    }
-                }
-            } else if (listType === 'deleted') {
-                bookingToProcess = deletedBookings[index];
+                    } else if (action === 'delete') {
+                        result = await sendBookingUpdate('updateStatus', bookingToProcess, 'Deleted');
 
-                if (action === 'undo') {
-                    let targetStatus = 'New'; // Default for _originalSource === 'requests'
-                    if (bookingToProcess._originalSource === 'pending') {
-                        targetStatus = 'Pending';
-                    }
+                        if (result.success) {
+                            const [movedBooking] = pendingBookings.splice(index, 1);
+                            movedBooking._originalSource = 'pending';
+                            deletedBookings.push(movedBooking);
+                            renderPendingBookings();
+                            renderDeletedBookings();
+                            console.log(result.message);
+                        } else {
+                            alert("Failed to delete booking from pending: " + result.error);
+                        }
+                    } else if (action === 'undo') {
+                        result = await sendBookingUpdate('updateStatus', bookingToProcess, 'New');
 
-                    result = await sendBookingUpdate('undoDeleted', bookingToProcess, targetStatus, bookingToProcess._originalSource);
-
-                    if (result.success) {
-                        const [undoneBooking] = deletedBookings.splice(index, 1); // Remove from deleted
-
-                        if (undoneBooking._originalSource === 'requests') {
-                            bookingsData.push(undoneBooking); // Go back to main requests
+                        if (result.success) {
+                            const [undoneBooking] = pendingBookings.splice(index, 1);
+                            bookingsData.push(undoneBooking);
                             if (bookingsData.length > 0) {
                                 currentBookingIndex = bookingsData.length - 1;
                             }
                             renderBookingCard();
-                        } else if (undoneBooking._originalSource === 'pending') {
-                            pendingBookings.push(undoneBooking); // Go back to pending
                             renderPendingBookings();
+                            console.log(result.message);
+                        } else {
+                            alert("Failed to undo booking from pending: " + result.error);
                         }
-                        renderDeletedBookings(); // Always re-render deleted after an action
-                        console.log(result.message);
-                    } else {
-                        alert("Failed to undo deleted booking: " + result.error);
+                    }
+                } else if (listType === 'deleted') {
+                    bookingToProcess = deletedBookings[index];
+
+                    if (action === 'undo') {
+                        let targetStatus = 'New';
+                        if (bookingToProcess._originalSource === 'pending') {
+                            targetStatus = 'Pending';
+                        }
+
+                        result = await sendBookingUpdate('undoDeleted', bookingToProcess, targetStatus, bookingToProcess._originalSource);
+
+                        if (result.success) {
+                            const [undoneBooking] = deletedBookings.splice(index, 1);
+
+                            if (undoneBooking._originalSource === 'requests') {
+                                bookingsData.push(undoneBooking);
+                                if (bookingsData.length > 0) {
+                                    currentBookingIndex = bookingsData.length - 1;
+                                }
+                                renderBookingCard();
+                            } else if (undoneBooking._originalSource === 'pending') {
+                                pendingBookings.push(undoneBooking);
+                                renderPendingBookings();
+                            }
+                            renderDeletedBookings();
+                            console.log(result.message);
+                        } else {
+                            alert("Failed to undo deleted booking: " + result.error);
+                        }
                     }
                 }
+            } finally {
+                hideLoading(); // Always hide loading
             }
         }
     </script>
