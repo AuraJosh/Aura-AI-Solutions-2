@@ -196,14 +196,15 @@
         const auth = getAuth(app); // 'auth' is now defined in this module's scope
 
         // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL for BOOKING DATA!
-        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'https://script.google.com/macros/s/AKfycbxAxByHKyZAx0uGKt4I14yLSk_8zoD5Cm3R3pemJ6lTF4JTgyzsSywUwFSiZTmfc3dE/exec'; // <--- !!! UPDATE THIS LINE !!!
+        const GOOGLE_APPS_SCRIPT_BOOKING_URL = 'YOUR_DEPLOYED_APPS_SCRIPT_URL_HERE'; // <--- !!! UPDATE THIS LINE !!!
 
         let bookingsData = [];
         let pendingBookings = [];
         let deletedBookings = [];
 
         // --- NEW: Arrays to stage changes locally ---
-        let stagedChanges = []; // { rowIndex: number, newStatus: string, originalSource?: string }
+        // Changed from rowIndex to uniqueIdValue
+        let stagedChanges = []; // { uniqueIdValue: any, newStatus: string, originalSource?: string }
 
         let currentBookingIndex = 0;
         let bookingFieldsConfig = [];
@@ -215,37 +216,26 @@
         const cardCounterElement = document.getElementById('card-counter');
         const moveToPendingBtn = document.getElementById('move-to-pending-btn');
         const deleteBookingBtn = document.getElementById('delete-booking-btn');
-        const saveChangesBtn = document.getElementById('save-changes-btn'); // NEW: Get save button
+        const saveChangesBtn = document.getElementById('save-changes-btn');
 
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
 
-        // Get the loading overlay elements
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingSpinner = document.getElementById('loading-spinner');
         const loadingMessage = document.getElementById('loading-message');
 
-        /**
-         * Shows the loading overlay with a specific message.
-         * Optionally disables body scroll to prevent interaction.
-         * @param {string} message The message to display (e.g., "Loading data...", "Moving booking...").
-         */
         function showLoading(message) {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Disable scroll
+            document.body.style.overflow = 'hidden';
         }
 
-        /**
-         * Hides the loading overlay.
-         * Re-enables body scroll.
-         */
         function hideLoading() {
             loadingOverlay.classList.add('hidden');
-            document.body.style.overflow = ''; // Re-enable scroll
+            document.body.style.overflow = '';
         }
 
-        // Function to update the save button state
         function updateSaveButtonState() {
             saveChangesBtn.disabled = stagedChanges.length === 0;
             if (stagedChanges.length > 0) {
@@ -255,20 +245,19 @@
             }
         }
 
-        // Protect this page and initialize data
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "login.html";
-                return; // Stop execution if not logged in
+                return;
             }
 
             currentUserUid = user.uid;
             console.log("Logged-in user ID (Firebase UID):", currentUserUid);
 
-            showLoading("Loading your booking data..."); // Show loading for initial data fetch
+            showLoading("Loading your booking data...");
 
             try {
-                // For GET, userId can be in URL parameters
+                // For GET, userId is sent in URL parameters
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_BOOKING_URL}?userId=${encodeURIComponent(currentUserUid)}`);
 
                 if (!response.ok) {
@@ -296,7 +285,7 @@
                     moveToPendingBtn.disabled = true;
                     deleteBookingBtn.disabled = true;
                     cardCounterElement.textContent = '';
-                    updateSaveButtonState(); // Disable save if no data
+                    updateSaveButtonState();
                     return;
                 }
 
@@ -311,17 +300,16 @@
                         currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                     }
 
-                    // Ensure _originalSource is set for deleted bookings fetched from sheet
                     deletedBookings.forEach(booking => {
                         if (!booking._originalSource) {
-                            booking._originalSource = 'requests'; // Assume original source if not specified
+                            booking._originalSource = 'requests';
                         }
                     });
 
                     renderBookingCard();
                     renderPendingBookings();
                     renderDeletedBookings();
-                    updateSaveButtonState(); // Initialize save button state
+                    updateSaveButtonState();
                 } else {
                     const errorMessage = '<p class="text-red-400 text-center w-full">Unexpected data format received from booking server. Missing expected booking lists (bookings, pendingBookings, deletedBookings).</p>';
                     bookingCardElement.innerHTML = errorMessage;
@@ -337,11 +325,10 @@
                 pendingBookingsListElement.innerHTML = fetchErrorMessage;
                 deletedBookingsListElement.innerHTML = fetchErrorMessage;
             } finally {
-                hideLoading(); // Always hide loading regardless of success or failure
+                hideLoading();
             }
         });
 
-        // Logout button
         document.getElementById("logout-btn").addEventListener("click", async () => {
             try {
                 await signOut(auth);
@@ -351,7 +338,6 @@
             }
         });
 
-        // NEW: Function to send a batch of updates to Google Apps Script
         async function sendBatchBookingUpdates(updates) {
             if (!currentUserUid) {
                 console.error("User not logged in, cannot send update.");
@@ -367,12 +353,12 @@
                 const response = await fetch(GOOGLE_APPS_SCRIPT_BOOKING_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json', // Send as JSON
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        action: 'batchUpdateStatus', // Action for batch updates
-                        userId: currentUserUid, // <--- This is the key part for POST
-                        updates: updates // Array of update objects
+                        action: 'batchUpdateStatus',
+                        userId: currentUserUid,
+                        updates: updates // Array of update objects, now containing uniqueIdValue
                     })
                 });
 
@@ -390,8 +376,6 @@
                 return { success: false, error: "Network error or server issue during save. Please try again." };
             }
         }
-
-        // Removed the old `sendBookingUpdate` as we'll use `sendBatchBookingUpdates` via `saveChanges`
 
         function renderBookingCard() {
             if (bookingsData.length === 0) {
@@ -436,6 +420,9 @@
                 let fieldValue = (booking[fieldName] || 'N/A').toString().trim();
 
                 if (fieldName === 'Timestamp' && booking.Timestamp) {
+                    // This might need more robust formatting if 'Timestamp' is a Date object and
+                    // its string representation differs from what's stored in the sheet.
+                    // For now, simple toLocaleDateString() for display is fine.
                     fieldValue = new Date(booking.Timestamp).toLocaleDateString();
                 }
 
@@ -516,11 +503,11 @@
 
             const bookingToMove = bookingsData[currentBookingIndex];
             
-            // Stage the change
+            // Stage the change with uniqueIdValue
             stagedChanges.push({
-                rowIndex: bookingToMove._rowIndex,
+                uniqueIdValue: bookingToMove._uniqueIdValue, // <--- IMPORTANT: Use _uniqueIdValue here
                 newStatus: 'Pending',
-                originalSource: 'requests' // New bookings come from 'requests'
+                originalSource: 'requests'
             });
 
             // Update UI locally
@@ -530,7 +517,7 @@
             renderBookingCard();
             renderPendingBookings();
             updateSaveButtonState();
-            console.log("Staged move to pending for row:", bookingToMove._rowIndex);
+            console.log("Staged move to pending for unique ID:", bookingToMove._uniqueIdValue);
         }
 
         function deleteBooking() {
@@ -538,22 +525,22 @@
 
             const bookingToDelete = bookingsData[currentBookingIndex];
 
-            // Stage the change
+            // Stage the change with uniqueIdValue
             stagedChanges.push({
-                rowIndex: bookingToDelete._rowIndex,
+                uniqueIdValue: bookingToDelete._uniqueIdValue, // <--- IMPORTANT: Use _uniqueIdValue here
                 newStatus: 'Deleted',
-                originalSource: 'requests' // New bookings come from 'requests'
+                originalSource: 'requests'
             });
 
             // Update UI locally
             bookingsData.splice(currentBookingIndex, 1);
-            bookingToDelete._originalSource = 'requests'; // Mark original source for undo
+            bookingToDelete._originalSource = 'requests';
             deletedBookings.push(bookingToDelete);
             adjustCurrentBookingIndex();
             renderBookingCard();
             renderDeletedBookings();
             updateSaveButtonState();
-            console.log("Staged delete for row:", bookingToDelete._rowIndex);
+            console.log("Staged delete for unique ID:", bookingToDelete._uniqueIdValue);
         }
 
         function adjustCurrentBookingIndex() {
@@ -587,16 +574,16 @@
                     targetStatus = 'Completed';
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
-                    originalSourceForStaging = 'pending'; // Was in pending list
+                    originalSourceForStaging = 'pending';
                 } else if (action === 'undo') {
                     targetStatus = 'New';
                 }
 
-                // Stage the change
+                // Stage the change with uniqueIdValue
                 stagedChanges.push({
-                    rowIndex: bookingToProcess._rowIndex,
+                    uniqueIdValue: bookingToProcess._uniqueIdValue, // <--- IMPORTANT: Use _uniqueIdValue here
                     newStatus: targetStatus,
-                    originalSource: originalSourceForStaging // Only needed for 'delete' from pending
+                    originalSource: originalSourceForStaging
                 });
 
                 // Update UI locally
@@ -613,24 +600,24 @@
                         currentBookingIndex = bookingsData.length - 1;
                     }
                 }
-                renderBookingCard(); // In case a new booking is added to requests
+                renderBookingCard();
                 renderPendingBookings();
                 renderDeletedBookings();
                 updateSaveButtonState();
-                console.log(`Staged ${action} from pending for row:`, bookingToProcess._rowIndex);
+                console.log(`Staged ${action} from pending for unique ID:`, bookingToProcess._uniqueIdValue);
 
             } else if (listType === 'deleted') {
                 bookingToProcess = deletedBookings[index];
                 if (action === 'undo') {
                     targetStatus = bookingToProcess._originalSource === 'requests' ? 'New' : 'Pending';
-                    originalSourceForStaging = bookingToProcess._originalSource; // Retain original source
+                    originalSourceForStaging = bookingToProcess._originalSource;
                 }
 
-                // Stage the change
+                // Stage the change with uniqueIdValue
                 stagedChanges.push({
-                    rowIndex: bookingToProcess._rowIndex,
+                    uniqueIdValue: bookingToProcess._uniqueIdValue, // <--- IMPORTANT: Use _uniqueIdValue here
                     newStatus: targetStatus,
-                    originalSource: originalSourceForStaging // Needed to revert to correct list
+                    originalSource: originalSourceForStaging
                 });
 
                 // Update UI locally
@@ -649,7 +636,7 @@
                 }
                 renderDeletedBookings();
                 updateSaveButtonState();
-                console.log(`Staged undo from deleted for row:`, bookingToProcess._rowIndex);
+                console.log(`Staged undo from deleted for unique ID:`, bookingToProcess._uniqueIdValue);
             }
         }
 
@@ -660,7 +647,6 @@
                 return;
             }
 
-            // Confirm with the user
             const confirmation = confirm(`Are you sure you want to save ${stagedChanges.length} changes to the Google Sheet?`);
             if (!confirmation) {
                 return;
@@ -673,8 +659,10 @@
 
                 if (result.success) {
                     alert("Changes saved successfully!");
-                    stagedChanges = []; // Clear staged changes after successful save
+                    stagedChanges = [];
                     updateSaveButtonState();
+                    // Optionally, re-fetch all data to ensure local state is perfectly aligned with sheet
+                    // window.location.reload(); 
                 } else {
                     alert("Failed to save changes: " + result.error);
                 }
