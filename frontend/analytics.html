@@ -10,7 +10,6 @@
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        
         gtag('config', 'G-03MPB9XG9B');
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -20,15 +19,27 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;          /* Enables vertical scrolling */
-        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;           /* Enables vertical scrolling */
+        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
-        /* Remove max-height: 100%; as it's not needed with a fixed height */
     }
     .chat-log-message {
-        /* Optional: Add some padding to separate messages visually */
-        padding-bottom: 8px; 
+        padding-bottom: 8px;
     }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -38,12 +49,12 @@
         <div class="container mx-auto flex items-center justify-between p-4 relative">
             <div class="flex items-center space-x-4">
                 <div class="relative h-20 w-[150px]">
-                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                    <img src="https://placehold.co/150x80/060d1f/ffffff?text=Aura+AI+Logo" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" onerror="this.onerror=null;this.src='https://placehold.co/150x80/060d1f/ffffff?text=Aura+AI+Logo';" />
                 </div>
                 <span class="text-white text-base">Aura AI Solutions</span>
             </div>
             <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
-            <div class="flex items-center space-x-4"> 
+            <div class="flex items-center space-x-4">
                 <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
                 <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
             </div>
@@ -65,7 +76,7 @@
                     <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
                         Please describe the changes you would like to make to your AI's business information:
                     </label>
-                    <textarea id="update-details" name="updateDetails" rows="8" 
+                    <textarea id="update-details" name="updateDetails" rows="8"
                                 class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
                                 placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
                 </div>
@@ -81,11 +92,10 @@
 
     <div class="fixed inset-0 -z-10 pointer-events-none">
         <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" /> <!-- Example video -->
             Your browser does not support the video tag.
+            <img src="https://placehold.co/1920x1080/000000/ffffff?text=Background" alt="Background" class="absolute inset-0 w-full h-full object-cover block" onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/ffffff?text=Background';" />
         </video>
-        <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" />
-        
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
@@ -105,47 +115,37 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Protect this page
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-            }
-        });
-
-        // Logout button
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                window.location.href = "login.html";
-            } catch (err) {
-                alert("Logout failed: " + err.message);
-            }
-        });
-    </script>
-    <script type="module">
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-
         // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec'; 
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
 
-        const auth = getAuth(); // Get the Firebase Auth instance
+        let authInitialized = false; // Flag to ensure data loading happens only once
 
-        // --- Data Loading Logic ---
-        // This function listens for Firebase authentication state changes
-        // and loads data when a user is signed in.
+        // --- Custom Message Function (replaces alert) ---
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `message-box ${type}`;
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Remove after 3 seconds
+        }
+
+        // --- Protect this page and load data ---
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // User is signed in. We can now get their unique ID.
-                const userIdentifier = user.uid; // This is the unique Firebase User ID (e.g., k9tY2XzPqL8oN3rJ1sV7uA)
-                console.log("Logged-in user ID (Firebase UID):", userIdentifier);
+            if (!authInitialized) { // This block runs only once when auth state is first determined
+                authInitialized = true; // Mark as initialized
 
-                // Call the function to fetch data using this identifier
-                await loadCustomerData(userIdentifier);
-
-            } else {
-                // User is signed out. Redirect to login.
-                // (Your existing onAuthStateChanged already handles this redirect to login.html)
-                console.log("User is signed out. Redirecting to login.");
+                if (user) {
+                    // User is logged in, proceed with page-specific data loading
+                    const userIdentifier = user.uid;
+                    console.log("User is logged in on analytics page:", userIdentifier);
+                    await loadCustomerData(userIdentifier);
+                } else {
+                    // User is NOT logged in, redirect to login
+                    console.log("User is not logged in. Redirecting to login.");
+                    window.location.href = "login.html";
+                }
             }
         });
 
@@ -157,27 +157,22 @@
                 return;
             }
 
-            // Show a loading message while data is being fetched
             dataTableContainer.innerHTML = '<p class="text-white text-center">Loading your analytics data...</p>';
 
             try {
-                // Construct the URL to your Apps Script, including the Firebase User ID
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
-                
-                // Check if the network request was successful
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
 
-                const data = await response.json(); // Parse the JSON response from the Apps Script
-                
-                // Handle errors returned from the Apps Script itself
+                const data = await response.json();
+
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
                     return;
                 }
-                
-                // Check if the received data has the expected structure
+
                 if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
                     typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
                     Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
@@ -189,14 +184,13 @@
 
                     const tier = data.tier;
                     const paymentTerm = data.paymentTerm;
-                    const dailyUsageDataReal = data.dailyUsageData; // Real daily usage data
-                    const chatLogsReal = data.chatLogs;             // Real chat logs
+                    const dailyUsageDataReal = data.dailyUsageData;
+                    const chatLogsReal = data.chatLogs;
 
                     let formattedNextPaymentDate = 'N/A';
                     if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
                         const dateObj = new Date(data.nextPaymentDate);
                         if (!isNaN(dateObj.getTime())) {
-                            // Format for UK locale (DD/MM/YYYY)
                             formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
                                 year: 'numeric',
                                 month: '2-digit',
@@ -205,27 +199,20 @@
                         }
                     }
                     
-                    // --- Tier Access Logic ---
-                    // Tiers: Beta, Essential, Elite, Executive. Elite and Executive have additional features.
                     const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
 
-                    // --- Prepare data for charts and chat logs based on access ---
                     let chartLabels = [];
                     let chartData = [];
                     let chatContentHTML = '';
 
                     if (hasEliteOrExecutiveAccess) {
-                        // Use real data for Elite/Executive
                         chartLabels = dailyUsageDataReal.map(item => item.date);
                         chartData = dailyUsageDataReal.map(item => item.count);
                         
-                        // Generate HTML for real chat logs
                         if (chatLogsReal.length > 0) {
-                            // 👇 ADD .slice().reverse() HERE to ensure messages are reversed before rendering
                             chatLogsReal.slice().reverse().forEach(log => {
                                 const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
                                 const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
-                                // 👇 ADD chat-log-message CLASS HERE (optional for spacing)
                                 chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
                             });
                         } else {
@@ -233,12 +220,9 @@
                         }
 
                     } else {
-                        // Use example data for Beta/Essential (blurred tiers)
-                        // Static example data for blurred graph
                         chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
                         chartData = [10, 15, 8, 20, 12, 25, 18];
 
-                        // Static example chat log content for blurred display
                         chatContentHTML = `
                             <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
                             <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
@@ -248,7 +232,7 @@
                     }
                     
                     let displayHTML = `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"> 
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
@@ -317,9 +301,9 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
                                 <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
                                 <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
-                                  <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300"> 
-                                    Cancel Subscription 
-                                  </button> 
+                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Cancel Subscription
+                                    </button>
                                 </a>
                                 <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
                             </div>
@@ -327,10 +311,10 @@
                             <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
-                                <a href="form.html""
-                                       id="feedback-btn"
-                                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
-                                        Provide Feedback
+                                <a href="form.html"
+                                            id="feedback-btn"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                            Provide Feedback
                                 </a>
 
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
@@ -340,37 +324,36 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
                                 <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
                                 <a href="update.html" class="inline-block">
-                                  <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
-                                    Request Update
-                                  </button>
+                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Request Update
+                                    </button>
                                 </a>
                                 <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
                             </div>
                         </div>`;
                     
-                    dataTableContainer.innerHTML = displayHTML; // Display the generated HTML
+                    dataTableContainer.innerHTML = displayHTML;
 
-                    // Initialize Chart.js if user has access (or dummy chart)
                     const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
                     const ctx = document.getElementById(chartId);
 
-                    if (ctx) { // Ensure canvas element exists
+                    if (ctx) {
                         new Chart(ctx, {
-                            type: 'line', // Line chart for usage over time
+                            type: 'line',
                             data: {
-                                labels: chartLabels, // Use dynamically set labels
+                                labels: chartLabels,
                                 datasets: [{
                                     label: 'Messages Sent',
-                                    data: chartData, // Use dynamically set data
+                                    data: chartData,
                                     borderColor: 'rgb(75, 192, 192)',
                                     tension: 0.1,
                                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    fill: true, // Fill area under the line
+                                    fill: true,
                                 }]
                             },
                             options: {
                                 responsive: true,
-                                maintainAspectRatio: false, // Allow custom height
+                                maintainAspectRatio: false,
                                 scales: {
                                     y: {
                                         beginAtZero: true,
@@ -391,7 +374,6 @@
                         });
                     }
                 } else {
-                    // If the data structure is not what's expected from the Apps Script, show an error
                     dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
                     console.error("Received unexpected data format:", data);
                 }
@@ -401,9 +383,7 @@
                 dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
             }
         }
-        // --- NEW: Add functionality for the new buttons ---
 
-        // Get references to buttons and modal elements
         const feedbackBtn = document.getElementById('feedback-btn');
         const updateInfoBtn = document.getElementById('update-info-btn');
         const updateInfoModal = document.getElementById('update-info-modal');
@@ -412,33 +392,29 @@
         const formMessage = document.getElementById('form-message');
         const updateDetailsTextArea = document.getElementById('update-details');
 
-        // 1. Feedback Button Functionality
-        if (feedbackBtn) { // Ensure button exists
+        if (feedbackBtn) {
             feedbackBtn.addEventListener('click', () => {
-                // *** REPLACE THIS URL with your actual Google Form link! ***
                 window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
             });
         }
 
-        // 2. Update Business Info Modal Show/Hide
-        if (updateInfoBtn) { // Ensure button exists
+        if (updateInfoBtn) {
             updateInfoBtn.addEventListener('click', () => {
-                updateInfoModal.classList.remove('hidden'); // Show the modal
+                updateInfoModal.classList.remove('hidden');
             });
         }
 
-        if (closeModalBtn) { // Ensure button exists
+        if (closeModalBtn) {
             closeModalBtn.addEventListener('click', () => {
-                updateInfoModal.classList.add('hidden'); // Hide the modal
-                formMessage.textContent = ''; // Clear any previous messages
-                businessInfoForm.reset(); // Reset the form fields
+                updateInfoModal.classList.add('hidden');
+                formMessage.textContent = '';
+                businessInfoForm.reset();
             });
         }
 
-        // Hide modal if clicked outside (optional, but good UX)
         if (updateInfoModal) {
             updateInfoModal.addEventListener('click', (event) => {
-                if (event.target === updateInfoModal) { // Check if click was directly on the overlay
+                if (event.target === updateInfoModal) {
                     updateInfoModal.classList.add('hidden');
                     formMessage.textContent = '';
                     businessInfoForm.reset();
@@ -446,21 +422,19 @@
             });
         }
 
-        // 3. Update Business Info Form Submission
-        if (businessInfoForm) { // Ensure form exists
+        if (businessInfoForm) {
             businessInfoForm.addEventListener('submit', async (event) => {
-                event.preventDefault(); // Prevent default form submission
+                event.preventDefault();
 
                 formMessage.textContent = 'Sending request...';
-                formMessage.className = 'text-sm text-gray-400'; // Reset class
+                formMessage.className = 'text-sm text-gray-400';
 
                 const requestedChanges = updateDetailsTextArea.value;
 
-                // Get the current user's UID (auth is available from the outer scope)
                 const currentUser = auth.currentUser;
-                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER'; // Fallback if no user is found (shouldn't happen on this protected page)
+                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
 
-                if (!requestedChanges.trim()) { // Check if the text area is empty or just whitespace
+                if (!requestedChanges.trim()) {
                     formMessage.textContent = 'Please describe the changes.';
                     formMessage.className = 'text-sm text-red-400';
                     return;
@@ -468,24 +442,23 @@
 
                 try {
                     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST', // Use POST for submitting data
+                        method: 'POST',
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded', // Standard form encoding
+                            'Content-Type': 'application/x-www-form-urlencoded',
                         },
-                        body: new URLSearchParams({ // Prepare data for POST request
-                            action: 'sendBusinessInfoUpdate', // A new 'action' to tell Apps Script what to do
+                        body: new URLSearchParams({
+                            action: 'sendBusinessInfoUpdate',
                             userId: submitterUserId,
                             changes: requestedChanges
                         })
                     });
 
-                    const result = await response.json(); // Apps Script will return JSON {success: true/false, error: ...}
+                    const result = await response.json();
 
                     if (result.success) {
                         formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
                         formMessage.className = 'text-sm text-green-400';
-                        businessInfoForm.reset(); // Clear the form
-                        // Optionally, hide the modal after a delay
+                        businessInfoForm.reset();
                         setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
                     } else {
                         formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
