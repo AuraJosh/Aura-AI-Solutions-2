@@ -19,8 +19,8 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;           /* Enables vertical scrolling */
-        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
@@ -40,9 +40,30 @@
     .message-box.info { background-color: #3B82F6; /* blue-500 */ }
     .message-box.error { background-color: #EF4444; /* red-500 */ }
     .message-box.success { background-color: #22C55E; /* green-500 */ }
+
+    /* CSS for the loading overlay */
+    #loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's on top */
+        flex-direction: column;
+        gap: 1rem;
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
+
+    <div id="loading-overlay">
+        <l-trefoil size="40" stroke="4" stroke-length="0.15" bg-opacity="0.1" speed="1.4" color="white"></l-trefoil>
+        <p class="text-white text-lg">Loading your analytics data...</p>
+    </div>
 
     <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
         <div class="container mx-auto flex items-center justify-between p-4">
@@ -63,8 +84,7 @@
 
     <main class="pt-40 px-4 flex justify-center relative z-10">
         <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-            <p class="text-white text-center">Loading your analytics data...</p>
-        </div>
+            </div>
     </main>
 
     <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
@@ -77,8 +97,8 @@
                         Please describe the changes you would like to make to your AI's business information:
                     </label>
                     <textarea id="update-details" name="updateDetails" rows="8"
-                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
-                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                                 class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                 placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
@@ -100,6 +120,10 @@
     </div>
 
     <script type="module">
+        // Import and register the trefoil loader
+        import { trefoil } from 'https://cdn.jsdelivr.net/npm/ldrs/dist/loaders/trefoil.js';
+        trefoil.register();
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
@@ -120,6 +144,7 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
 
         let authInitialized = false; // Flag to ensure data loading happens only once
+        const loadingOverlay = document.getElementById('loading-overlay');
 
         // --- Custom Message Function (replaces alert) ---
         function showMessage(message, type = 'info') {
@@ -142,6 +167,7 @@
                     const userIdentifier = user.uid;
                     console.log("User is logged in on analytics page:", userIdentifier);
                     await loadCustomerData(userIdentifier);
+                    loadingOverlay.style.display = 'none'; // Hide loading overlay after data is loaded
                 } else {
                     // User is NOT logged in, redirect to login
                     console.log("User is not logged in. Redirecting to login.");
@@ -170,7 +196,8 @@
                 return;
             }
 
-            dataTableContainer.innerHTML = '<p class="text-white text-center">Loading your analytics data...</p>';
+            // The loading overlay handles the initial "Loading..." message now
+            // dataTableContainer.innerHTML = '<p class="text-white text-center">Loading your analytics data...</p>';
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
@@ -304,7 +331,12 @@
                                     </div>
                                 ` : `
                                     <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock your chat history.</p>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
                                         </div>
+                                    </div>
                                     <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
                                     </div>
                                 `}
@@ -325,9 +357,9 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
                                 <a href="form.html"
-                                            id="feedback-btn"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
-                                            Provide Feedback
+                                                id="feedback-btn"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                                Provide Feedback
                                 </a>
 
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
@@ -394,6 +426,9 @@
             } catch (error) {
                 console.error('Error fetching or parsing data:', error);
                 dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
+            } finally {
+                // Ensure the loading overlay is hidden even if there's an error
+                loadingOverlay.style.display = 'none';
             }
         }
 
