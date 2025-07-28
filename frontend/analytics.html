@@ -1,573 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aura Analytics Suite</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-03MPB9XG9B');
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" href="media/favicon.png" type="image/png">
-    <style>
-    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
-    .chat-logs-container {
-        display: flex;
-        flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;           /* Enables vertical scrolling */
-        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
-        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
-    }
-    .chat-log-message {
-        padding-bottom: 8px;
-    }
-    /* Basic styling for custom message box */
-    .message-box {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 0.5rem;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
-    .message-box.error { background-color: #EF4444; /* red-500 */ }
-    .message-box.success { background-color: #22C55E; /* green-500 */ }
-
-    /* Styles for the loading animation */
-    #loading-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000; /* Ensure it's on top of everything */
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Analytics Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
+    .chat-logs-container {
+        display: flex;
+        flex-direction: column-reverse; /* Stacks items from bottom to top */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
-  .container {
-    --uib-size: 40px;
-    --uib-color: white; /* Changed to white for better visibility on dark background */
-    --uib-speed: 1.4s;
-    --uib-bg-opacity: .1;
-    height: var(--uib-size);
-    width: var(--uib-size);
-    transform-origin: center;
-    overflow: visible;
-  }
+    .chat-log-message {
+        padding-bottom: 8px;
+    }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
 
-  .car {
-    fill: none;
-    stroke: var(--uib-color);
-    stroke-dasharray: 15, 85;
-    stroke-dashoffset: 0;
-    stroke-linecap: round;
-    animation: travel var(--uib-speed) linear infinite;
-    will-change: stroke-dasharray, stroke-dashoffset;
-    transition: stroke 0.5s ease;
-  }
-
-  .track {
-    stroke: var(--uib-color);
-    opacity: var(--uib-bg-opacity);
-    transition: stroke 0.5s ease;
-  }
-
-  @keyframes travel {
-    0% {
-      stroke-dashoffset: 0;
+    /* Loading animation styles */
+    .container {
+        --uib-size: 40px;
+        --uib-color: white; /* Changed to white for better visibility on dark background */
+        --uib-speed: 1.4s;
+        --uib-bg-opacity: .1;
+        height: var(--uib-size);
+        width: var(--uib-size);
+        transform-origin: center;
+        overflow: visible;
     }
 
-    100% {
-      stroke-dashoffset: -100;
+    .car {
+        fill: none;
+        stroke: var(--uib-color);
+        stroke-dasharray: 15, 85;
+        stroke-dashoffset: 0;
+        stroke-linecap: round;
+        animation: travel var(--uib-speed) linear infinite;
+        will-change: stroke-dasharray, stroke-dashoffset;
+        transition: stroke 0.5s ease;
     }
-  }
-    </style>
+
+    .track {
+        stroke: var(--uib-color);
+        opacity: var(--uib-bg-opacity);
+        transition: stroke 0.5s ease;
+    }
+
+    @keyframes travel {
+        0% {
+            stroke-dashoffset: 0;
+        }
+        100% {
+            stroke-dashoffset: -100;
+        }
+    }
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
-    <div id="loading-overlay" class="hidden">
-      <svg 
-        class="container" 
-        x="0px" 
-        y="0px" 
-        viewBox="0 0 40 40" 
-        height="40" 
-        width="40" 
-        preserveAspectRatio="xMidYMid meet">
-      <path 
-        class="track" 
-        fill="none" 
-        stroke-width="4" 
-        pathLength="100" 
-        d="M29.760000000000005 18.72 c0 7.28 -3.9200000000000004 13.600000000000001 -9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.840000000000002 2.64 c -3.6 0 -6.88 -0.96 -9.76 -2.64 c0 -7.28 3.9200000000000004 -13.52 9.840000000000002 -16.96 c2.8800000000000003 -1.6800000000000002 6.24 -2.64 9.76 -2.64 S26.880000000000003 17.040000000000003 29.760000000000005 18.72 c5.84 3.3600000000000003 9.76 9.68 9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.76 2.64 c -3.6 0 -6.88 -0.96 -9.840000000000002 -2.64 c -5.84 -3.3600000000000003 -9.76 -9.68 -9.76 -16.96 c0 -7.28 3.9200000000000004 -13.600000000000001 9.76 -16.96 C25.84 5.120000000000001 29.760000000000005 11.440000000000001 29.760000000000005 18.72z">
-      </path>
-      <path 
-        class="car" 
-        fill="none" 
-        stroke-width="4" 
-        pathLength="100" 
-        d="M29.760000000000005 18.72 c0 7.28 -3.9200000000000004 13.600000000000001 -9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.840000000000002 2.64 c -3.6 0 -6.88 -0.96 -9.76 -2.64 c0 -7.28 3.9200000000000004 -13.52 9.840000000000002 -16.96 c2.8800000000000003 -1.6800000000000002 6.24 -2.64 9.76 -2.64 S26.880000000000003 17.040000000000003 29.760000000000005 18.72 c5.84 3.3600000000000003 9.76 9.68 9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.76 2.64 c -3.6 0 -6.88 -0.96 -9.840000000000002 -2.64 c -5.84 -3.3600000000000003 -9.76 -9.68 -9.76 -16.96 c0 -7.28 3.9200000000000004 -13.600000000000001 9.76 -16.96 C25.84 5.120000000000001 29.760000000000005 11.440000000000001 29.760000000000005 18.72z">
-      </path>
-      </svg>
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="container mx-auto flex items-center justify-between p-4 relative">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
+            <div class="flex items-center space-x-4">
+                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto flex flex-col items-center justify-center">
+            <div id="loading-indicator" class="flex items-center space-x-3">
+                <p class="text-white text-center">Loading your analytics data...</p>
+                <svg
+                  class="container"
+                  x="0px"
+                  y="0px"
+                  viewBox="0 0 40 40"
+                  height="40"
+                  width="40"
+                  preserveAspectRatio="xMidYMid meet">
+                <path
+                  class="track"
+                  fill="none"
+                  stroke-width="4"
+                  pathLength="100"
+                  d="M29.760000000000005 18.72 c0 7.28 -3.9200000000000004 13.600000000000001 -9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.840000000000002 2.64 c -3.6 0 -6.88 -0.96 -9.76 -2.64 c0 -7.28 3.9200000000000004 -13.52 9.840000000000002 -16.96 c2.8800000000000003 -1.6800000000000002 6.24 -2.64 9.76 -2.64 S26.880000000000003 17.040000000000003 29.760000000000005 18.72 c5.84 3.3600000000000003 9.76 9.68 9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.76 2.64 c -3.6 0 -6.88 -0.96 -9.840000000000002 -2.64 c -5.84 -3.3600000000000003 -9.76 -9.68 -9.76 -16.96 c0 -7.28 3.9200000000000004 -13.600000000000001 9.76 -16.96 C25.84 5.120000000000001 29.760000000000005 11.440000000000001 29.760000000000005 18.72z">
+                </path>
+                <path
+                  class="car"
+                  fill="none"
+                  stroke-width="4"
+                  pathLength="100"
+                  d="M29.760000000000005 18.72 c0 7.28 -3.9200000000000004 13.600000000000001 -9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.840000000000002 2.64 c -3.6 0 -6.88 -0.96 -9.76 -2.64 c0 -7.28 3.9200000000000004 -13.52 9.840000000000002 -16.96 c2.8800000000000003 -1.6800000000000002 6.24 -2.64 9.76 -2.64 S26.880000000000003 17.040000000000003 29.760000000000005 18.72 c5.84 3.3600000000000003 9.76 9.68 9.840000000000002 16.96 c -2.8800000000000003 1.6800000000000002 -6.24 2.64 -9.76 2.64 c -3.6 0 -6.88 -0.96 -9.840000000000002 -2.64 c -5.84 -3.3600000000000003 -9.76 -9.68 -9.76 -16.96 c0 -7.28 3.9200000000000004 -13.600000000000001 9.76 -16.96 C25.84 5.120000000000001 29.760000000000005 11.440000000000001 29.760000000000005 18.72z">
+                </path>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <form id="business-info-form">
+                <div class="mb-4">
+                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
+                        Please describe the changes you would like to make to your AI's business information:
+                    </label>
+                    <textarea id="update-details" name="updateDetails" rows="8"
+                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        Send Update Request
+                    </button>
+                    <p id="form-message" class="text-sm text-gray-400"></p>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
-        <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="container mx-auto flex items-center justify-between p-4 relative">
-            <div class="flex items-center space-x-4">
-                <div class="relative h-20 w-[150px]">
-                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
-                </div>
-                <span class="text-white text-base">Aura AI Solutions</span>
-            </div>
-            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
-            <div class="flex items-center space-x-4">
-                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
-                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
-            </div>
-        </div>
-    </header>
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
+        </video>
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
 
-    <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-            <p class="text-white text-center">Loading your analytics data...</p>
-        </div>
-    </main>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
-    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
-            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
-            <form id="business-info-form">
-                <div class="mb-4">
-                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
-                        Please describe the changes you would like to make to your AI's business information:
-                    </label>
-                    <textarea id="update-details" name="updateDetails" rows="8"
-                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
-                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
-                        Send Update Request
-                    </button>
-                    <p id="form-message" class="text-sm text-gray-400"></p>
-                </div>
-            </form>
-        </div>
-    </div>
+        // IMPORTANT: Replace with your actual Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
+        };
 
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
-        </video>
-        <div class="absolute inset-0 bg-black/60"></div>
-    </div>
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
 
-        // IMPORTANT: Replace with your actual Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-            authDomain: "aura-ai-85b65.firebaseapp.com",
-            projectId: "aura-ai-85b65",
-            storageBucket: "aura-ai-85b65.appspot.com",
-            messagingSenderId: "492492484793",
-            appId: "1:492492484793:web:7f9038d50f523241536b68"
-        };
+        let authInitialized = false; // Flag to ensure data loading happens only once
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        // --- Custom Message Function (replaces alert) ---
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `message-box ${type}`;
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Remove after 3 seconds
+        }
 
-        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
+        // --- Protect this page and load data ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!authInitialized) { // This block runs only once when auth state is first determined
+                authInitialized = true; // Mark as initialized
 
-        let authInitialized = false; // Flag to ensure data loading happens only once
-
-        // --- Custom Message Function (replaces alert) ---
-        function showMessage(message, type = 'info') {
-            const messageBox = document.createElement('div');
-            messageBox.className = `message-box ${type}`;
-            messageBox.textContent = message;
-            document.body.appendChild(messageBox);
-            setTimeout(() => {
-                messageBox.remove();
-            }, 3000); // Remove after 3 seconds
-        }
-
-        // --- Protect this page and load data ---
-        onAuthStateChanged(auth, async (user) => {
-            if (!authInitialized) { // This block runs only once when auth state is first determined
-                authInitialized = true; // Mark as initialized
-
-                if (user) {
-                    // User is logged in, proceed with page-specific data loading
-                    const userIdentifier = user.uid;
-                    console.log("User is logged in on analytics page:", userIdentifier);
-                    await loadCustomerData(userIdentifier);
-                } else {
-                    // User is NOT logged in, redirect to login
-                    console.log("User is not logged in. Redirecting to login.");
-                    window.location.href = "login.html";
-                }
-            }
-        });
-
-        // --- Logout button ---
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                console.log("User logged out. Redirecting to login.html");
-                window.location.href = "login.html";
-            } catch (err) {
-                console.error("Logout failed:", err.message);
-                showMessage("Logout failed: " + err.message, 'error');
-            }
-        });
-
-        // Function to fetch data from the Google Apps Script
-        async function loadCustomerData(userIdentifier) {
-            const dataTableContainer = document.getElementById('data-table-container');
-            const loadingOverlay = document.getElementById('loading-overlay'); // Get the loading overlay element
-
-            if (!dataTableContainer) {
-                console.error("Error: Element with ID 'data-table-container' not found.");
-                return;
-            }
-
-            // Show loading animation
-            loadingOverlay.classList.remove('hidden');
-            dataTableContainer.innerHTML = ''; // Clear previous content while loading
-
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
-                    return;
-                }
-                
-                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
-                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
-                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
-
-                    const totalSent = data.totalMessagesSent;
-                    const monthlyLimit = data.monthlyLimit;
-                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
-                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-
-                    const tier = data.tier;
-                    const paymentTerm = data.paymentTerm;
-                    const dailyUsageDataReal = data.dailyUsageData;
-                    const chatLogsReal = data.chatLogs;
-
-                    let formattedNextPaymentDate = 'N/A';
-                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
-                        const dateObj = new Date(data.nextPaymentDate);
-                        if (!isNaN(dateObj.getTime())) {
-                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit'
-                            });
-                        }
-                    }
-                    
-                    const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
-
-                    let chartLabels = [];
-                    let chartData = [];
-                    let chatContentHTML = '';
-
-                    if (hasEliteOrExecutiveAccess) {
-                        chartLabels = dailyUsageDataReal.map(item => item.date);
-                        chartData = dailyUsageDataReal.map(item => item.count);
-                        
-                        if (chatLogsReal.length > 0) {
-                            chatLogsReal.slice().reverse().forEach(log => {
-                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
-                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
-                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
-                            });
-                        } else {
-                            chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
-                        }
-
-                    } else {
-                        chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
-                        chartData = [10, 15, 8, 20, 12, 25, 18];
-
-                        chatContentHTML = `
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                        `;
-                    }
-                    
-                    let displayHTML = `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                        <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
-                                <div class="flex items-center justify-between">
-                                    <p class="text-gray-300 text-lg">Messages Used:</p>
-                                    <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
-                                </div>
-                                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
-                                    <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
-                                </div>
-                                <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
-                                ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
-                            </div>
-
-                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Current Tier:</p>
-                                        <p class="text-white font-medium">${tier}</p>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Payment Term:</p>
-                                        <p class="text-white font-medium">${paymentTerm}</p>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Next Payment Date:</p>
-                                        <p class="text-white font-medium">${formattedNextPaymentDate}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
-                                ${hasEliteOrExecutiveAccess ? `
-                                    <div class="h-60">
-                                        <canvas id="dailyUsageChart"></canvas>
-                                    </div>
-                                ` : `
-                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
-                                        <div class="text-center">
-                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                            <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
-                                        </div>
-                                    </div>
-                                    <div class="h-60 opacity-20">
-                                        <canvas id="dailyUsageChartDummy"></canvas>
-                                    </div>
-                                `}
-                            </div>
-
-                           <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
-                                ${hasEliteOrExecutiveAccess ? `
-                                    <div class="text-gray-300 chat-logs-container"> ${chatContentHTML}
-                                    </div>
-                                ` : `
-                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
-                                        </div>
-                                    <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
-                                    </div>
-                                `}
-                            </div>
-
-                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
-                                <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
-                                <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
-                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
-                                        Cancel Subscription
-                                    </button>
-                                </a>
-                                <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
-                            </div>
-
-                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
-                                <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
-                                <a href="form.html"
-                                            id="feedback-btn"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
-                                            Provide Feedback
-                                </a>
-
-                                <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
-                            </div>
-
-                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
-                                <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
-                                <a href="update.html" class="inline-block">
-                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
-                                        Request Update
-                                    </button>
-                                </a>
-                                <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
-                            </div>
-                        </div>`;
-                    
-                    dataTableContainer.innerHTML = displayHTML;
-
-                    const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
-                    const ctx = document.getElementById(chartId);
-
-                    if (ctx) {
-                        new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: chartLabels,
-                                datasets: [{
-                                    label: 'Messages Sent',
-                                    data: chartData,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1,
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    fill: true,
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
-                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
-                                    },
-                                    x: {
-                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
-                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
-                                    }
-                                },
-                                plugins: {
-                                    legend: {
-                                        labels: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
-                    console.error("Received unexpected data format:", data);
-                }
-
-            } catch (error) {
-                console.error('Error fetching or parsing data:', error);
-                dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
-            } finally {
-                // Hide loading animation after data is loaded or if an error occurs
-                loadingOverlay.classList.add('hidden');
+                if (user) {
+                    // User is logged in, proceed with page-specific data loading
+                    const userIdentifier = user.uid;
+                    console.log("User is logged in on analytics page:", userIdentifier);
+                    await loadCustomerData(userIdentifier);
+                } else {
+                    // User is NOT logged in, redirect to login
+                    console.log("User is not logged in. Redirecting to login.");
+                    window.location.href = "login.html";
+                }
             }
-        }
+        });
 
-        const feedbackBtn = document.getElementById('feedback-btn');
-        const updateInfoBtn = document.getElementById('update-info-btn');
-        const updateInfoModal = document.getElementById('update-info-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const businessInfoForm = document.getElementById('business-info-form');
-        const formMessage = document.getElementById('form-message');
-        const updateDetailsTextArea = document.getElementById('update-details');
+        // --- Logout button ---
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out. Redirecting to login.html");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout failed:", err.message);
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
 
-        if (feedbackBtn) {
-            feedbackBtn.addEventListener('click', () => {
-                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
-            });
-        }
+        // Function to fetch data from the Google Apps Script
+        async function loadCustomerData(userIdentifier) {
+            const dataTableContainer = document.getElementById('data-table-container');
+            const loadingIndicator = document.getElementById('loading-indicator');
 
-        if (updateInfoBtn) {
-            updateInfoBtn.addEventListener('click', () => {
-                updateInfoModal.classList.remove('hidden');
-            });
-        }
+            if (!dataTableContainer) {
+                console.error("Error: Element with ID 'data-table-container' not found.");
+                return;
+            }
 
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', () => {
-                updateInfoModal.classList.add('hidden');
-                formMessage.textContent = '';
-                businessInfoForm.reset();
-            });
-        }
+            // Show loading indicator
+            loadingIndicator.classList.remove('hidden');
+            // Ensure the container is set up for centering the loading message
+            dataTableContainer.classList.add('flex', 'flex-col', 'items-center', 'justify-center');
+            dataTableContainer.innerHTML = ''; // Clear previous content
 
-        if (updateInfoModal) {
-            updateInfoModal.addEventListener('click', (event) => {
-                if (event.target === updateInfoModal) {
-                    updateInfoModal.classList.add('hidden');
-                    formMessage.textContent = '';
-                    businessInfoForm.reset();
-                }
-            });
-        }
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+               
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
 
-        if (businessInfoForm) {
-            businessInfoForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
+                const data = await response.json();
+               
+                // Hide loading indicator
+                loadingIndicator.classList.add('hidden');
+                // Remove centering classes, as content will now fill the container
+                dataTableContainer.classList.remove('flex', 'flex-col', 'items-center', 'justify-center');
 
-                formMessage.textContent = 'Sending request...';
-                formMessage.className = 'text-sm text-gray-400';
 
-                const requestedChanges = updateDetailsTextArea.value;
+                if (data.error) {
+                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
+                    return;
+                }
+               
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
+                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
+                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
 
-                const currentUser = auth.currentUser;
-                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
+                    const totalSent = data.totalMessagesSent;
+                    const monthlyLimit = data.monthlyLimit;
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
 
-                if (!requestedChanges.trim()) {
-                    formMessage.textContent = 'Please describe the changes.';
-                    formMessage.className = 'text-sm text-red-400';
-                    return;
-                }
+                    const tier = data.tier;
+                    const paymentTerm = data.paymentTerm;
+                    const dailyUsageDataReal = data.dailyUsageData;
+                    const chatLogsReal = data.chatLogs;
 
-                try {
-                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            action: 'sendBusinessInfoUpdate',
-                            userId: submitterUserId,
-                            changes: requestedChanges
-                        })
-                    });
+                    let formattedNextPaymentDate = 'N/A';
+                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
+                        const dateObj = new Date(data.nextPaymentDate);
+                        if (!isNaN(dateObj.getTime())) {
+                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit'
+                            });
+                        }
+                    }
+                   
+                    const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
 
-                    const result = await response.json();
+                    let chartLabels = [];
+                    let chartData = [];
+                    let chatContentHTML = '';
 
-                    if (result.success) {
-                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
-                        formMessage.className = 'text-sm text-green-400';
-                        businessInfoForm.reset();
-                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
-                    } else {
-                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
-                        formMessage.className = 'text-sm text-red-400';
-                    }
-                } catch (error) {
-                    console.error('Error submitting business info update:', error);
-                    formMessage.textContent = 'Failed to send request. Please try again later.';
-                    formMessage.className = 'text-sm text-red-400';
-                }
-            });
-        }
-    </script>
+                    if (hasEliteOrExecutiveAccess) {
+                        chartLabels = dailyUsageDataReal.map(item => item.date);
+                        chartData = dailyUsageDataReal.map(item => item.count);
+                       
+                        if (chatLogsReal.length > 0) {
+                            chatLogsReal.slice().reverse().forEach(log => {
+                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
+                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
+                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
+                            });
+                        } else {
+                            chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
+                        }
+
+                    } else {
+                        chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+                        chartData = [10, 15, 8, 20, 12, 25, 18];
+
+                        chatContentHTML = `
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        `;
+                    }
+                   
+                    let displayHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-gray-300 text-lg">Messages Used:</p>
+                                    <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                                    <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                </div>
+                                <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
+                                ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
+                            </div>
+
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Current Tier:</p>
+                                        <p class="text-white font-medium">${tier}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Payment Term:</p>
+                                        <p class="text-white font-medium">${paymentTerm}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Next Payment Date:</p>
+                                        <p class="text-white font-medium">${formattedNextPaymentDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="h-60">
+                                        <canvas id="dailyUsageChart"></canvas>
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                        </div>
+                                    </div>
+                                    <div class="h-60 opacity-20">
+                                        <canvas id="dailyUsageChartDummy"></canvas>
+                                    </div>
+                                `}
+                            </div>
+
+                           <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        </div>
+                                    <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                `}
+                            </div>
+
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
+                                <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
+                                <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
+                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Cancel Subscription
+                                    </button>
+                                </a>
+                                <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
+                            </div>
+
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
+                                <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
+                                <a href="form.html"
+                                            id="feedback-btn"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                            Provide Feedback
+                                </a>
+
+                                <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
+                            </div>
+
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
+                                <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
+                                <a href="update.html" class="inline-block">
+                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Request Update
+                                    </button>
+                                </a>
+                                <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
+                            </div>
+                        </div>`;
+                   
+                    dataTableContainer.innerHTML = displayHTML;
+
+                    const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
+                    const ctx = document.getElementById(chartId);
+
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartLabels,
+                                datasets: [{
+                                    label: 'Messages Sent',
+                                    data: chartData,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    fill: true,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    },
+                                    x: {
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
+                    console.error("Received unexpected data format:", data);
+                }
+
+            } catch (error) {
+                console.error('Error fetching or parsing data:', error);
+                // Hide loading indicator on error
+                loadingIndicator.classList.add('hidden');
+                // Remove centering classes on error
+                dataTableContainer.classList.remove('flex', 'flex-col', 'items-center', 'justify-center');
+                dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
+            }
+        }
+
+        const feedbackBtn = document.getElementById('feedback-btn');
+        const updateInfoBtn = document.getElementById('update-info-btn');
+        const updateInfoModal = document.getElementById('update-info-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const businessInfoForm = document.getElementById('business-info-form');
+        const formMessage = document.getElementById('form-message');
+        const updateDetailsTextArea = document.getElementById('update-details');
+
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', () => {
+                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
+            });
+        }
+
+        if (updateInfoBtn) {
+            updateInfoBtn.addEventListener('click', () => {
+                updateInfoModal.classList.remove('hidden');
+            });
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                updateInfoModal.classList.add('hidden');
+                formMessage.textContent = '';
+                businessInfoForm.reset();
+            });
+        }
+
+        if (updateInfoModal) {
+            updateInfoModal.addEventListener('click', (event) => {
+                if (event.target === updateInfoModal) {
+                    updateInfoModal.classList.add('hidden');
+                    formMessage.textContent = '';
+                    businessInfoForm.reset();
+                }
+            });
+        }
+
+        if (businessInfoForm) {
+            businessInfoForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                formMessage.textContent = 'Sending request...';
+                formMessage.className = 'text-sm text-gray-400';
+
+                const requestedChanges = updateDetailsTextArea.value;
+
+                const currentUser = auth.currentUser;
+                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
+
+                if (!requestedChanges.trim()) {
+                    formMessage.textContent = 'Please describe the changes.';
+                    formMessage.className = 'text-sm text-red-400';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'sendBusinessInfoUpdate',
+                            userId: submitterUserId,
+                            changes: requestedChanges
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
+                        formMessage.className = 'text-sm text-green-400';
+                        businessInfoForm.reset();
+                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
+                    } else {
+                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
+                        formMessage.className = 'text-sm text-red-400';
+                    }
+                } catch (error) {
+                    console.error('Error submitting business info update:', error);
+                    formMessage.textContent = 'Failed to send request. Please try again later.';
+                    formMessage.className = 'text-sm text-red-400';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
