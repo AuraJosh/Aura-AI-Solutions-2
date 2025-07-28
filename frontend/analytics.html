@@ -92,9 +92,9 @@
 
     <div class="fixed inset-0 -z-10 pointer-events-none">
         <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" /> <!-- Example video -->
+            <source src="media/background.mp4" type="video/mp4" />
             Your browser does not support the video tag.
-            <img src="https://placehold.co/1920x1080/000000/ffffff?text=Background" alt="Background" class="absolute inset-0 w-full h-full object-cover block" onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/ffffff?text=Background';" />
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block sm:hidden" onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/ffffff?text=Background';" />
         </video>
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
@@ -103,6 +103,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
 
+        // IMPORTANT: Replace with your actual Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
             authDomain: "aura-ai-85b65.firebaseapp.com",
@@ -149,6 +150,18 @@
             }
         });
 
+        // --- Logout button ---
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out. Redirecting to login.html");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout failed:", err.message);
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
+
         // Function to fetch data from the Google Apps Script
         async function loadCustomerData(userIdentifier) {
             const dataTableContainer = document.getElementById('data-table-container');
@@ -161,18 +174,18 @@
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
-
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
 
                 const data = await response.json();
-
+                
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
                     return;
                 }
-
+                
                 if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
                     typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
                     Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
