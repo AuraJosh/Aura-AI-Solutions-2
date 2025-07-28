@@ -183,9 +183,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        // NEW: Import Firestore modules
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -199,20 +198,17 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app); // NEW: Initialize Firestore
+        const db = getFirestore(app);
 
         let bookingsData = []; // 'New' bookings
         let pendingBookings = [];
         let deletedBookings = [];
-
-        // --- NEW: Arrays to stage changes locally ---
-        // Each staged change will now include the Firestore document ID (`id`)
-        let stagedChanges = []; // { id: string, newStatus: string, originalSource?: string }
-
+        let stagedChanges = [];
         let currentBookingIndex = 0;
-        let bookingFieldsConfig = []; // This will be dynamically determined from the first booking
+        let bookingFieldsConfig = [];
         let currentUserUid = null;
-        let currentAccountId = null; // NEW: Store the accountId for the logged-in user
+        let currentAccountId = null;
+        let isAuthReady = false; // NEW: Flag to track if auth state is resolved
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -229,27 +225,17 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         const loadingMessage = document.getElementById('loading-message');
 
-        /**
-         * Shows the loading overlay with a specific message.
-         * Optionally disables body scroll to prevent interaction.
-         * @param {string} message The message to display (e.g., "Loading data...", "Moving booking...").
-         */
         function showLoading(message) {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Disable scroll
+            document.body.style.overflow = 'hidden';
         }
 
-        /**
-         * Hides the loading overlay.
-         * Re-enables body scroll.
-         */
         function hideLoading() {
             loadingOverlay.classList.add('hidden');
-            document.body.style.overflow = ''; // Re-enable scroll
+            document.body.style.overflow = '';
         }
 
-        // Function to update the save button state
         function updateSaveButtonState() {
             saveChangesBtn.disabled = stagedChanges.length === 0;
             if (stagedChanges.length > 0) {
@@ -259,7 +245,6 @@
             }
         }
 
-        // Custom "alert" replacement
         function showMessage(message, type = 'info') {
             const messageBox = document.createElement('div');
             messageBox.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-[101]`;
@@ -274,32 +259,76 @@
             document.body.appendChild(messageBox);
             setTimeout(() => {
                 messageBox.remove();
-            }, 3000); // Remove after 3 seconds
+            }, 3000);
         }
 
-        // Custom "confirm" replacement (simplified for this example, just logs)
         function showConfirm(message, onConfirm, onCancel) {
-            console.log(`Confirmation requested: ${message}`);
-            // In a real app, you'd show a modal here with "Yes" and "No" buttons
-            // For now, we'll just auto-confirm for demonstration purposes
-            onConfirm(); // Auto-confirm for now
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[102]';
+            modal.innerHTML = `
+                <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-sm text-center">
+                    <p class="text-white text-lg mb-6">${message}</p>
+                    <div class="flex justify-center space-x-4">
+                        <button id="confirm-yes" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold transition duration-200">Yes</button>
+                        <button id="confirm-no" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg font-semibold transition duration-200">No</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            document.getElementById('confirm-yes').onclick = () => {
+                modal.remove();
+                onConfirm();
+            };
+            document.getElementById('confirm-no').onclick = () => {
+                modal.remove();
+                onCancel();
+            };
         }
 
-
-        // Protect this page and initialize data
+        // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return; // Stop execution if not logged in
+            if (typeof __initial_auth_token !== 'undefined' && !isAuthReady) {
+                // If in Canvas environment and not yet authenticated, use custom token
+                try {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Signed in with custom token from Canvas.");
+                    isAuthReady = true; // Mark auth as ready
+                    // The onAuthStateChanged will fire again with the actual user object
+                    // so we don't need to call initializeBookingData here directly.
+                } catch (error) {
+                    console.error("Error signing in with custom token:", error);
+                    showMessage("Authentication failed. Please try logging in again.", 'error');
+                    window.location.href = "login.html";
+                }
+                return; // Wait for the next onAuthStateChanged call
             }
 
-            currentUserUid = user.uid;
-            console.log("Logged-in user ID (Firebase UID):", currentUserUid);
+            if (!user) {
+                // If not authenticated and not in Canvas environment (or token failed)
+                // or if auth state is definitively resolved to no user
+                if (isAuthReady) { // Only redirect if auth state is truly resolved to no user
+                    window.location.href = "login.html";
+                } else {
+                    // This state means auth is still resolving, don't redirect yet
+                    console.log("Auth state not yet resolved, waiting for user object...");
+                }
+                return;
+            }
 
+            // User is authenticated, proceed with loading data
+            if (!isAuthReady) { // Only run this block once when user is first confirmed
+                isAuthReady = true;
+                currentUserUid = user.uid;
+                console.log("Logged-in user ID (Firebase UID):", currentUserUid);
+                initializeBookingData();
+            }
+        });
+
+        async function initializeBookingData() {
             showLoading("Finding your account...");
 
             try {
-                // 1. Get the accountId from user_mappings
                 const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
                 const userMappingSnap = await getDoc(userMappingDocRef);
 
@@ -326,33 +355,29 @@
 
                 showLoading("Loading your booking data...");
 
-                // 2. Set up real-time listener for bookings
                 const bookingsCollectionRef = collection(db, 'accounts', currentAccountId, 'bookings');
-                // You can add a query here if you only want to listen to specific bookings initially
-                // e.g., query(bookingsCollectionRef, where('Status', '!=', 'Completed'))
                 onSnapshot(bookingsCollectionRef, (snapshot) => {
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                    bookingFieldsConfig = []; // Reset config
+                    bookingFieldsConfig = [];
 
                     snapshot.forEach(doc => {
-                        const booking = { id: doc.id, ...doc.data() }; // Include Firestore document ID
+                        const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
 
-                        // Dynamically build bookingFieldsConfig from the first document
                         if (bookingFieldsConfig.length === 0) {
                             Object.keys(booking).forEach(key => {
-                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource') { // Exclude internal fields
+                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp') {
                                     bookingFieldsConfig.push({ field: key, question: key });
                                 }
                             });
-                            // Ensure Status and Timestamp are always included if they exist in data
-                            if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
-                                bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
-                            }
+                            // Ensure Timestamp and Status are always included and at the end for consistency
                             if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
                                 bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                            }
+                            if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
+                                bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
                             }
                         }
 
@@ -361,13 +386,11 @@
                         } else if (status === 'Pending') {
                             pendingBookings.push(booking);
                         } else if (status === 'Deleted') {
-                            // Ensure _originalSource is preserved if it came from the database
                             booking._originalSource = booking._originalSource || 'UNKNOWN';
                             deletedBookings.push(booking);
                         }
                     });
 
-                    // Sort bookings by Timestamp for consistent display
                     bookingsData.sort((a, b) => {
                         const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : new Date(a.Timestamp);
                         const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : new Date(b.Timestamp);
@@ -384,8 +407,6 @@
                         return dateA - dateB;
                     });
 
-
-                    // Adjust currentBookingIndex after data refresh
                     if (bookingsData.length > 0) {
                         currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                     } else {
@@ -395,8 +416,8 @@
                     renderBookingCard();
                     renderPendingBookings();
                     renderDeletedBookings();
-                    updateSaveButtonState(); // Update button state based on staged changes
-                    hideLoading(); // Hide loading after initial data load or subsequent updates
+                    updateSaveButtonState();
+                    hideLoading();
                     console.log("Booking data updated from Firestore.");
                 }, (error) => {
                     console.error("Error listening to bookings:", error);
@@ -415,9 +436,8 @@
                 deletedBookingsListElement.innerHTML = fetchErrorMessage;
                 hideLoading();
             }
-        });
+        }
 
-        // Logout button
         document.getElementById("logout-btn").addEventListener("click", async () => {
             try {
                 await signOut(auth);
@@ -427,7 +447,6 @@
             }
         });
 
-        // NEW: Function to send a batch of updates to Firestore
         async function sendBatchBookingUpdates(updates) {
             if (!currentAccountId) {
                 console.error("Account not identified, cannot send update.");
@@ -438,32 +457,26 @@
                 return { success: true, message: "No changes to save." };
             }
 
-            const batch = writeBatch(db); // Create a new batch
+            const batch = writeBatch(db);
 
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
-                // Update only the 'Status' field and _originalSource
                 const updateData = { Status: change.newStatus };
 
-                // Handle _originalSource for Deleted status
                 if (change.newStatus === 'Deleted') {
-                    updateData._originalSource = change.originalSource || 'requests'; // Store original source when deleting
+                    updateData._originalSource = change.originalSource || 'requests';
                 } else {
-                    // When reverting from Deleted, or moving to Pending/New, clear _originalSource if it's not relevant
-                    // Or set it back to what it was if it's an 'undo' operation that restores a previous state.
-                    // For simplicity, we'll only set it when moving TO Deleted.
-                    // If you need to persist original source for other states, you'd add more logic.
-                    if (change.originalSource && change.newStatus !== 'Completed') { // if it was deleted and now being undone
+                    if (change.originalSource && change.newStatus !== 'Completed') {
                          updateData._originalSource = change.originalSource;
                     } else {
-                         updateData._originalSource = firestore.FieldValue.delete(); // Remove the field if not needed
+                         updateData._originalSource = FieldValue.delete();
                     }
                 }
                 batch.update(bookingDocRef, updateData);
             });
 
             try {
-                await batch.commit(); // Commit the batch
+                await batch.commit();
                 return { success: true, message: "Booking statuses updated successfully." };
             } catch (error) {
                 console.error('Error committing batch updates:', error);
@@ -485,26 +498,23 @@
             const currentBooking = bookingsData[currentBookingIndex];
             let cardContentArray = [];
 
-            // Ensure bookingFieldsConfig is populated. If not, try to infer from current booking.
             if (bookingFieldsConfig.length === 0) {
                  Object.keys(currentBooking).forEach(key => {
                     if (key !== 'id' && key !== 'Status' && key !== '_originalSource') {
                         bookingFieldsConfig.push({ field: key, question: key });
                     }
                 });
-                if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
                 if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
             }
-
 
             bookingFieldsConfig.forEach(fieldConfig => {
                 let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
 
-                // Format Timestamp if it's a Firebase Timestamp object or Date object
                 if (fieldConfig.field === 'Timestamp' && fieldValue) {
-                    if (fieldValue.toDate) { // Firestore Timestamp object
+                    if (fieldValue.toDate) {
                         fieldValue = fieldValue.toDate().toLocaleString();
-                    } else if (fieldValue instanceof Date) { // JavaScript Date object
+                    } else if (fieldValue instanceof Date) {
                         fieldValue = fieldValue.toLocaleString();
                     } else {
                         fieldValue = fieldValue.toString().trim();
@@ -529,7 +539,6 @@
 
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
-            // Try to get relevant fields for display, prioritizing common ones
             const fieldsToDisplay = ['Timestamp', 'Customer Name', 'Email', 'Subject', 'Service'];
             let displayedCount = 0;
 
@@ -552,7 +561,6 @@
                 }
             }
 
-            // Fallback if common fields are not found or less than 3
             if (displayedCount < 3 && bookingFieldsConfig.length > 0) {
                 for (let i = 0; i < bookingFieldsConfig.length && displayedCount < 3; i++) {
                     const fieldName = bookingFieldsConfig[i].field;
@@ -574,7 +582,6 @@
                     }
                 }
             }
-
 
             const displayString = displayValues.join(' | ');
 
@@ -644,30 +651,25 @@
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
 
-        // --- Core Booking Action Functions (now staging changes) ---
         function moveBookingToPending() {
             if (bookingsData.length === 0) return;
 
             const bookingToMove = bookingsData[currentBookingIndex];
             
-            // Check if this booking is already staged for a different status
             const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToMove.id);
             if (existingStagedIndex !== -1) {
-                // If already staged, update its status
                 stagedChanges[existingStagedIndex].newStatus = 'Pending';
-                stagedChanges[existingStagedIndex].originalSource = 'requests'; // Ensure original source is correct
+                stagedChanges[existingStagedIndex].originalSource = 'requests';
             } else {
-                // Stage the change
                 stagedChanges.push({
-                    id: bookingToMove.id, // Use Firestore document ID
+                    id: bookingToMove.id,
                     newStatus: 'Pending',
-                    originalSource: 'requests' // New bookings come from 'requests'
+                    originalSource: 'requests'
                 });
             }
 
-            // Update UI locally (remove from bookingsData, add to pendingBookings)
             bookingsData.splice(currentBookingIndex, 1);
-            bookingToMove.Status = 'Pending'; // Update local status for rendering
+            bookingToMove.Status = 'Pending';
             pendingBookings.push(bookingToMove);
             adjustCurrentBookingIndex();
             renderBookingCard();
@@ -681,25 +683,21 @@
 
             const bookingToDelete = bookingsData[currentBookingIndex];
 
-            // Check if this booking is already staged for a different status
             const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToDelete.id);
             if (existingStagedIndex !== -1) {
-                // If already staged, update its status
                 stagedChanges[existingStagedIndex].newStatus = 'Deleted';
-                stagedChanges[existingStagedIndex].originalSource = 'requests'; // Ensure original source is correct
+                stagedChanges[existingStagedIndex].originalSource = 'requests';
             } else {
-                // Stage the change
                 stagedChanges.push({
-                    id: bookingToDelete.id, // Use Firestore document ID
+                    id: bookingToDelete.id,
                     newStatus: 'Deleted',
-                    originalSource: 'requests' // New bookings come from 'requests'
+                    originalSource: 'requests'
                 });
             }
 
-            // Update UI locally
             bookingsData.splice(currentBookingIndex, 1);
-            bookingToDelete.Status = 'Deleted'; // Update local status for rendering
-            bookingToDelete._originalSource = 'requests'; // Mark original source for undo
+            bookingToDelete.Status = 'Deleted';
+            bookingToDelete._originalSource = 'requests';
             deletedBookings.push(bookingToDelete);
             adjustCurrentBookingIndex();
             renderBookingCard();
@@ -718,49 +716,43 @@
             }
         }
 
-        // Event listeners for the main action buttons
         moveToPendingBtn.addEventListener('click', moveBookingToPending);
         deleteBookingBtn.addEventListener('click', deleteBooking);
 
-        // --- Handlers for buttons within Pending/Deleted lists (now staging changes) ---
         function handleListButtonAction(event) {
             const button = event.target;
-            const bookingId = button.dataset.id; // Use data-id instead of data-index
+            const bookingId = button.dataset.id;
             const listType = button.dataset.listType;
             const action = button.dataset.action;
 
             let bookingToProcess;
             let targetStatus;
-            let originalSourceForStaging; // To store the original list type for undoing
+            let originalSourceForStaging;
 
             if (listType === 'pending') {
                 bookingToProcess = pendingBookings.find(b => b.id === bookingId);
-                if (!bookingToProcess) return; // Should not happen
+                if (!bookingToProcess) return;
 
                 if (action === 'complete') {
                     targetStatus = 'Completed';
-                    // Remove from pending locally (onSnapshot will handle actual removal from DB list)
                     pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
-                    originalSourceForStaging = 'pending'; // Was in pending list
-                    // Move from pending to deleted locally
+                    originalSourceForStaging = 'pending';
                     pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = 'Deleted';
                     bookingToProcess._originalSource = 'pending';
                     deletedBookings.push(bookingToProcess);
                 } else if (action === 'undo') {
                     targetStatus = 'New';
-                    // Move from pending to new requests locally
                     pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = 'New';
                     bookingsData.push(bookingToProcess);
                     if (bookingsData.length > 0) {
-                        currentBookingIndex = bookingsData.length - 1; // Show the undone booking
+                        currentBookingIndex = bookingsData.length - 1;
                     }
                 }
                 
-                // Stage the change
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
@@ -769,32 +761,29 @@
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource // Pass original source if available
+                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
                     });
                 }
 
             } else if (listType === 'deleted') {
                 bookingToProcess = deletedBookings.find(b => b.id === bookingId);
-                if (!bookingToProcess) return; // Should not happen
+                if (!bookingToProcess) return;
 
                 if (action === 'undo') {
-                    // Revert to original source (New or Pending)
                     targetStatus = bookingToProcess._originalSource === 'requests' ? 'New' : 'Pending';
-                    originalSourceForStaging = bookingToProcess._originalSource; // Retain original source
+                    originalSourceForStaging = bookingToProcess._originalSource;
 
-                    // Move from deleted back to original list locally
                     deletedBookings = deletedBookings.filter(b => b.id !== bookingId);
-                    bookingToProcess.Status = targetStatus; // Update local status
+                    bookingToProcess.Status = targetStatus;
                     if (originalSourceForStaging === 'requests') {
                         bookingsData.push(bookingToProcess);
                         if (bookingsData.length > 0) {
-                            currentBookingIndex = bookingsData.length - 1; // Show the undone booking
+                            currentBookingIndex = bookingsData.length - 1;
                         }
                     } else if (originalSourceForStaging === 'pending') {
                         pendingBookings.push(bookingToProcess);
                     }
                 }
-                // Stage the change
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
@@ -803,26 +792,24 @@
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource // Pass original source
+                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
                     });
                 }
             }
 
-            renderBookingCard(); // Re-render main card in case a new booking was added
+            renderBookingCard();
             renderPendingBookings();
             renderDeletedBookings();
             updateSaveButtonState();
             console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
         }
 
-        // NEW: Save Changes Button Event Listener
         saveChangesBtn.addEventListener('click', async () => {
             if (stagedChanges.length === 0) {
                 showMessage("No changes to save.", 'info');
                 return;
             }
 
-            // Replace alert with custom confirm logic or just proceed
             showConfirm(`Are you sure you want to save ${stagedChanges.length} changes to the database?`, async () => {
                 showLoading("Saving changes to Database...");
 
@@ -831,9 +818,8 @@
 
                     if (result.success) {
                         showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = []; // Clear staged changes after successful save
+                        stagedChanges = [];
                         updateSaveButtonState();
-                        // The onSnapshot listener will automatically re-render the UI with the latest data
                     } else {
                         showMessage("Failed to save changes: " + result.error, 'error');
                     }
@@ -841,7 +827,6 @@
                     hideLoading();
                 }
             }, () => {
-                // User cancelled, do nothing
                 showMessage("Save cancelled.", 'info');
             });
         });
