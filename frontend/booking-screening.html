@@ -71,6 +71,20 @@
         0%,5%  {rotate:  0deg}
         95%,to {rotate:-60deg}
     }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -165,11 +179,10 @@
     </div>
 
     <div class="fixed inset-0 -z-10 pointer-events-none">
-        <!-- Placeholder for your background video, ensure 'media/background.mp4' exists or replace -->
         <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" /> <!-- Example video -->
+            <source src="media/background.mp4" type="video/mp4" />
             Your browser does not support the video tag.
-            <img src="https://placehold.co/1920x1080/000000/ffffff?text=Background" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" onerror="this.onerror=null;this.src='https://placehold.co/1920x1080/000000/ffffff?text=Background';" />
         </video>
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
@@ -188,12 +201,12 @@
 
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "YOUR_API_KEY", // Replace with your actual API Key from Firebase Console
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8", // Replace with your actual API Key from Firebase Console
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -208,7 +221,7 @@
         let bookingFieldsConfig = [];
         let currentUserUid = null;
         let currentAccountId = null;
-        let isAuthReady = false; // NEW: Flag to track if auth state is resolved
+        let authInitialized = false; // Flag to track if auth state is resolved
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -288,12 +301,11 @@
 
         // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
-            if (typeof __initial_auth_token !== 'undefined' && !isAuthReady) {
+            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
                 // If in Canvas environment and not yet authenticated, use custom token
                 try {
                     await signInWithCustomToken(auth, __initial_auth_token);
                     console.log("Signed in with custom token from Canvas.");
-                    isAuthReady = true; // Mark auth as ready
                     // The onAuthStateChanged will fire again with the actual user object
                     // so we don't need to call initializeBookingData here directly.
                 } catch (error) {
@@ -307,7 +319,7 @@
             if (!user) {
                 // If not authenticated and not in Canvas environment (or token failed)
                 // or if auth state is definitively resolved to no user
-                if (isAuthReady) { // Only redirect if auth state is truly resolved to no user
+                if (authInitialized) { // Only redirect if auth state is truly resolved to no user
                     window.location.href = "login.html";
                 } else {
                     // This state means auth is still resolving, don't redirect yet
@@ -317,8 +329,8 @@
             }
 
             // User is authenticated, proceed with loading data
-            if (!isAuthReady) { // Only run this block once when user is first confirmed
-                isAuthReady = true;
+            if (!authInitialized) { // Only run this block once when user is first confirmed
+                authInitialized = true;
                 currentUserUid = user.uid;
                 console.log("Logged-in user ID (Firebase UID):", currentUserUid);
                 initializeBookingData();
@@ -366,13 +378,18 @@
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
 
+                        // Dynamically build bookingFieldsConfig from the first document
+                        // This ensures all fields from your bookings are displayed, not just hardcoded ones.
                         if (bookingFieldsConfig.length === 0) {
+                            // Collect all keys from the first booking document
                             Object.keys(booking).forEach(key => {
+                                // Exclude internal Firestore 'id' and our custom '_originalSource'
+                                // Also exclude 'Status' and 'Timestamp' as they are handled separately for display order
                                 if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp') {
-                                    bookingFieldsConfig.push({ field: key, question: key });
+                                    bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }); // Basic formatting for display
                                 }
                             });
-                            // Ensure Timestamp and Status are always included and at the end for consistency
+                            // Add Timestamp and Status at the end for consistent display
                             if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
                                 bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
                             }
@@ -391,6 +408,7 @@
                         }
                     });
 
+                    // Sort bookings by Timestamp for consistent display
                     bookingsData.sort((a, b) => {
                         const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : new Date(a.Timestamp);
                         const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : new Date(b.Timestamp);
@@ -407,6 +425,7 @@
                         return dateA - dateB;
                     });
 
+                    // Adjust currentBookingIndex after data refresh
                     if (bookingsData.length > 0) {
                         currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                     } else {
@@ -416,8 +435,8 @@
                     renderBookingCard();
                     renderPendingBookings();
                     renderDeletedBookings();
-                    updateSaveButtonState();
-                    hideLoading();
+                    updateSaveButtonState(); // Update button state based on staged changes
+                    hideLoading(); // Hide loading after initial data load or subsequent updates
                     console.log("Booking data updated from Firestore.");
                 }, (error) => {
                     console.error("Error listening to bookings:", error);
@@ -438,6 +457,7 @@
             }
         }
 
+        // Logout button
         document.getElementById("logout-btn").addEventListener("click", async () => {
             try {
                 await signOut(auth);
@@ -447,6 +467,7 @@
             }
         });
 
+        // NEW: Function to send a batch of updates to Firestore
         async function sendBatchBookingUpdates(updates) {
             if (!currentAccountId) {
                 console.error("Account not identified, cannot send update.");
@@ -457,26 +478,32 @@
                 return { success: true, message: "No changes to save." };
             }
 
-            const batch = writeBatch(db);
+            const batch = writeBatch(db); // Create a new batch
 
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
+                // Update only the 'Status' field and _originalSource
                 const updateData = { Status: change.newStatus };
 
+                // Handle _originalSource for Deleted status
                 if (change.newStatus === 'Deleted') {
-                    updateData._originalSource = change.originalSource || 'requests';
+                    updateData._originalSource = change.originalSource || 'requests'; // Store original source when deleting
                 } else {
-                    if (change.originalSource && change.newStatus !== 'Completed') {
+                    // When reverting from Deleted, or moving to Pending/New, clear _originalSource if it's not relevant
+                    // Or set it back to what it was if it's an 'undo' operation that restores a previous state.
+                    // For simplicity, we'll only set it when moving TO Deleted.
+                    // If you need to persist original source for other states, you'd add more logic.
+                    if (change.originalSource && change.newStatus !== 'Completed') { // if it was deleted and now being undone
                          updateData._originalSource = change.originalSource;
                     } else {
-                         updateData._originalSource = FieldValue.delete();
+                         updateData._originalSource = FieldValue.delete(); // Remove the field if not needed
                     }
                 }
                 batch.update(bookingDocRef, updateData);
             });
 
             try {
-                await batch.commit();
+                await batch.commit(); // Commit the batch
                 return { success: true, message: "Booking statuses updated successfully." };
             } catch (error) {
                 console.error('Error committing batch updates:', error);
@@ -498,6 +525,7 @@
             const currentBooking = bookingsData[currentBookingIndex];
             let cardContentArray = [];
 
+            // Ensure bookingFieldsConfig is populated. If not, try to infer from current booking.
             if (bookingFieldsConfig.length === 0) {
                  Object.keys(currentBooking).forEach(key => {
                     if (key !== 'id' && key !== 'Status' && key !== '_originalSource') {
@@ -508,13 +536,15 @@
                 if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
             }
 
+
             bookingFieldsConfig.forEach(fieldConfig => {
                 let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
 
+                // Format Timestamp if it's a Firebase Timestamp object or Date object
                 if (fieldConfig.field === 'Timestamp' && fieldValue) {
-                    if (fieldValue.toDate) {
+                    if (fieldValue.toDate) { // Firestore Timestamp object
                         fieldValue = fieldValue.toDate().toLocaleString();
-                    } else if (fieldValue instanceof Date) {
+                    } else if (fieldValue instanceof Date) { // JavaScript Date object
                         fieldValue = fieldValue.toLocaleString();
                     } else {
                         fieldValue = fieldValue.toString().trim();
@@ -539,6 +569,7 @@
 
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
+            // Try to get relevant fields for display, prioritizing common ones
             const fieldsToDisplay = ['Timestamp', 'Customer Name', 'Email', 'Subject', 'Service'];
             let displayedCount = 0;
 
@@ -561,6 +592,7 @@
                 }
             }
 
+            // Fallback if common fields are not found or less than 3
             if (displayedCount < 3 && bookingFieldsConfig.length > 0) {
                 for (let i = 0; i < bookingFieldsConfig.length && displayedCount < 3; i++) {
                     const fieldName = bookingFieldsConfig[i].field;
@@ -582,6 +614,7 @@
                     }
                 }
             }
+
 
             const displayString = displayValues.join(' | ');
 
