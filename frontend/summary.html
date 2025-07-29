@@ -40,6 +40,50 @@
     .message-box.info { background-color: #3B82F6; /* blue-500 */ }
     .message-box.error { background-color: #EF4444; /* red-500 */ }
     .message-box.success { background-color: #22C55E; /* green-500 */ }
+
+    /* REFINED INSIGHT BUBBLE STYLE */
+    .insight-bubble {
+        display: flex;
+        flex-direction: column; /* Stack icon and text vertically */
+        align-items: center;    /* Center content horizontally */
+        justify-content: center; /* Center content vertically if space allows */
+        text-align: center;     /* Center text */
+        padding: 1.25rem 1.5rem; /* More padding for a 'bubble' feel */
+        border-radius: 9999px; /* Make it perfectly round / pill-shaped */
+        background-color: #6B46C1; /* A nice purple (tailwind: violet-700 approx) */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1); /* Deeper shadow and subtle inner glow */
+        color: #E2E8F0; /* Light gray text for contrast */
+        border: 1px solid #7C3AED; /* Slightly lighter purple border */
+        min-height: 100px; /* Ensure a minimum height for the bubble shape */
+        min-width: 150px; /* Ensure a minimum width for the bubble shape */
+        max-width: 100%; /* Ensure it doesn't overflow its parent */
+        margin: 0 auto; /* Center the bubble itself */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+
+    .insight-bubble:hover {
+        transform: translateY(-2px); /* Slight lift on hover */
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.15);
+    }
+
+    .insight-bubble-icon {
+        color: #C3DAFE; /* Even lighter blue for the icon */
+        margin-bottom: 0.75rem; /* Space between icon and text */
+        width: 1.75rem; /* Larger icon */
+        height: 1.75rem; /* Larger icon */
+    }
+
+    .insight-bubble-text {
+        font-size: 1rem; /* Clearer text size */
+        line-height: 1.5;
+        font-weight: 500; /* Slightly bolder text */
+    }
+
+    /* Adjust the default padding for cards to allow space for the bubble at the bottom */
+    .card-with-bubble-padding {
+        padding-bottom: 2rem; /* Give some extra room if the bubble overflows slightly */
+    }
+
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -67,7 +111,7 @@
             <div id="dynamic-content-placeholder" class="hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
-                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Current Monthly Usage</h2>
                         <div class="flex items-center justify-between mb-2">
                             <p class="text-gray-300 text-lg">Messages Used:</p>
@@ -78,37 +122,37 @@
                         </div>
                         <p class="text-gray-400 text-sm mt-2 text-right">Usage against your <span class="font-bold" id="current-tier-display">N/A</span> tier limit.</p>
                         <p id="limit-reached-message" class="text-red-400 text-sm mt-2 text-center font-bold hidden">You have reached your monthly message limit!</p>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="current-usage-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Monthly Usage Trend (Last 6 Months)</h2>
                         <div class="h-60">
                             <canvas id="monthlyUsageTrendChart"></canvas>
                         </div>
                         <p class="text-gray-400 text-sm mt-2">See your message usage patterns over time.</p>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="monthly-trend-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage (Current Month)</h2>
                         <div id="daily-usage-chart-wrapper">
                             <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="daily-usage-upgrade-overlay">
@@ -124,19 +168,19 @@
                             </div>
                         </div>
                         <p class="text-gray-400 text-sm mt-2">Detailed view of your daily message activity.</p>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="daily-usage-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Top User Questions/Topics</h2>
                         <div id="top-topics-content" class="h-60 flex items-center justify-center">
                             <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="top-topics-upgrade-overlay">
@@ -150,19 +194,20 @@
                                 <p class="text-gray-400">Chart or list of top topics will appear here.</p>
                                 </div>
                         </div>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <p class="text-gray-400 text-sm mt-2">Identify common themes in customer queries.</p>
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="top-topics-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Chat Sentiment Analysis</h2>
                         <div id="sentiment-content" class="h-60 flex items-center justify-center">
                             <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="sentiment-upgrade-overlay">
@@ -176,19 +221,20 @@
                                 <p class="text-gray-400">Chart showing sentiment distribution will appear here.</p>
                                 </div>
                         </div>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <p class="text-gray-400 text-sm mt-2">Understand the emotional tone of your customer interactions.</p>
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="sentiment-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Average Chat Resolution Time</h2>
                         <div id="resolution-time-content" class="h-60 flex items-center justify-center">
                             <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="resolution-time-upgrade-overlay">
@@ -203,19 +249,20 @@
                                 <p class="text-gray-400">minutes</p>
                             </div>
                         </div>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <p class="text-gray-400 text-sm mt-2">Gauge the efficiency of your AI's support.</p>
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="resolution-time-insight"></p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                    <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
                         <h2 class="text-xl font-semibold text-white mb-4">Peak Chat Activity Times</h2>
                         <div id="peak-times-content" class="h-60 flex items-center justify-center">
                             <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="peak-times-upgrade-overlay">
@@ -229,13 +276,14 @@
                                 <p class="text-gray-400">Chart showing peak activity times will appear here.</p>
                                 </div>
                         </div>
-                        <div class="insight-box mt-6">
-                            <div class="insight-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <p class="text-gray-400 text-sm mt-2">Identify optimal staffing or content update times.</p>
+                        <div class="insight-bubble mt-8">
+                            <div class="insight-bubble-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
                                 </svg>
                             </div>
-                            <div class="insight-text">
+                            <div class="insight-bubble-text">
                                 <p id="peak-times-insight"></p>
                             </div>
                         </div>
@@ -396,17 +444,15 @@
 
                     // Monthly Usage Trend Chart
                     const monthlyUsageTrendCtx = document.getElementById('monthlyUsageTrendChart');
-                    // You'll need to pass 'monthlyUsageTrendData' from your Apps Script.
-                    // For now, let's use some dummy data for demonstration.
-                    const dummyMonthlyTrendLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul']; // Example labels
-                    const dummyMonthlyTrendData = [1200, 1350, 1100, 1500, 1650, totalSent]; // Example data, last month is current totalSent
+                    const dummyMonthlyTrendLabels = ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+                    const dummyMonthlyTrendData = [1200, 1350, 1100, 1500, 1650, totalSent];
                     new Chart(monthlyUsageTrendCtx, {
                         type: 'line',
                         data: {
-                            labels: dummyMonthlyTrendLabels, // Replace with actual monthly labels
+                            labels: dummyMonthlyTrendLabels,
                             datasets: [{
                                 label: 'Monthly Messages',
-                                data: dummyMonthlyTrendData, // Replace with actual monthly data
+                                data: dummyMonthlyTrendData,
                                 borderColor: 'rgb(255, 99, 132)',
                                 tension: 0.1,
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -434,14 +480,12 @@
                             }
                         }
                     });
-                    // Placeholder for monthly trend insight
                     document.getElementById('monthly-trend-insight').textContent = `Your message usage has shown a consistent upward trend over the last few months, indicating growing customer interaction!`;
 
 
                     // Handle Daily Message Usage Chart
                     const dailyUsageChartCtx = document.getElementById('dailyUsageChart');
                     const dailyUsageChartDummyCtx = document.getElementById('dailyUsageChartDummy');
-                    const dailyUsageChartWrapper = document.getElementById('daily-usage-chart-wrapper');
                     const dailyUsageChartArea = document.getElementById('daily-usage-chart-area');
                     const dailyUsageUpgradeOverlay = document.getElementById('daily-usage-upgrade-overlay');
 
@@ -450,7 +494,6 @@
                         dailyUsageUpgradeOverlay.classList.add('hidden');
                         dailyUsageChartArea.style.opacity = '1';
 
-                        // Ensure only one canvas is active
                         dailyUsageChartCtx.classList.remove('hidden');
                         dailyUsageChartDummyCtx.classList.add('hidden'); 
 
@@ -488,18 +531,15 @@
                                 }
                             }
                         });
-                        // Placeholder for daily usage insight (you'd generate this dynamically)
-                        document.getElementById('daily-usage-insight').textContent = `Your daily usage shows consistent activity with a recent peak.`; // Example
+                        document.getElementById('daily-usage-insight').textContent = `Your daily usage shows consistent activity with a recent peak.`;
                     } else {
                         dailyUsageUpgradeOverlay.classList.remove('hidden');
-                        dailyUsageChartArea.style.opacity = '0.2'; // Apply blur effect
+                        dailyUsageChartArea.style.opacity = '0.2';
 
-                        // Ensure dummy chart is visible and main chart is hidden
                         dailyUsageChartCtx.classList.add('hidden');
                         dailyUsageChartDummyCtx.classList.remove('hidden');
 
-                        // Initialize dummy chart for visual effect if not already
-                        if (!dailyUsageChartDummyCtx.chart) { // Check if chart instance exists
+                        if (!dailyUsageChartDummyCtx.chart) {
                              new Chart(dailyUsageChartDummyCtx, {
                                 type: 'line',
                                 data: {
@@ -562,31 +602,22 @@
                         resolutionTimeDisplayArea.style.opacity = '1';
                         peakTimesChartArea.style.opacity = '1';
 
-                        // Placeholder for Top User Questions/Topics Chart (e.g., Word Cloud or Bar Chart)
-                        // You'd need to process chatLogsReal to extract topics and counts
                         topTopicsChartArea.innerHTML = '<p class="text-gray-400 text-center">Graph of top topics will be dynamically generated here based on chat logs.</p>';
                         document.getElementById('top-topics-insight').textContent = `Customers frequently ask about 'shipping' and 'returns'. Consider adding a prominent FAQ section for these topics.`;
 
 
-                        // Placeholder for Sentiment Analysis Chart
-                        // You'd need to process chatLogsReal for sentiment analysis
                         sentimentChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart showing sentiment (positive, neutral, negative) will be dynamically generated here.</p>';
                         document.getElementById('sentiment-insight').textContent = `95% of customer interactions show positive or neutral sentiment, indicating high satisfaction!`;
 
 
-                        // Placeholder for Average Resolution Time
-                        // You'd need to calculate this from chatLogsReal (requires start/end timestamps for each chat)
                         avgResolutionTimeValue.textContent = '2.5'; // Example value
                         document.getElementById('resolution-time-insight').textContent = `Your average chat resolution time is 2.5 minutes, ensuring quick and efficient support.`;
 
 
-                        // Placeholder for Peak Chat Times/Days Chart
-                        // You'd need to process chatLogsReal for timestamps and count by hour/day
                         peakTimesChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart of peak chat times will be dynamically generated here.</p>';
                         document.getElementById('peak-times-insight').textContent = `Chat volume peaks on Tuesdays, 10 AM - 12 PM. Consider adjusting staffing during these hours for optimal response times.`;
 
                     } else {
-                        // Apply upgrade overlays and blur effects for non-Elite/Executive tiers
                         topTopicsUpgradeOverlay.classList.remove('hidden');
                         sentimentUpgradeOverlay.classList.remove('hidden');
                         resolutionTimeUpgradeOverlay.classList.remove('hidden');
@@ -619,10 +650,6 @@
             }
         }
 
-        // The modal and its related JS are kept here, as they are part of your existing setup
-        // but no longer triggered from the main analytics dashboard.
-        // If they are not used elsewhere, they can be removed entirely.
-        // Removed `feedbackBtn` and `updateInfoBtn` declarations as they are no longer in HTML
         const updateInfoModal = document.getElementById('update-info-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const businessInfoForm = document.getElementById('business-info-form');
