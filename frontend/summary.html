@@ -41,47 +41,44 @@
     .message-box.error { background-color: #EF4444; /* red-500 */ }
     .message-box.success { background-color: #22C55E; /* green-500 */ }
 
-    /* REFINED INSIGHT BUBBLE STYLE */
+    /* REFINED INSIGHT BUBBLE STYLE - Smaller and No Icon */
     .insight-bubble {
-        display: flex;
-        flex-direction: column; /* Stack icon and text vertically */
-        align-items: center;    /* Center content horizontally */
-        justify-content: center; /* Center content vertically if space allows */
+        display: inline-flex; /* Use inline-flex to make it size to content and align horizontally */
+        align-items: center;    /* Center content vertically */
+        justify-content: center; /* Center content horizontally */
         text-align: center;     /* Center text */
-        padding: 1.25rem 1.5rem; /* More padding for a 'bubble' feel */
-        border-radius: 9999px; /* Make it perfectly round / pill-shaped */
+        padding: 0.75rem 1.25rem; /* Smaller padding */
+        border-radius: 9999px; /* Still perfectly round / pill-shaped */
         background-color: #6B46C1; /* A nice purple (tailwind: violet-700 approx) */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(255, 255, 255, 0.1); /* Deeper shadow and subtle inner glow */
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 0 3px rgba(255, 255, 255, 0.05); /* Lighter shadow */
         color: #E2E8F0; /* Light gray text for contrast */
         border: 1px solid #7C3AED; /* Slightly lighter purple border */
-        min-height: 100px; /* Ensure a minimum height for the bubble shape */
-        min-width: 150px; /* Ensure a minimum width for the bubble shape */
-        max-width: 100%; /* Ensure it doesn't overflow its parent */
-        margin: 0 auto; /* Center the bubble itself */
+        height: auto; /* Allow height to adjust to content */
+        max-width: fit-content; /* Make it fit content width */
+        margin: 0 auto; /* Center the bubble itself if parent allows */
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        font-size: 0.9rem; /* Slightly smaller text for concise look */
+        line-height: 1.3;
+        font-weight: 500;
     }
 
     .insight-bubble:hover {
-        transform: translateY(-2px); /* Slight lift on hover */
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.15);
-    }
-
-    .insight-bubble-icon {
-        color: #C3DAFE; /* Even lighter blue for the icon */
-        margin-bottom: 0.75rem; /* Space between icon and text */
-        width: 1.75rem; /* Larger icon */
-        height: 1.75rem; /* Larger icon */
+        transform: translateY(-1px); /* Subtle lift on hover */
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3), inset 0 0 4px rgba(255, 255, 255, 0.08);
     }
 
     .insight-bubble-text {
-        font-size: 1rem; /* Clearer text size */
-        line-height: 1.5;
-        font-weight: 500; /* Slightly bolder text */
+        /* No longer needs flex-grow as it's the only direct child for text */
+        /* font-size and line-height are now on .insight-bubble */
     }
 
     /* Adjust the default padding for cards to allow space for the bubble at the bottom */
     .card-with-bubble-padding {
-        padding-bottom: 2rem; /* Give some extra room if the bubble overflows slightly */
+        /* Keep this if cards need extra room, or remove if the smaller bubbles fit fine */
+        padding-bottom: 1rem; /* Reduced padding if bubbles are smaller */
+        display: flex; /* Make card a flex container */
+        flex-direction: column; /* Stack contents vertically */
+        justify-content: space-between; /* Push content to top, bubble to bottom */
     }
 
     </style>
@@ -112,178 +109,149 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
                     <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Current Monthly Usage</h2>
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="text-gray-300 text-lg">Messages Used:</p>
-                            <p class="text-white text-3xl font-bold" id="total-messages-used">0 / 0</p>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2.5 mt-2">
-                            <div id="usage-progress-bar" class="h-2.5 rounded-full" style="width: 0%;"></div>
-                        </div>
-                        <p class="text-gray-400 text-sm mt-2 text-right">Usage against your <span class="font-bold" id="current-tier-display">N/A</span> tier limit.</p>
-                        <p id="limit-reached-message" class="text-red-400 text-sm mt-2 text-center font-bold hidden">You have reached your monthly message limit!</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Current Monthly Usage</h2>
+                            <div class="flex items-center justify-between mb-2">
+                                <p class="text-gray-300 text-lg">Messages Used:</p>
+                                <p class="text-white text-3xl font-bold" id="total-messages-used">0 / 0</p>
                             </div>
-                            <div class="insight-bubble-text">
+                            <div class="w-full bg-gray-700 rounded-full h-2.5 mt-2">
+                                <div id="usage-progress-bar" class="h-2.5 rounded-full" style="width: 0%;"></div>
+                            </div>
+                            <p class="text-gray-400 text-sm mt-2 text-right">Usage against your <span class="font-bold" id="current-tier-display">N/A</span> tier limit.</p>
+                            <p id="limit-reached-message" class="text-red-400 text-sm mt-2 text-center font-bold hidden">You have reached your monthly message limit!</p>
+                        </div>
+                        <div class="mt-auto pt-4 flex justify-center"> <div class="insight-bubble">
                                 <p id="current-usage-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Monthly Usage Trend (Last 6 Months)</h2>
-                        <div class="h-60">
-                            <canvas id="monthlyUsageTrendChart"></canvas>
-                        </div>
-                        <p class="text-gray-400 text-sm mt-2">See your message usage patterns over time.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Monthly Usage Trend (Last 6 Months)</h2>
+                            <div class="h-60">
+                                <canvas id="monthlyUsageTrendChart"></canvas>
                             </div>
-                            <div class="insight-bubble-text">
+                            <p class="text-gray-400 text-sm mt-2">See your message usage patterns over time.</p>
+                        </div>
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="monthly-trend-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage (Current Month)</h2>
-                        <div id="daily-usage-chart-wrapper">
-                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="daily-usage-upgrade-overlay">
-                                <div class="text-center">
-                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                    <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
-                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage (Current Month)</h2>
+                            <div id="daily-usage-chart-wrapper">
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="daily-usage-upgrade-overlay">
+                                    <div class="text-center">
+                                        <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                        <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
+                                        <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                    </div>
+                                </div>
+                                <div class="h-60 opacity-100" id="daily-usage-chart-area">
+                                    <canvas id="dailyUsageChart"></canvas>
+                                    <canvas id="dailyUsageChartDummy" class="hidden"></canvas>
                                 </div>
                             </div>
-                            <div class="h-60 opacity-100" id="daily-usage-chart-area">
-                                <canvas id="dailyUsageChart"></canvas>
-                                <canvas id="dailyUsageChartDummy" class="hidden"></canvas>
-                            </div>
+                            <p class="text-gray-400 text-sm mt-2">Detailed view of your daily message activity.</p>
                         </div>
-                        <p class="text-gray-400 text-sm mt-2">Detailed view of your daily message activity.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
-                            </div>
-                            <div class="insight-bubble-text">
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="daily-usage-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Top User Questions/Topics</h2>
-                        <div id="top-topics-content" class="h-60 flex items-center justify-center">
-                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="top-topics-upgrade-overlay">
-                                <div class="text-center">
-                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                    <p class="text-gray-300 text-sm">Unlock insights into customer questions and topics.</p>
-                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Top User Questions/Topics</h2>
+                            <div id="top-topics-content" class="h-60 flex items-center justify-center">
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="top-topics-upgrade-overlay">
+                                    <div class="text-center">
+                                        <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                        <p class="text-gray-300 text-sm">Unlock insights into customer questions and topics.</p>
+                                        <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                    </div>
                                 </div>
+                                <div class="opacity-100 h-full w-full flex items-center justify-center" id="top-topics-chart-area">
+                                    <p class="text-gray-400">Chart or list of top topics will appear here.</p>
+                                    </div>
                             </div>
-                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="top-topics-chart-area">
-                                <p class="text-gray-400">Chart or list of top topics will appear here.</p>
-                                </div>
+                            <p class="text-gray-400 text-sm mt-2">Identify common themes in customer queries.</p>
                         </div>
-                        <p class="text-gray-400 text-sm mt-2">Identify common themes in customer queries.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
-                            </div>
-                            <div class="insight-bubble-text">
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="top-topics-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Chat Sentiment Analysis</h2>
-                        <div id="sentiment-content" class="h-60 flex items-center justify-center">
-                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="sentiment-upgrade-overlay">
-                                <div class="text-center">
-                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                    <p class="text-gray-300 text-sm">Unlock insights into customer sentiment.</p>
-                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Chat Sentiment Analysis</h2>
+                            <div id="sentiment-content" class="h-60 flex items-center justify-center">
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="sentiment-upgrade-overlay">
+                                    <div class="text-center">
+                                        <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                        <p class="text-gray-300 text-sm">Unlock insights into customer sentiment.</p>
+                                        <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                    </div>
                                 </div>
+                                <div class="opacity-100 h-full w-full flex items-center justify-center" id="sentiment-chart-area">
+                                    <p class="text-gray-400">Chart showing sentiment distribution will appear here.</p>
+                                    </div>
                             </div>
-                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="sentiment-chart-area">
-                                <p class="text-gray-400">Chart showing sentiment distribution will appear here.</p>
-                                </div>
+                            <p class="text-gray-400 text-sm mt-2">Understand the emotional tone of your customer interactions.</p>
                         </div>
-                        <p class="text-gray-400 text-sm mt-2">Understand the emotional tone of your customer interactions.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
-                            </div>
-                            <div class="insight-bubble-text">
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="sentiment-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Average Chat Resolution Time</h2>
-                        <div id="resolution-time-content" class="h-60 flex items-center justify-center">
-                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="resolution-time-upgrade-overlay">
-                                <div class="text-center">
-                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                    <p class="text-gray-300 text-sm">Unlock average resolution time metrics.</p>
-                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Average Chat Resolution Time</h2>
+                            <div id="resolution-time-content" class="h-60 flex items-center justify-center">
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="resolution-time-upgrade-overlay">
+                                    <div class="text-center">
+                                        <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                        <p class="text-gray-300 text-sm">Unlock average resolution time metrics.</p>
+                                        <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                    </div>
+                                </div>
+                                <div class="opacity-100 h-full w-full flex flex-col items-center justify-center" id="resolution-time-display-area">
+                                    <p class="text-5xl font-bold text-white mb-2" id="avg-resolution-time-value">N/A</p>
+                                    <p class="text-gray-400">minutes</p>
                                 </div>
                             </div>
-                            <div class="opacity-100 h-full w-full flex flex-col items-center justify-center" id="resolution-time-display-area">
-                                <p class="text-5xl font-bold text-white mb-2" id="avg-resolution-time-value">N/A</p>
-                                <p class="text-gray-400">minutes</p>
-                            </div>
+                            <p class="text-gray-400 text-sm mt-2">Gauge the efficiency of your AI's support.</p>
                         </div>
-                        <p class="text-gray-400 text-sm mt-2">Gauge the efficiency of your AI's support.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
-                            </div>
-                            <div class="insight-bubble-text">
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="resolution-time-insight"></p>
                             </div>
                         </div>
                     </div>
 
                     <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl card-with-bubble-padding">
-                        <h2 class="text-xl font-semibold text-white mb-4">Peak Chat Activity Times</h2>
-                        <div id="peak-times-content" class="h-60 flex items-center justify-center">
-                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="peak-times-upgrade-overlay">
-                                <div class="text-center">
-                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                    <p class="text-gray-300 text-sm">Unlock insights into your busiest chat periods.</p>
-                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
-                                </div>
-                            </div >
-                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="peak-times-chart-area">
-                                <p class="text-gray-400">Chart showing peak activity times will appear here.</p>
-                                </div>
-                        </div>
-                        <p class="text-gray-400 text-sm mt-2">Identify optimal staffing or content update times.</p>
-                        <div class="insight-bubble mt-8">
-                            <div class="insight-bubble-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-full h-full">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
-                                </svg>
+                        <div> <h2 class="text-xl font-semibold text-white mb-4">Peak Chat Activity Times</h2>
+                            <div id="peak-times-content" class="h-60 flex items-center justify-center">
+                                <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="peak-times-upgrade-overlay">
+                                    <div class="text-center">
+                                        <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                        <p class="text-gray-300 text-sm">Unlock insights into your busiest chat periods.</p>
+                                        <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                    </div>
+                                </div >
+                                <div class="opacity-100 h-full w-full flex items-center justify-center" id="peak-times-chart-area">
+                                    <p class="text-gray-400">Chart showing peak activity times will appear here.</p>
+                                    </div>
                             </div>
-                            <div class="insight-bubble-text">
+                            <p class="text-gray-400 text-sm mt-2">Identify optimal staffing or content update times.</p>
+                        </div>
+                        <div class="mt-auto pt-4 flex justify-center">
+                            <div class="insight-bubble">
                                 <p id="peak-times-insight"></p>
                             </div>
                         </div>
@@ -439,7 +407,7 @@
                         document.getElementById('limit-reached-message').classList.add('hidden');
                     }
                     // Update current usage insight
-                    document.getElementById('current-usage-insight').textContent = `You've used ${percentageUsed.toFixed(0)}% of your monthly messages. Keep up the great engagement!`;
+                    document.getElementById('current-usage-insight').textContent = `You've used ${percentageUsed.toFixed(0)}% of your monthly messages. Great engagement!`;
 
 
                     // Monthly Usage Trend Chart
@@ -480,7 +448,7 @@
                             }
                         }
                     });
-                    document.getElementById('monthly-trend-insight').textContent = `Your message usage has shown a consistent upward trend over the last few months, indicating growing customer interaction!`;
+                    document.getElementById('monthly-trend-insight').textContent = `Your message usage shows consistent growth.`;
 
 
                     // Handle Daily Message Usage Chart
@@ -531,7 +499,7 @@
                                 }
                             }
                         });
-                        document.getElementById('daily-usage-insight').textContent = `Your daily usage shows consistent activity with a recent peak.`;
+                        document.getElementById('daily-usage-insight').textContent = `Daily usage is consistent with recent peaks.`;
                     } else {
                         dailyUsageUpgradeOverlay.classList.remove('hidden');
                         dailyUsageChartArea.style.opacity = '0.2';
@@ -575,7 +543,7 @@
                                 }
                             });
                         }
-                        document.getElementById('daily-usage-insight').textContent = `Upgrade to Elite or Executive for detailed daily usage insights!`;
+                        document.getElementById('daily-usage-insight').textContent = `Upgrade for detailed daily usage insights!`;
                     }
 
                     // Handle all advanced chat analytics (Top Topics, Sentiment, Resolution Time, Peak Times)
@@ -603,19 +571,19 @@
                         peakTimesChartArea.style.opacity = '1';
 
                         topTopicsChartArea.innerHTML = '<p class="text-gray-400 text-center">Graph of top topics will be dynamically generated here based on chat logs.</p>';
-                        document.getElementById('top-topics-insight').textContent = `Customers frequently ask about 'shipping' and 'returns'. Consider adding a prominent FAQ section for these topics.`;
+                        document.getElementById('top-topics-insight').textContent = `Customers often ask about 'shipping' and 'returns'.`;
 
 
                         sentimentChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart showing sentiment (positive, neutral, negative) will be dynamically generated here.</p>';
-                        document.getElementById('sentiment-insight').textContent = `95% of customer interactions show positive or neutral sentiment, indicating high satisfaction!`;
+                        document.getElementById('sentiment-insight').textContent = `95% of customer interactions are positive/neutral.`;
 
 
                         avgResolutionTimeValue.textContent = '2.5'; // Example value
-                        document.getElementById('resolution-time-insight').textContent = `Your average chat resolution time is 2.5 minutes, ensuring quick and efficient support.`;
+                        document.getElementById('resolution-time-insight').textContent = `Avg. chat resolution time is 2.5 minutes.`;
 
 
                         peakTimesChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart of peak chat times will be dynamically generated here.</p>';
-                        document.getElementById('peak-times-insight').textContent = `Chat volume peaks on Tuesdays, 10 AM - 12 PM. Consider adjusting staffing during these hours for optimal response times.`;
+                        document.getElementById('peak-times-insight').textContent = `Peak chat volume on Tuesdays, 10 AM - 12 PM.`;
 
                     } else {
                         topTopicsUpgradeOverlay.classList.remove('hidden');
@@ -628,10 +596,10 @@
                         resolutionTimeDisplayArea.style.opacity = '0.2';
                         peakTimesChartArea.style.opacity = '0.2';
 
-                        document.getElementById('top-topics-insight').textContent = `Upgrade to Elite or Executive for top user questions!`;
-                        document.getElementById('sentiment-insight').textContent = `Upgrade to Elite or Executive for sentiment analysis!`;
-                        document.getElementById('resolution-time-insight').textContent = `Upgrade to Elite or Executive for chat resolution insights!`;
-                        document.getElementById('peak-times-insight').textContent = `Upgrade to Elite or Executive for peak activity insights!`;
+                        document.getElementById('top-topics-insight').textContent = `Upgrade for top user questions!`;
+                        document.getElementById('sentiment-insight').textContent = `Upgrade for sentiment analysis!`;
+                        document.getElementById('resolution-time-insight').textContent = `Upgrade for chat resolution insights!`;
+                        document.getElementById('peak-times-insight').textContent = `Upgrade for peak activity insights!`;
                     }
                     
                     loadingMessage.classList.add('hidden'); // Hide loading message
