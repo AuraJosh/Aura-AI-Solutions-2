@@ -78,8 +78,15 @@
                         </div>
                         <p class="text-gray-400 text-sm mt-2 text-right">Usage against your <span class="font-bold" id="current-tier-display">N/A</span> tier limit.</p>
                         <p id="limit-reached-message" class="text-red-400 text-sm mt-2 text-center font-bold hidden">You have reached your monthly message limit!</p>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="current-usage-insight">**Insight:** You've used X% of your messages, on track for the month.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="current-usage-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -89,8 +96,15 @@
                             <canvas id="monthlyUsageTrendChart"></canvas>
                         </div>
                         <p class="text-gray-400 text-sm mt-2">See your message usage patterns over time.</p>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="monthly-trend-insight">**Insight:** Your monthly usage has been steady, indicating consistent engagement.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="monthly-trend-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -110,8 +124,15 @@
                             </div>
                         </div>
                         <p class="text-gray-400 text-sm mt-2">Detailed view of your daily message activity.</p>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="daily-usage-insight">**Insight:** Usage spiked on [Date], possibly due to a new campaign.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="daily-usage-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -129,8 +150,15 @@
                                 <p class="text-gray-400">Chart or list of top topics will appear here.</p>
                                 </div>
                         </div>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="top-topics-insight">**Insight:** Customers frequently inquire about 'pricing' and 'delivery options'.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="top-topics-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -148,8 +176,15 @@
                                 <p class="text-gray-400">Chart showing sentiment distribution will appear here.</p>
                                 </div>
                         </div>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="sentiment-insight">**Insight:** 92% of your chats have a positive or neutral sentiment.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="sentiment-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -168,8 +203,15 @@
                                 <p class="text-gray-400">minutes</p>
                             </div>
                         </div>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="resolution-time-insight">**Insight:** Your average resolution time is quick, ensuring efficient support.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="resolution-time-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -187,8 +229,15 @@
                                 <p class="text-gray-400">Chart showing peak activity times will appear here.</p>
                                 </div>
                         </div>
-                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
-                            <p id="peak-times-insight">**Insight:** Chat volume peaks on Tuesdays, 10 AM - 1 PM. Consider staffing adjustments.</p>
+                        <div class="insight-box mt-6">
+                            <div class="insight-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 01.928 0m-.928 0L14.75 16.5M11.25 11.25L9.75 9.75M7.75 12a4.25 4.25 0 118.5 0 4.25 4.25 0 01-8.5 0z" />
+                                </svg>
+                            </div>
+                            <div class="insight-text">
+                                <p id="peak-times-insight"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -317,7 +366,7 @@
                 }
                 
                 if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
-                    typeof data.tier === 'string' && Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) { // Removed paymentTerm and nextPaymentDate check
+                    typeof data.tier === 'string' && Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
 
                     const totalSent = data.totalMessagesSent;
                     const monthlyLimit = data.monthlyLimit;
@@ -342,7 +391,7 @@
                         document.getElementById('limit-reached-message').classList.add('hidden');
                     }
                     // Update current usage insight
-                    document.getElementById('current-usage-insight').textContent = `**Insight:** You've used ${percentageUsed.toFixed(0)}% of your monthly messages. Keep up the great engagement!`;
+                    document.getElementById('current-usage-insight').textContent = `You've used ${percentageUsed.toFixed(0)}% of your monthly messages. Keep up the great engagement!`;
 
 
                     // Monthly Usage Trend Chart
@@ -386,7 +435,7 @@
                         }
                     });
                     // Placeholder for monthly trend insight
-                    document.getElementById('monthly-trend-insight').textContent = `**Insight:** Your message usage has shown a consistent upward trend over the last few months, indicating growing customer interaction!`;
+                    document.getElementById('monthly-trend-insight').textContent = `Your message usage has shown a consistent upward trend over the last few months, indicating growing customer interaction!`;
 
 
                     // Handle Daily Message Usage Chart
@@ -440,7 +489,7 @@
                             }
                         });
                         // Placeholder for daily usage insight (you'd generate this dynamically)
-                        document.getElementById('daily-usage-insight').textContent = `**Insight:** Your daily usage shows consistent activity with a recent peak.`; // Example
+                        document.getElementById('daily-usage-insight').textContent = `Your daily usage shows consistent activity with a recent peak.`; // Example
                     } else {
                         dailyUsageUpgradeOverlay.classList.remove('hidden');
                         dailyUsageChartArea.style.opacity = '0.2'; // Apply blur effect
@@ -486,7 +535,7 @@
                                 }
                             });
                         }
-                        document.getElementById('daily-usage-insight').textContent = `**Insight:** Upgrade to Elite or Executive for detailed daily usage insights!`;
+                        document.getElementById('daily-usage-insight').textContent = `Upgrade to Elite or Executive for detailed daily usage insights!`;
                     }
 
                     // Handle all advanced chat analytics (Top Topics, Sentiment, Resolution Time, Peak Times)
@@ -516,25 +565,25 @@
                         // Placeholder for Top User Questions/Topics Chart (e.g., Word Cloud or Bar Chart)
                         // You'd need to process chatLogsReal to extract topics and counts
                         topTopicsChartArea.innerHTML = '<p class="text-gray-400 text-center">Graph of top topics will be dynamically generated here based on chat logs.</p>';
-                        document.getElementById('top-topics-insight').textContent = `**Insight:** Customers frequently ask about 'shipping' and 'returns'.`;
+                        document.getElementById('top-topics-insight').textContent = `Customers frequently ask about 'shipping' and 'returns'. Consider adding a prominent FAQ section for these topics.`;
 
 
                         // Placeholder for Sentiment Analysis Chart
                         // You'd need to process chatLogsReal for sentiment analysis
                         sentimentChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart showing sentiment (positive, neutral, negative) will be dynamically generated here.</p>';
-                        document.getElementById('sentiment-insight').textContent = `**Insight:** 95% of customer interactions show positive or neutral sentiment, indicating high satisfaction!`;
+                        document.getElementById('sentiment-insight').textContent = `95% of customer interactions show positive or neutral sentiment, indicating high satisfaction!`;
 
 
                         // Placeholder for Average Resolution Time
                         // You'd need to calculate this from chatLogsReal (requires start/end timestamps for each chat)
                         avgResolutionTimeValue.textContent = '2.5'; // Example value
-                        document.getElementById('resolution-time-insight').textContent = `**Insight:** Your average chat resolution time is 2.5 minutes, ensuring quick and efficient support.`;
+                        document.getElementById('resolution-time-insight').textContent = `Your average chat resolution time is 2.5 minutes, ensuring quick and efficient support.`;
 
 
                         // Placeholder for Peak Chat Times/Days Chart
                         // You'd need to process chatLogsReal for timestamps and count by hour/day
                         peakTimesChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart of peak chat times will be dynamically generated here.</p>';
-                        document.getElementById('peak-times-insight').textContent = `**Insight:** Peak chat activity occurs between 10 AM and 12 PM on weekdays. Consider adjusting staffing during these hours for optimal response times.`;
+                        document.getElementById('peak-times-insight').textContent = `Chat volume peaks on Tuesdays, 10 AM - 12 PM. Consider adjusting staffing during these hours for optimal response times.`;
 
                     } else {
                         // Apply upgrade overlays and blur effects for non-Elite/Executive tiers
@@ -548,10 +597,10 @@
                         resolutionTimeDisplayArea.style.opacity = '0.2';
                         peakTimesChartArea.style.opacity = '0.2';
 
-                        document.getElementById('top-topics-insight').textContent = `**Insight:** Upgrade to Elite or Executive for top user questions!`;
-                        document.getElementById('sentiment-insight').textContent = `**Insight:** Upgrade to Elite or Executive for sentiment analysis!`;
-                        document.getElementById('resolution-time-insight').textContent = `**Insight:** Upgrade to Elite or Executive for chat resolution insights!`;
-                        document.getElementById('peak-times-insight').textContent = `**Insight:** Upgrade to Elite or Executive for peak activity insights!`;
+                        document.getElementById('top-topics-insight').textContent = `Upgrade to Elite or Executive for top user questions!`;
+                        document.getElementById('sentiment-insight').textContent = `Upgrade to Elite or Executive for sentiment analysis!`;
+                        document.getElementById('resolution-time-insight').textContent = `Upgrade to Elite or Executive for chat resolution insights!`;
+                        document.getElementById('peak-times-insight').textContent = `Upgrade to Elite or Executive for peak activity insights!`;
                     }
                     
                     loadingMessage.classList.add('hidden'); // Hide loading message
@@ -573,29 +622,12 @@
         // The modal and its related JS are kept here, as they are part of your existing setup
         // but no longer triggered from the main analytics dashboard.
         // If they are not used elsewhere, they can be removed entirely.
-        const feedbackBtn = document.getElementById('feedback-btn'); // This element is removed from HTML
-        const updateInfoBtn = document.getElementById('update-info-btn'); // This element is removed from HTML
+        // Removed `feedbackBtn` and `updateInfoBtn` declarations as they are no longer in HTML
         const updateInfoModal = document.getElementById('update-info-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const businessInfoForm = document.getElementById('business-info-form');
         const formMessage = document.getElementById('form-message');
         const updateDetailsTextArea = document.getElementById('update-details');
-
-        // Event listeners for feedback and update info are now redundant if the buttons are removed from HTML.
-        // I've left the modal logic in the JS in case it's triggered from another page or a hidden element.
-        // You can remove these blocks if the modal and forms are truly not needed at all.
-
-        if (feedbackBtn) { // This condition will now be false as feedbackBtn is removed from HTML
-            feedbackBtn.addEventListener('click', () => {
-                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
-            });
-        }
-
-        if (updateInfoBtn) { // This condition will now be false as updateInfoBtn is removed from HTML
-            updateInfoBtn.addEventListener('click', () => {
-                updateInfoModal.classList.remove('hidden');
-            });
-        }
 
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', () => {
