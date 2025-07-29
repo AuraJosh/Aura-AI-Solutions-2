@@ -1,1 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Analytics Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
+    .chat-logs-container {
+        display: flex;
+        flex-direction: column-reverse; /* Stacks items from bottom to top */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
+    }
+    .chat-log-message {
+        padding-bottom: 8px;
+    }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="container mx-auto flex items-center justify-between p-4 relative">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
+            <div class="flex items-center space-x-4">
+                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="analytics-dashboard-container" class="w-full max-w-[1600px] h-auto bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
+            <p class="text-white text-center">Loading your analytics data...</p>
+
+            <div id="dynamic-content-placeholder" class="hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+
+                    <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
+                        <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                        <div class="flex items-center justify-between">
+                            <p class="text-gray-300 text-lg">Messages Used:</p>
+                            <p class="text-white text-3xl font-bold" id="total-messages-used">0 / 0</p>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                            <div id="usage-progress-bar" class="h-2.5 rounded-full" style="width: 0%;"></div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
+                        <p id="limit-reached-message" class="text-red-400 text-sm mt-2 text-center font-bold hidden">You have reached your monthly message limit!</p>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
+                        <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <p class="text-gray-300">Current Tier:</p>
+                                <p class="text-white font-medium" id="current-tier">N/A</p>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <p class="text-gray-300">Payment Term:</p>
+                                <p class="text-white font-medium" id="payment-term">N/A</p>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <p class="text-gray-300">Next Payment Date:</p>
+                                <p class="text-white font-medium" id="next-payment-date">N/A</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-3">
+                        <hr class="my-6 border-gray-700">
+                        <h2 class="text-2xl font-semibold text-white mb-6">Key Insights & Trends</h2>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Monthly Usage Trend (Last 6 Months)</h2>
+                        <div class="h-60">
+                            <canvas id="monthlyUsageTrendChart"></canvas>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">See your message usage patterns over time.</p>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="monthly-trend-insight">**Insight:** Your monthly usage has been steady, indicating consistent engagement.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage (Current Month)</h2>
+                        <div id="daily-usage-chart-wrapper">
+                            <div class="h-60">
+                                <canvas id="dailyUsageChart"></canvas>
+                                <canvas id="dailyUsageChartDummy" class="hidden"></canvas>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-2">Detailed view of your daily message activity.</p>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="daily-usage-insight">**Insight:** Usage spiked on [Date], possibly due to a new campaign.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Top User Questions/Topics</h2>
+                        <div id="top-topics-content" class="h-60 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="top-topics-upgrade-overlay">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock insights into customer questions and topics.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div>
+                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="top-topics-chart-area">
+                                <p class="text-gray-400">Chart or list of top topics will appear here.</p>
+                                </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="top-topics-insight">**Insight:** Customers frequently inquire about 'pricing' and 'delivery options'.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Chat Sentiment Analysis</h2>
+                        <div id="sentiment-content" class="h-60 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="sentiment-upgrade-overlay">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock insights into customer sentiment.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div>
+                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="sentiment-chart-area">
+                                <p class="text-gray-400">Chart showing sentiment distribution will appear here.</p>
+                                </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="sentiment-insight">**Insight:** 92% of your chats have a positive or neutral sentiment.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Average Chat Resolution Time</h2>
+                        <div id="resolution-time-content" class="h-60 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="resolution-time-upgrade-overlay">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock average resolution time metrics.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div>
+                            <div class="opacity-100 h-full w-full flex flex-col items-center justify-center" id="resolution-time-display-area">
+                                <p class="text-5xl font-bold text-white mb-2" id="avg-resolution-time-value">N/A</p>
+                                <p class="text-gray-400">minutes</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="resolution-time-insight">**Insight:** Your average resolution time is quick, ensuring efficient support.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Peak Chat Activity Times</h2>
+                        <div id="peak-times-content" class="h-60 flex items-center justify-center">
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="peak-times-upgrade-overlay">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock insights into your busiest chat periods.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div >
+                            <div class="opacity-100 h-full w-full flex items-center justify-center" id="peak-times-chart-area">
+                                <p class="text-gray-400">Chart showing peak activity times will appear here.</p>
+                                </div>
+                        </div>
+                        <div class="mt-4 p-3 bg-gray-700 rounded text-sm text-gray-300">
+                            <p id="peak-times-insight">**Insight:** Chat volume peaks on Tuesdays, 10 AM - 1 PM. Consider staffing adjustments.</p>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-3 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                        <h2 class="text-xl font-semibold text-white mb-4">Raw Chat Logs</h2>
+                        <div id="chat-logs-wrapper">
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10 hidden" id="chat-logs-upgrade-overlay">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock access to your full chat logs.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div>
+                            <div id="chat-logs-display" class="text-gray-300 chat-logs-container opacity-100">
+                                <p class="text-gray-400 text-center">Chat log messages will load here.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                        <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
+                        <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
+                        <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
+                            <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                Cancel Subscription
+                            </button>
+                        </a>
+                        <p class="text-gray-500 text-xs mt-2">Cancel your subscription through Stripe; we are sad to see you go.</p>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                        <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
+                        <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
+                        <a href="form.html" id="feedback-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                            Provide Feedback
+                        </a>
+                        <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
+                    </div>
+
+                    <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                        <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
+                        <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
+                        <a href="update.html" class="inline-block">
+                            <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                Request Update
+                            </button>
+                        </a>
+                        <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <form id="business-info-form">
+                <div class="mb-4">
+                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
+                        Please describe the changes you would like to make to your AI's business information:
+                    </label>
+                    <textarea id="update-details" name="updateDetails" rows="8"
+                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        Send Update Request
+                    </button>
+                    <p id="form-message" class="text-sm text-gray-400"></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
+        </video>
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+
+        // IMPORTANT: Replace with your actual Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
+
+        let authInitialized = false; // Flag to ensure data loading happens only once
+
+        // --- Custom Message Function (replaces alert) ---
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `message-box ${type}`;
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Remove after 3 seconds
+        }
+
+        // --- Protect this page and load data ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!authInitialized) { // This block runs only once when auth state is first determined
+                authInitialized = true; // Mark as initialized
+
+                if (user) {
+                    // User is logged in, proceed with page-specific data loading
+                    const userIdentifier = user.uid;
+                    console.log("User is logged in on analytics page:", userIdentifier);
+                    await loadCustomerData(userIdentifier);
+                } else {
+                    // User is NOT logged in, redirect to login
+                    console.log("User is not logged in. Redirecting to login.");
+                    window.location.href = "login.html";
+                }
+            }
+        });
+
+        // --- Logout button ---
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out. Redirecting to login.html");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout failed:", err.message);
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
+
+        // Function to fetch data from the Google Apps Script
+        async function loadCustomerData(userIdentifier) {
+            const analyticsDashboardContainer = document.getElementById('analytics-dashboard-container');
+            const loadingMessage = analyticsDashboardContainer.querySelector('p');
+            const dynamicContentPlaceholder = document.getElementById('dynamic-content-placeholder');
+
+            loadingMessage.classList.remove('hidden'); // Ensure loading message is visible initially
+            dynamicContentPlaceholder.classList.add('hidden'); // Hide content until loaded
+
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    loadingMessage.style.color = 'red';
+                    loadingMessage.textContent = `Error: ${data.error}`;
+                    return;
+                }
+                
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
+                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
+                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
+
+                    const totalSent = data.totalMessagesSent;
+                    const monthlyLimit = data.monthlyLimit;
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+
+                    const tier = data.tier;
+                    const paymentTerm = data.paymentTerm;
+                    const dailyUsageDataReal = data.dailyUsageData;
+                    const chatLogsReal = data.chatLogs;
+
+                    let formattedNextPaymentDate = 'N/A';
+                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
+                        const dateObj = new Date(data.nextPaymentDate);
+                        if (!isNaN(dateObj.getTime())) {
+                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit'
+                            });
+                        }
+                    }
+                    
+                    const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
+
+                    // Populate existing elements
+                    document.getElementById('total-messages-used').textContent = `${totalSent} / ${monthlyLimit}`;
+                    const progressBar = document.getElementById('usage-progress-bar');
+                    progressBar.style.width = `${percentageUsed}%`;
+                    progressBar.className = `${progressBarColor} h-2.5 rounded-full`;
+                    if (totalSent >= monthlyLimit) {
+                        document.getElementById('limit-reached-message').classList.remove('hidden');
+                    } else {
+                        document.getElementById('limit-reached-message').classList.add('hidden');
+                    }
+                    document.getElementById('current-tier').textContent = tier;
+                    document.getElementById('payment-term').textContent = paymentTerm;
+                    document.getElementById('next-payment-date').textContent = formattedNextPaymentDate;
+
+                    // Handle Daily Message Usage Chart
+                    const dailyUsageChartCtx = document.getElementById('dailyUsageChart');
+                    const dailyUsageChartDummyCtx = document.getElementById('dailyUsageChartDummy');
+                    const dailyUsageChartWrapper = document.getElementById('daily-usage-chart-wrapper');
+
+                    if (hasEliteOrExecutiveAccess) {
+                        dailyUsageChartCtx.classList.remove('hidden');
+                        dailyUsageChartDummyCtx.classList.add('hidden'); // Hide dummy chart
+                        dailyUsageChartWrapper.querySelector('#daily-usage-chart-wrapper > div.absolute')?.classList.add('hidden'); // Hide overlay if present
+
+                        new Chart(dailyUsageChartCtx, {
+                            type: 'line',
+                            data: {
+                                labels: dailyUsageDataReal.map(item => item.date),
+                                datasets: [{
+                                    label: 'Messages Sent',
+                                    data: dailyUsageDataReal.map(item => item.count),
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    fill: true,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255,255,255,0.1)' }
+                                    },
+                                    x: {
+                                        ticks: { color: 'white' },
+                                        grid: { color: 'rgba(255,255,255,0.1)' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: { color: 'white' }
+                                    }
+                                }
+                            }
+                        });
+                        // Placeholder for daily usage insight (you'd generate this dynamically)
+                        document.getElementById('daily-usage-insight').textContent = `**Insight:** Your daily usage shows consistent activity with a peak on ${dailyUsageDataReal[dailyUsageDataReal.length -1].date}.`; // Example
+                    } else {
+                        dailyUsageChartCtx.classList.add('hidden');
+                        dailyUsageChartDummyCtx.classList.remove('hidden'); // Show dummy chart
+                        // Add an overlay for upgrade prompt
+                        dailyUsageChartWrapper.innerHTML = `
+                            <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                <div class="text-center">
+                                    <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                    <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
+                                    <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                </div>
+                            </div>
+                            <div class="h-60 opacity-20">
+                                <canvas id="dailyUsageChartDummy"></canvas>
+                            </div>
+                        `;
+                        // Initialize dummy chart for visual effect
+                        new Chart(document.getElementById('dailyUsageChartDummy'), {
+                            type: 'line',
+                            data: {
+                                labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+                                datasets: [{
+                                    label: 'Messages Sent',
+                                    data: [10, 15, 8, 20, 12, 25, 18],
+                                    borderColor: 'rgba(75, 192, 192, 0.3)',
+                                    tension: 0.1,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.05)',
+                                    fill: true,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { color: 'rgba(255,255,255,0.3)' },
+                                        grid: { color: 'rgba(255,255,255,0.05)' }
+                                    },
+                                    x: {
+                                        ticks: { color: 'rgba(255,255,255,0.3)' },
+                                        grid: { color: 'rgba(255,255,255,0.05)' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: { color: 'rgba(255,255,255,0.3)' }
+                                    }
+                                }
+                            }
+                        });
+                        document.getElementById('daily-usage-insight').textContent = `**Insight:** Upgrade to Elite or Executive for detailed daily usage insights!`;
+                    }
+
+                    // Monthly Usage Trend Chart (New)
+                    const monthlyUsageTrendCtx = document.getElementById('monthlyUsageTrendChart');
+                    // You'll need to pass 'monthlyUsageTrendData' from your Apps Script.
+                    // For now, let's use some dummy data for demonstration.
+                    const dummyMonthlyTrendLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                    const dummyMonthlyTrendData = [1200, 1350, 1100, 1500, 1650, totalSent]; // Last month is current totalSent
+                    new Chart(monthlyUsageTrendCtx, {
+                        type: 'line',
+                        data: {
+                            labels: dummyMonthlyTrendLabels, // Replace with actual monthly labels
+                            datasets: [{
+                                label: 'Monthly Messages',
+                                data: dummyMonthlyTrendData, // Replace with actual monthly data
+                                borderColor: 'rgb(255, 99, 132)',
+                                tension: 0.1,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { color: 'white' },
+                                    grid: { color: 'rgba(255,255,255,0.1)' }
+                                },
+                                x: {
+                                    ticks: { color: 'white' },
+                                    grid: { color: 'rgba(255,255,255,0.1)' }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: { color: 'white' }
+                                }
+                            }
+                        }
+                    });
+                    // Placeholder for monthly trend insight
+                    document.getElementById('monthly-trend-insight').textContent = `**Insight:** Your message usage has grown consistently over the last 3 months.`;
+
+
+                    // Handle Chat Logs (Raw logs, Top Topics, Sentiment, Resolution Time, Peak Times)
+                    const chatLogsDisplay = document.getElementById('chat-logs-display');
+                    const chatLogsUpgradeOverlay = document.getElementById('chat-logs-upgrade-overlay');
+                    const topTopicsUpgradeOverlay = document.getElementById('top-topics-upgrade-overlay');
+                    const sentimentUpgradeOverlay = document.getElementById('sentiment-upgrade-overlay');
+                    const resolutionTimeUpgradeOverlay = document.getElementById('resolution-time-upgrade-overlay');
+                    const peakTimesUpgradeOverlay = document.getElementById('peak-times-upgrade-overlay');
+
+                    const topTopicsChartArea = document.getElementById('top-topics-chart-area');
+                    const sentimentChartArea = document.getElementById('sentiment-chart-area');
+                    const resolutionTimeDisplayArea = document.getElementById('resolution-time-display-area');
+                    const avgResolutionTimeValue = document.getElementById('avg-resolution-time-value');
+                    const peakTimesChartArea = document.getElementById('peak-times-chart-area');
+
+
+                    if (hasEliteOrExecutiveAccess) {
+                        chatLogsUpgradeOverlay.classList.add('hidden');
+                        topTopicsUpgradeOverlay.classList.add('hidden');
+                        sentimentUpgradeOverlay.classList.add('hidden');
+                        resolutionTimeUpgradeOverlay.classList.add('hidden');
+                        peakTimesUpgradeOverlay.classList.add('hidden');
+                        
+                        chatLogsDisplay.style.opacity = '1';
+                        topTopicsChartArea.style.opacity = '1';
+                        sentimentChartArea.style.opacity = '1';
+                        resolutionTimeDisplayArea.style.opacity = '1';
+                        peakTimesChartArea.style.opacity = '1';
+
+
+                        // Populate Raw Chat Logs
+                        if (chatLogsReal.length > 0) {
+                            let chatContentHTML = '';
+                            chatLogsReal.slice().reverse().forEach(log => {
+                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
+                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
+                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
+                            });
+                            chatLogsDisplay.innerHTML = chatContentHTML;
+                        } else {
+                            chatLogsDisplay.innerHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
+                        }
+
+                        // Placeholder for Top User Questions/Topics Chart (e.g., Word Cloud or Bar Chart)
+                        // You'd need to process chatLogsReal to extract topics and counts
+                        topTopicsChartArea.innerHTML = '<p class="text-gray-400 text-center">Graph of top topics will be dynamically generated here based on chat logs.</p>';
+                        document.getElementById('top-topics-insight').textContent = `**Insight:** Customers frequently ask about 'shipping' and 'returns'.`;
+
+
+                        // Placeholder for Sentiment Analysis Chart
+                        // You'd need to process chatLogsReal for sentiment analysis
+                        sentimentChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart showing sentiment (positive, neutral, negative) will be dynamically generated here.</p>';
+                        document.getElementById('sentiment-insight').textContent = `**Insight:** 95% of customer interactions show positive or neutral sentiment.`;
+
+
+                        // Placeholder for Average Resolution Time
+                        // You'd need to calculate this from chatLogsReal (requires start/end timestamps for each chat)
+                        avgResolutionTimeValue.textContent = '2.5'; // Example value
+                        document.getElementById('resolution-time-insight').textContent = `**Insight:** Your average chat resolution time is 2.5 minutes, ensuring quick support.`;
+
+
+                        // Placeholder for Peak Chat Times/Days Chart
+                        // You'd need to process chatLogsReal for timestamps and count by hour/day
+                        peakTimesChartArea.innerHTML = '<p class="text-gray-400 text-center">Chart of peak chat times will be dynamically generated here.</p>';
+                        document.getElementById('peak-times-insight').textContent = `**Insight:** Peak chat activity occurs between 10 AM and 12 PM on weekdays.`;
+
+                    } else {
+                        // Apply upgrade overlays and blur effects for non-Elite/Executive tiers
+                        chatLogsUpgradeOverlay.classList.remove('hidden');
+                        topTopicsUpgradeOverlay.classList.remove('hidden');
+                        sentimentUpgradeOverlay.classList.remove('hidden');
+                        resolutionTimeUpgradeOverlay.classList.remove('hidden');
+                        peakTimesUpgradeOverlay.classList.remove('hidden');
+
+                        chatLogsDisplay.style.opacity = '0.2';
+                        topTopicsChartArea.style.opacity = '0.2';
+                        sentimentChartArea.style.opacity = '0.2';
+                        resolutionTimeDisplayArea.style.opacity = '0.2';
+                        peakTimesChartArea.style.opacity = '0.2';
+
+                        // Dummy content for non-elite tiers for chat logs
+                        chatLogsDisplay.innerHTML = `
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        `;
+
+                        document.getElementById('top-topics-insight').textContent = `**Insight:** Upgrade to Elite or Executive for top user questions!`;
+                        document.getElementById('sentiment-insight').textContent = `**Insight:** Upgrade to Elite or Executive for sentiment analysis!`;
+                        document.getElementById('resolution-time-insight').textContent = `**Insight:** Upgrade to Elite or Executive for chat resolution insights!`;
+                        document.getElementById('peak-times-insight').textContent = `**Insight:** Upgrade to Elite or Executive for peak activity insights!`;
+                    }
+                    
+                    loadingMessage.classList.add('hidden'); // Hide loading message
+                    dynamicContentPlaceholder.classList.remove('hidden'); // Show content
+
+                } else {
+                    loadingMessage.style.color = 'red';
+                    loadingMessage.textContent = 'Unexpected data format received from analytics server. Please try again later.';
+                    console.error("Received unexpected data format:", data);
+                }
+
+            } catch (error) {
+                console.error('Error fetching or parsing data:', error);
+                loadingMessage.style.color = 'red';
+                loadingMessage.textContent = 'Failed to load data. Please try again later.';
+            }
+        }
+
+        const feedbackBtn = document.getElementById('feedback-btn');
+        const updateInfoBtn = document.getElementById('update-info-btn');
+        const updateInfoModal = document.getElementById('update-info-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const businessInfoForm = document.getElementById('business-info-form');
+        const formMessage = document.getElementById('form-message');
+        const updateDetailsTextArea = document.getElementById('update-details');
+
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', () => {
+                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
+            });
+        }
+
+        if (updateInfoBtn) {
+            updateInfoBtn.addEventListener('click', () => {
+                updateInfoModal.classList.remove('hidden');
+            });
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                updateInfoModal.classList.add('hidden');
+                formMessage.textContent = '';
+                businessInfoForm.reset();
+            });
+        }
+
+        if (updateInfoModal) {
+            updateInfoModal.addEventListener('click', (event) => {
+                if (event.target === updateInfoModal) {
+                    updateInfoModal.classList.add('hidden');
+                    formMessage.textContent = '';
+                    businessInfoForm.reset();
+                }
+            });
+        }
+
+        if (businessInfoForm) {
+            businessInfoForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                formMessage.textContent = 'Sending request...';
+                formMessage.className = 'text-sm text-gray-400';
+
+                const requestedChanges = updateDetailsTextArea.value;
+
+                const currentUser = auth.currentUser;
+                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
+
+                if (!requestedChanges.trim()) {
+                    formMessage.textContent = 'Please describe the changes.';
+                    formMessage.className = 'text-sm text-red-400';
+                    return;
+                }
+
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'sendBusinessInfoUpdate',
+                            userId: submitterUserId,
+                            changes: requestedChanges
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
+                        formMessage.className = 'text-sm text-green-400';
+                        businessInfoForm.reset();
+                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
+                    } else {
+                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
+                        formMessage.className = 'text-sm text-red-400';
+                    }
+                } catch (error) {
+                    console.error('Error submitting business info update:', error);
+                    formMessage.textContent = 'Failed to send request. Please try again later.';
+                    formMessage.className = 'text-sm text-red-400';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
