@@ -103,6 +103,10 @@
         background-color: #1D4ED8; /* blue-700 */
         border: 2px solid #3B82F6; /* blue-500 */
     }
+    .day-cell-month-selected {
+        background-color: #1D4ED8; /* blue-700 */
+        border: 2px solid #3B82F6 !important; /* blue-500 */
+    }
 
     /* Event display styles */
     .calendar-event {
@@ -118,7 +122,7 @@
         cursor: pointer;
     }
     .calendar-event.pending {
-        background-color: #F59E0B; /* amber-500 for pending events */
+        background-color: #F59E0B; /* amber-500 for pending events (if you decide to display them) */
     }
     </style>
 </head>
@@ -269,7 +273,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        // We'll also need 'addDoc' to create new documents in the scheduled_meetings collection
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue, Timestamp, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -288,12 +293,13 @@
         let bookingsData = []; // 'New' bookings
         let pendingBookings = [];
         let deletedBookings = [];
-        let stagedChanges = [];
+        let stagedChanges = []; // For original 'bookings' collection changes
+        let stagedScheduledMeetings = []; // NEW: For 'scheduled_meetings' collection creations
         let currentBookingIndex = 0;
         let bookingFieldsConfig = [];
         let currentUserUid = null;
         let currentAccountId = null;
-        let authInitialized = false; // Flag to track if auth state is resolved
+        let authInitialized = false;
 
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
@@ -317,15 +323,14 @@
         const calendarPrev = document.getElementById('calendar-prev');
         const calendarNext = document.getElementById('calendar-next');
         const calendarToday = document.getElementById('calendar-today');
-        const calendarViewSelect = document.getElementById('calendar-view'); // Renamed to avoid conflict
+        const calendarViewSelect = document.getElementById('calendar-view');
         const calendarClose = document.getElementById('calendar-close');
         const confirmScheduleBtn = document.getElementById('confirm-schedule-btn');
 
-
         let currentDate = new Date();
-        let currentView = 'month'; // Default view
-        let selectedEventDate = null; // To store the date/time chosen by the user
-        let currentBookingBeingScheduled = null; // To store the booking object when the modal is opened
+        let currentView = 'month';
+        let selectedEventDate = null;
+        let currentBookingBeingScheduled = null;
         let fetchedCalendarEvents = []; // Cache for events fetched from Firebase
 
 
@@ -341,9 +346,9 @@
         }
 
         function updateSaveButtonState() {
-            saveChangesBtn.disabled = stagedChanges.length === 0;
-            if (stagedChanges.length > 0) {
-                saveChangesBtn.textContent = `Save Changes (${stagedChanges.length})`;
+            saveChangesBtn.disabled = (stagedChanges.length + stagedScheduledMeetings.length) === 0;
+            if ((stagedChanges.length + stagedScheduledMeetings.length) > 0) {
+                saveChangesBtn.textContent = `Save Changes (${stagedChanges.length + stagedScheduledMeetings.length})`;
             } else {
                 saveChangesBtn.textContent = 'Save Changes to Database';
             }
@@ -392,7 +397,6 @@
 
         // --- CUSTOM CALENDAR LOGIC ---
 
-        // Function to fetch calendar events from Firebase
         async function fetchCalendarEvents(startDate, endDate) {
             if (!currentAccountId) {
                 console.warn("Account ID not available for fetching calendar events.");
@@ -400,47 +404,63 @@
             }
             try {
                 const events = [];
-                const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
+                // Now querying the NEW scheduled_meetings collection
+                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
                 
-                // Query for 'Completed' bookings within the date range
-                const qCompleted = query(bookingsRef,
-                    where('Status', '==', 'Completed'),
+                // Query for scheduled meetings within the date range
+                // Assumes 'ScheduledDateTime' is the field for the meeting's start time in this new collection
+                const qScheduled = query(scheduledMeetingsRef,
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
-                const querySnapshotCompleted = await getDocs(qCompleted);
-                querySnapshotCompleted.docs.forEach(doc => {
+                console.log("Querying for Scheduled Meetings from 'scheduled_meetings' collection...");
+                const querySnapshotScheduled = await getDocs(qScheduled);
+                console.log("Scheduled Meetings query snapshot size:", querySnapshotScheduled.size);
+                querySnapshotScheduled.docs.forEach(doc => {
                     const data = doc.data();
+                    console.log("Fetched Scheduled Meeting data:", data);
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Booked',
+                            title: data.Customer_Name || data.Email || 'Meeting',
                             start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed'
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + (data.DurationHours || 1) * 60 * 60 * 1000), // Use DurationHours if available, default to 1hr
+                            type: 'scheduled', // A new type for confirmed meetings
+                            originalBookingId: data.originalBookingId || null // Link back to original booking if needed
                         });
+                    } else {
+                        console.warn("Scheduled meeting missing ScheduledDateTime or invalid:", data);
                     }
                 });
 
-                // Query for 'Pending' bookings that might already have a scheduled time
-                // (if your chatbot provides a specific time that gets moved to pending)
+                // Optionally, if you still want to display pending bookings with *fixed* times on the calendar
+                // that are still in the 'bookings' collection, you can keep this part.
+                // Otherwise, remove it for a cleaner separation.
+                // I'll keep it for now as it was in the previous version, but note the separation.
+                const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
                 const qPending = query(bookingsRef,
-                    where('Status', '==', 'Pending'),
+                    where('Status', '==', 'Pending'), // Or whatever status means it has a scheduled time but isn't confirmed
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
+                console.log("Querying for Pending bookings from 'bookings' collection...");
                 const querySnapshotPending = await getDocs(qPending);
+                console.log("Pending query snapshot size:", querySnapshotPending.size);
                 querySnapshotPending.docs.forEach(doc => {
                     const data = doc.data();
+                    console.log("Fetched Pending booking data:", data);
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Pending',
+                            title: data.Customer_Name || data.Email || 'Pending Booking',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'pending'
                         });
+                    } else {
+                        console.warn("Pending booking missing ScheduledDateTime or invalid:", data);
                     }
                 });
                 
+                console.log("Total events fetched for calendar:", events);
                 return events;
             } catch (error) {
                 console.error("Error fetching calendar events:", error);
@@ -454,25 +474,29 @@
             currentBookingBeingScheduled = bookingData;
             selectedEventDate = null; // Reset selection
             confirmScheduleBtn.disabled = true; // Disable until a time is selected
+            
+            // Clear any previously selected elements in the calendar UI
+            document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
+
             calendarOverlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scrolling background
             renderCalendar(); // Render the calendar when opening
         }
         
-        // This function will fetch events and render the calendar view
         async function renderCalendar() {
             calendarGrid.innerHTML = ''; // Clear previous content
             confirmScheduleBtn.disabled = true; // Disable confirm button on re-render
 
             let fetchStartDate, fetchEndDate;
 
+            // Determine fetch range based on current view
             if (currentView === 'month') {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 fetchStartDate = new Date(year, month, 1);
                 fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59); // End of month
                 calendarTitle.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
-                renderMonthView(fetchStartDate, fetchEndDate);
             } else if (currentView === 'week') {
                 const startOfWeek = new Date(currentDate);
                 startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday
@@ -489,7 +513,6 @@
                     ${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - 
                     ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 `;
-                renderWeekView(fetchStartDate, fetchEndDate);
             } else { // Day View
                 const startOfDay = new Date(currentDate);
                 startOfDay.setHours(0, 0, 0, 0);
@@ -500,20 +523,38 @@
                 fetchEndDate = endOfDay;
 
                 calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-                renderDayView(fetchStartDate, fetchEndDate);
             }
+
+            // Fetch events before rendering
             fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
+
+            // Now call the specific render function with the fetched events
+            if (currentView === 'month') {
+                renderMonthView();
+            } else if (currentView === 'week') {
+                renderWeekView();
+            } else {
+                renderDayView();
+            }
         }
 
         function addEventToCell(cellElement, event) {
             const eventDiv = document.createElement('div');
             eventDiv.className = `calendar-event mb-0.5 ${event.type === 'pending' ? 'pending' : ''}`;
-            eventDiv.textContent = event.title; // Show event title
+            eventDiv.textContent = event.title;
             eventDiv.title = `${event.title} (${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+            
+            // Add click listener for event details (optional)
+            eventDiv.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent cell click event from firing
+                showMessage(`Event: ${event.title} on ${event.start.toLocaleString()}`, 'info');
+                // You could open another modal here with more event details
+            });
+
             cellElement.appendChild(eventDiv);
         }
 
-        function renderMonthView(fetchStartDate, fetchEndDate) {
+        function renderMonthView() {
             // Create header with day names
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
@@ -527,7 +568,7 @@
 
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 for Sunday, 1 for Monday, etc.
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
 
@@ -535,7 +576,7 @@
             let nextMonthDayCounter = 1;
             let currentDayMs = new Date().setHours(0,0,0,0);
 
-            for (let i = 0; i < 6; i++) { // Max 6 weeks in a month view
+            for (let i = 0; i < 6; i++) {
                 const weekRow = document.createElement('div');
                 weekRow.className = 'grid grid-cols-7 gap-1';
 
@@ -545,43 +586,37 @@
                     const dateNumDiv = document.createElement('div');
                     dateNumDiv.className = 'text-right font-medium mb-1';
                     
-                    let cellDate; // Date object for this specific cell
+                    let cellDate;
 
                     if (i === 0 && j < firstDayOfMonth) {
-                        // Days from previous month
                         const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
                         dateNumDiv.textContent = prevMonthDay;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month - 1, prevMonthDay);
                     } else if (dayCounter > daysInMonth) {
-                        // Days from next month
                         dateNumDiv.textContent = nextMonthDayCounter;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
                     } else {
-                        // Current month days
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
 
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
+                            dayCell.classList.add('border-blue-500', 'border-2');
                         }
                         
-                        // Add click listener for selection
-                        dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
+                        dayCell.dataset.date = cellDate.toISOString();
                         dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                         dayCell.addEventListener('click', (e) => {
-                            // Clear previous selection
                             document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                             document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
                             
-                            // Select this day
                             selectedEventDate = new Date(e.currentTarget.dataset.date);
                             selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); // Default to current time for month selection
                             confirmScheduleBtn.disabled = false;
-                            e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
-                            showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
+                            e.currentTarget.classList.add('day-cell-month-selected');
+                            showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour in week/day view)`, 'info');
                         });
 
                         dayCounter++;
@@ -594,6 +629,7 @@
                     
                     // Add events for this cell's date
                     fetchedCalendarEvents.forEach(event => {
+                        // Check if event falls on this date (ignoring time for month view initial rendering)
                         if (event.start.getDate() === cellDate.getDate() &&
                             event.start.getMonth() === cellDate.getMonth() &&
                             event.start.getFullYear() === cellDate.getFullYear()) {
@@ -607,15 +643,14 @@
             }
         }
 
-        function renderWeekView(fetchStartDate, fetchEndDate) {
+        function renderWeekView() {
             const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Start on Sunday
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
             startOfWeek.setHours(0,0,0,0);
 
-            // Create header row with blank corner and days of week
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-8 gap-1';
-            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`; // Corner for time column
+            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
             for (let i = 0; i < 7; i++) {
                 const day = new Date(startOfWeek);
                 day.setDate(startOfWeek.getDate() + i);
@@ -632,43 +667,36 @@
             }
             calendarGrid.appendChild(headerRow);
 
-            // Time slots and event areas
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
+            for (let hour = 8; hour < 20; hour++) {
                 const timeRow = document.createElement('div');
-                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16'; // Fixed height for time slot
+                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
                 
-                // Time label column
                 const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10'; // Sticky for scrolling
+                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeRow.appendChild(timeLabel);
 
-                // Day cells for each hour
                 for (let i = 0; i < 7; i++) {
                     const day = new Date(startOfWeek);
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
                     timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden cursor-pointer hover:bg-gray-700/50';
-                    timeCell.dataset.date = day.toISOString(); // Full date for the day
-                    timeCell.dataset.hour = hour; // Hour for selection
+                    timeCell.dataset.date = day.toISOString();
+                    timeCell.dataset.hour = hour;
 
-                    // Add click listener for time slot selection
                     timeCell.addEventListener('click', (e) => {
-                        // Clear previous selection
                         document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                         document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
 
-                        // Set the selected date/time
                         const selectedDate = new Date(e.currentTarget.dataset.date);
-                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                         selectedEventDate = selectedDate;
                         confirmScheduleBtn.disabled = false;
                         e.currentTarget.classList.add('selected');
                         showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                     });
 
-                    // Add events that fall within this hour slot
                     fetchedCalendarEvents.forEach(event => {
                         if (event.start.getFullYear() === day.getFullYear() &&
                             event.start.getMonth() === day.getMonth() &&
@@ -684,45 +712,38 @@
             }
         }
 
-        function renderDayView(fetchStartDate, fetchEndDate) {
+        function renderDayView() {
             const day = currentDate;
-            const currentDayMs = day.setHours(0,0,0,0);
 
             const timeSlotsContainer = document.createElement('div');
             timeSlotsContainer.className = 'space-y-1';
 
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
+            for (let hour = 8; hour < 20; hour++) {
                 const timeSlot = document.createElement('div');
-                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16'; // Fixed height for time slot
+                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
                 
-                // Time label
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeSlot.appendChild(timeLabel);
 
-                // Main content area for the hour
                 const contentArea = document.createElement('div');
                 contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden cursor-pointer hover:bg-gray-700/50';
                 contentArea.dataset.date = day.toISOString();
                 contentArea.dataset.hour = hour;
 
-                // Add click listener for time slot selection
                 contentArea.addEventListener('click', (e) => {
-                    // Clear previous selection
                     document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                     document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
 
-                    // Set the selected date/time
                     const selectedDate = new Date(e.currentTarget.dataset.date);
-                    selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                    selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                     selectedEventDate = selectedDate;
                     confirmScheduleBtn.disabled = false;
                     e.currentTarget.classList.add('selected');
                     showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                 });
                 
-                // Add events that fall within this hour slot
                 fetchedCalendarEvents.forEach(event => {
                     if (event.start.getFullYear() === day.getFullYear() &&
                         event.start.getMonth() === day.getMonth() &&
@@ -776,9 +797,8 @@
             renderCalendar();
         });
 
-        // --- Core Booking App Logic (Mostly Unchanged) ---
+        // --- Core Booking App Logic ---
 
-        // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
             if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
                 try {
@@ -867,6 +887,7 @@
                             }
                         }
 
+                        // Filter out 'Scheduled' bookings from these lists as they now go to scheduled_meetings
                         if (status === 'New' || status === '') {
                             bookingsData.push(booking);
                         } else if (status === 'Pending') {
@@ -934,39 +955,60 @@
             }
         });
 
+        // Modified function to send batch updates
         async function sendBatchBookingUpdates(updates) {
             if (!currentAccountId) {
                 console.error("Account not identified, cannot send update.");
                 return { success: false, error: "Account not identified." };
             }
 
-            if (updates.length === 0) {
+            if (updates.length === 0 && stagedScheduledMeetings.length === 0) { // Check both staged arrays
                 return { success: true, message: "No changes to save." };
             }
 
             const batch = writeBatch(db);
 
+            // 1. Handle updates for the 'bookings' collection (status changes for original requests)
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
                 const updateData = { Status: change.newStatus };
 
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
-                } else if (change.newStatus === 'Completed') {
-                    updateData._originalSource = FieldValue.delete();
-                    if (change.scheduledTime) {
-                        updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
-                    }
+                } else if (change.newStatus === 'Scheduled') { // New status: 'Scheduled' for original booking
+                    updateData._originalSource = FieldValue.delete(); // Clear originalSource
+                    // ScheduledDateTime will be stored in the new collection, not here.
                 }
-                else {
+                else { // 'New' or 'Pending' or 'Undo' from Deleted to New/Pending
                     updateData._originalSource = FieldValue.delete();
                 }
                 batch.update(bookingDocRef, updateData);
             });
 
+            // 2. Handle creations for the 'scheduled_meetings' collection
+            for (const meeting of stagedScheduledMeetings) {
+                const newMeetingRef = doc(collection(db, 'accounts', currentAccountId, 'scheduled_meetings')); // Auto-ID
+                batch.set(newMeetingRef, {
+                    // Copy relevant fields from the original booking
+                    originalBookingId: meeting.originalBookingId,
+                    Customer_Name: meeting.Customer_Name,
+                    Email: meeting.Email,
+                    Subject: meeting.Subject,
+                    Service: meeting.Service,
+                    ScheduledDateTime: Timestamp.fromDate(meeting.scheduledTime),
+                    DurationHours: meeting.durationHours || 1, // Default to 1 hour
+                    CreatedAt: Timestamp.now()
+                    // Add any other fields you want to copy to the scheduled meeting
+                });
+            }
+
             try {
                 await batch.commit();
-                return { success: true, message: "Booking statuses updated successfully." };
+                // Clear both staged arrays on successful commit
+                stagedScheduledMeetings = []; 
+                stagedChanges = []; // Also clear general stagedChanges
+
+                return { success: true, message: "Booking statuses and scheduled meetings updated successfully." };
             } catch (error) {
                 console.error('Error committing batch updates:', error);
                 return { success: false, error: `Failed to save changes: ${error.message}` };
@@ -994,6 +1036,8 @@
                     }
                 });
                 if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                // Note: ScheduledDateTime is less relevant here for New/Pending, as it will be moved.
+                // But keeping it for consistency if needed for other statuses.
                 if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
                 if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
             }
@@ -1298,42 +1342,55 @@
             }
         }
 
+        // Handle confirmation from calendar modal
         confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
                 showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
                     showLoading("Completing booking...");
 
                     try {
-                        const bookingId = currentBookingBeingScheduled.id;
-                        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
+                        const originalBookingId = currentBookingBeingScheduled.id;
 
-                        const updateData = {
-                            id: bookingId,
-                            newStatus: 'Completed',
-                            scheduledTime: selectedEventDate
-                        };
-
-                        if (existingStagedIndex !== -1) {
-                            stagedChanges[existingStagedIndex] = updateData;
+                        // 1. Stage update for the original booking to 'Scheduled' status
+                        const existingStagedChangeIndex = stagedChanges.findIndex(s => s.id === originalBookingId);
+                        if (existingStagedChangeIndex !== -1) {
+                            stagedChanges[existingStagedChangeIndex].newStatus = 'Scheduled';
                         } else {
-                            stagedChanges.push(updateData);
+                            stagedChanges.push({
+                                id: originalBookingId,
+                                newStatus: 'Scheduled',
+                                // No originalSource needed here, as it's a final state for the original request
+                            });
                         }
 
-                        pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                        currentBookingBeingScheduled.Status = 'Completed';
-                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate);
+                        // 2. Stage creation of a new document in 'scheduled_meetings'
+                        stagedScheduledMeetings.push({
+                            originalBookingId: originalBookingId,
+                            Customer_Name: currentBookingBeingScheduled.Customer_Name || currentBookingBeingScheduled.Name || 'N/A', // Prioritize Customer_Name, fallback to Name
+                            Email: currentBookingBeingScheduled.Email || 'N/A',
+                            Subject: currentBookingBeingScheduled.Subject || 'Client Meeting',
+                            Service: currentBookingBeingScheduled.Service || 'General Consultation',
+                            scheduledTime: selectedEventDate, // The selected Date object
+                            // Add other fields you want to transfer to the scheduled meeting
+                            // e.g., currentBookingBeingScheduled.SomeOtherField
+                        });
 
+                        // Visually update the UI immediately
+                        pendingBookings = pendingBookings.filter(b => b.id !== originalBookingId);
                         renderPendingBookings();
                         updateSaveButtonState();
 
-                        showMessage("Booking staged for completion! Click 'Save Changes' to finalize.", 'success');
+                        showMessage("Booking staged for scheduling! Click 'Save Changes' to finalize.", 'success');
                         hideLoading();
-                        calendarOverlay.classList.add('hidden');
+                        calendarOverlay.classList.add('hidden'); // Close calendar modal
                         document.body.style.overflow = '';
 
+                        // Clear selected date as it's been staged
+                        selectedEventDate = null; 
+
                     } catch (error) {
-                        console.error("Error during booking completion staging:", error);
-                        showMessage("Failed to stage booking completion: " + error.message, 'error');
+                        console.error("Error during booking scheduling staging:", error);
+                        showMessage("Failed to stage booking for scheduling: " + error.message, 'error');
                         hideLoading();
                     }
                 }, () => {
@@ -1345,12 +1402,12 @@
         });
 
         saveChangesBtn.addEventListener('click', async () => {
-            if (stagedChanges.length === 0) {
+            if (stagedChanges.length === 0 && stagedScheduledMeetings.length === 0) {
                 showMessage("No changes to save.", 'info');
                 return;
             }
 
-            showConfirm(`Are you sure you want to save ${stagedChanges.length} changes to the database?`, async () => {
+            showConfirm(`Are you sure you want to save ${stagedChanges.length + stagedScheduledMeetings.length} changes to the database?`, async () => {
                 showLoading("Saving changes to Database...");
 
                 try {
@@ -1358,8 +1415,10 @@
 
                     if (result.success) {
                         showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = [];
+                        // stagedChanges and stagedScheduledMeetings are cleared inside sendBatchBookingUpdates now
                         updateSaveButtonState();
+                        // Re-fetch calendar events to update display after save
+                        renderCalendar(); 
                     } else {
                         showMessage("Failed to save changes: " + result.error, 'error');
                     }
