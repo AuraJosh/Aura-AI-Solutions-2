@@ -267,9 +267,10 @@
     </div>
 
     <script type="module">
+        // MODIFIED IMPORT: Changed FieldValue to deleteField
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, deleteField, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -445,7 +446,8 @@
                 return events;
             } catch (error) {
                 console.error("Error fetching calendar events:", error);
-                showMessage("Error loading calendar events.", 'error');
+                // The query requires an index error will appear here. It's expected until you create the index in Firebase.
+                showMessage("Error loading calendar events. Check console for index requirement.", 'error');
                 return [];
             }
         }
@@ -958,19 +960,23 @@
 
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
-                    updateData.ScheduledDateTime = FieldValue.delete(); // Clear scheduled time for deleted
+                    // MODIFIED: Use deleteField()
+                    updateData.ScheduledDateTime = deleteField(); 
                 } else if (change.newStatus === 'Completed') {
-                    updateData._originalSource = FieldValue.delete(); // Clear original source for completed
+                    // MODIFIED: Use deleteField()
+                    updateData._originalSource = deleteField();
                     if (change.scheduledTime) { 
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
                     } else {
-                        // If it's marked complete without a specific calendar selection (unlikely with UI)
-                        updateData.ScheduledDateTime = FieldValue.delete(); // Ensure ScheduledDateTime is cleared or set to null if not provided
+                        // MODIFIED: Use deleteField()
+                        updateData.ScheduledDateTime = deleteField();
                     }
                 }
                 else { // 'New' or 'Pending'
-                    updateData._originalSource = FieldValue.delete(); // Clear _originalSource
-                    updateData.ScheduledDateTime = FieldValue.delete(); // Clear ScheduledDateTime if not completed
+                    // MODIFIED: Use deleteField()
+                    updateData._originalSource = deleteField(); 
+                    // MODIFIED: Use deleteField()
+                    updateData.ScheduledDateTime = deleteField(); 
                 }
                 batch.update(bookingDocRef, updateData);
             });
