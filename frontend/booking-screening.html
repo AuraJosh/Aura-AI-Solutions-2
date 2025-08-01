@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aura Booking Screening</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Analytics (keep if needed) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -15,6 +14,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="icon" href="media/favicon.png" type="image/png">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
     <style>
     /* Custom CSS from analytics page (kept for visual consistency, though chat logs not present here) */
     .chat-logs-container {
@@ -85,6 +85,28 @@
     .message-box.info { background-color: #3B82F6; /* blue-500 */ }
     .message-box.error { background-color: #EF4444; /* red-500 */ }
     .message-box.success { background-color: #22C55E; /* green-500 */ }
+
+    /* Custom styles for FullCalendar within your modal */
+    #fullcalendar {
+        height: 500px; /* Adjust as needed */
+        max-width: 100%; /* Ensure it fits within the modal */
+        margin: 0 auto;
+    }
+    /* To make sure FullCalendar's default text color is visible on white background */
+    .fc .fc-button-primary {
+        color: #fff !important;
+        background-color: #3B82F6 !important; /* Tailwind blue-500 */
+        border-color: #3B82F6 !important;
+    }
+    .fc .fc-button-primary:hover {
+        background-color: #2563EB !important; /* Tailwind blue-600 */
+        border-color: #2563EB !important;
+    }
+    .fc-event {
+        background-color: #EF4444 !important; /* Red for booked events */
+        border-color: #EF4444 !important;
+        color: white !important;
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -94,7 +116,6 @@
         <div class="container mx-auto flex items-center justify-between p-4 relative">
             <div class="flex items-center space-x-4">
                 <div class="relative h-20 w-[150px]">
-                    <!-- Placeholder for your logo, ensure 'media/logo-dark.png' exists or replace -->
                     <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
                 </div>
                 <span class="text-white text-base">Aura AI Solutions</span>
@@ -154,7 +175,17 @@
         </div>
     </main>
 
-    <!-- Update Info Modal (keep if still needed, functionality not covered in this migration) -->
+    <div id="calendar-booking-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl relative">
+            <button id="close-calendar-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Schedule Booking</h2>
+            <div id="fullcalendar" class="text-black bg-white rounded-lg p-4"></div>
+            <div class="flex justify-end space-x-4 mt-6">
+                <button id="confirm-schedule-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200" disabled>Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
     <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
             <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
@@ -194,10 +225,11 @@
         </div>
     </div>
 
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, FieldValue, Timestamp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -237,6 +269,17 @@
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingSpinner = document.getElementById('loading-spinner');
         const loadingMessage = document.getElementById('loading-message');
+
+        // Calendar Modal Elements
+        const calendarBookingModal = document.getElementById('calendar-booking-modal');
+        const closeCalendarModalBtn = document.getElementById('close-calendar-modal-btn');
+        const confirmScheduleBtn = document.getElementById('confirm-schedule-btn');
+        const fullCalendarDiv = document.getElementById('fullcalendar');
+
+        let calendarInstance; // To hold the FullCalendar instance
+        let selectedEventDate = null; // To store the date/time chosen by the user
+        let currentBookingBeingScheduled = null; // To store the booking object when the modal is opened
+
 
         function showLoading(message) {
             loadingMessage.textContent = message;
@@ -298,6 +341,166 @@
                 onCancel();
             };
         }
+
+        // --- FULLCALENDAR AND BOOKING MODAL LOGIC ---
+
+        function showCalendarModal(bookingData) {
+            currentBookingBeingScheduled = bookingData;
+            selectedEventDate = null; // Reset selection
+            confirmScheduleBtn.disabled = true; // Disable until a time is selected
+
+            calendarBookingModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling background
+
+            if (!calendarInstance) {
+                calendarInstance = new FullCalendar.Calendar(fullCalendarDiv, {
+                    initialView: 'timeGridWeek', // Default to weekly view
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,timeGridDay' // Toggle options
+                    },
+                    editable: false, // Don't allow dragging/resizing for this use case
+                    selectable: true, // Allow users to select time slots
+                    selectMirror: true, // Shows a "mirror" event while dragging
+                    nowIndicator: true, // Shows current time
+                    slotMinTime: '09:00:00', // Start calendar at 9 AM
+                    slotMaxTime: '18:00:00', // End calendar at 6 PM
+                    validRange: {
+                        start: new Date() // Don't allow selecting past dates
+                    },
+                    select: function(info) {
+                        // When a time slot is selected
+                        selectedEventDate = info.start;
+                        confirmScheduleBtn.disabled = false;
+                        showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+                        // Optionally, you can highlight the selected slot visually if FullCalendar allows
+                        // or provide more detailed feedback in the modal itself.
+                    },
+                    eventClick: function(info) {
+                        // Handle clicking on an existing event (if you load them)
+                        showMessage(`Existing event: ${info.event.title} at ${info.event.start.toLocaleString()}`, 'info');
+                        // You might want to allow rescheduling or viewing details here
+                    },
+                    // This is where you would load existing *scheduled* meetings
+                    // from a new Firebase collection, e.g., 'scheduled_meetings'.
+                    // For now, it uses dummy data and also tries to load from your
+                    // existing 'Pending' bookings that already have a ScheduledDateTime.
+                    events: async function(fetchInfo, successCallback, failureCallback) {
+                        try {
+                            const events = [];
+
+                            // 1. Fetch from your existing pendingBookings that might have scheduled times
+                            // (If you decide to store scheduled time when moving to pending)
+                            pendingBookings.forEach(booking => {
+                                if (booking.ScheduledDateTime && booking.ScheduledDateTime.toDate) {
+                                    events.push({
+                                        title: 'Pending Booking', // You might want to get the client name here
+                                        start: booking.ScheduledDateTime.toDate(),
+                                        end: new Date(booking.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assuming 1 hour meeting
+                                        color: '#F59E0B' // Amber for pending
+                                    });
+                                }
+                            });
+
+                            // 2. Fetch from a dedicated 'scheduled_meetings' collection for *confirmed* bookings
+                            // This is the ideal place for events that block out the calendar.
+                            // You would likely have a 'completed_bookings' or 'scheduled_events' collection
+                            // that you query here.
+                            if (currentAccountId) {
+                                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
+                                const q = query(scheduledMeetingsRef,
+                                    where('Status', '==', 'Completed'),
+                                    where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchInfo.start)),
+                                    where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchInfo.end))
+                                );
+                                const querySnapshot = await getDocs(q);
+                                querySnapshot.docs.forEach(doc => {
+                                    const data = doc.data();
+                                    // Make sure 'ScheduledDateTime' is present and is a Firebase Timestamp
+                                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                                        events.push({
+                                            title: data.Customer_Name || 'Booked Meeting', // Or relevant info like client name
+                                            start: data.ScheduledDateTime.toDate(),
+                                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assuming 1 hour meeting
+                                            color: '#EF4444' // Red for completed/booked
+                                        });
+                                    }
+                                });
+                            }
+                            
+                            // Add any other existing events (e.g., from Google Calendar API) here
+                            
+                            successCallback(events);
+                        } catch (error) {
+                            console.error("Error fetching calendar events:", error);
+                            failureCallback(error);
+                            showMessage("Error loading calendar events.", 'error');
+                        }
+                    }
+                });
+                calendarInstance.render();
+            } else {
+                // If calendar already initialized, just rerender to update (e.g., if events change)
+                calendarInstance.refetchEvents(); // Important to refresh events
+            }
+        }
+
+        // Close calendar modal
+        closeCalendarModalBtn.addEventListener('click', () => {
+            calendarBookingModal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+
+        // Handle confirmation from calendar modal
+        confirmScheduleBtn.addEventListener('click', async () => {
+            if (selectedEventDate && currentBookingBeingScheduled) {
+                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
+                    showLoading("Completing booking...");
+
+                    try {
+                        const bookingId = currentBookingBeingScheduled.id;
+                        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
+
+                        const updateData = {
+                            id: bookingId,
+                            newStatus: 'Completed',
+                            // Store the selected Date object, Firebase will convert it to Timestamp
+                            scheduledTime: selectedEventDate
+                        };
+
+                        if (existingStagedIndex !== -1) {
+                            stagedChanges[existingStagedIndex] = updateData;
+                        } else {
+                            stagedChanges.push(updateData);
+                        }
+
+                        // Remove from pending list visually immediately
+                        pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
+                        currentBookingBeingScheduled.Status = 'Completed'; // Update local object
+                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate); // Update local object with Timestamp
+
+                        renderPendingBookings(); // Re-render pending list to reflect change
+                        updateSaveButtonState();
+
+                        showMessage("Booking staged for completion! Click 'Save Changes' to finalize.", 'success');
+                        hideLoading();
+                        calendarBookingModal.classList.add('hidden'); // Close calendar modal
+                        document.body.style.overflow = '';
+
+                    } catch (error) {
+                        console.error("Error during booking completion staging:", error);
+                        showMessage("Failed to stage booking completion: " + error.message, 'error');
+                        hideLoading();
+                    }
+                }, () => {
+                    showMessage("Booking confirmation cancelled.", 'info');
+                });
+            } else {
+                showMessage("Please select a date and time for the booking.", 'info');
+            }
+        });
+
 
         // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
@@ -372,26 +575,25 @@
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                    bookingFieldsConfig = [];
+                    bookingFieldsConfig = []; // Reset config on each snapshot to rebuild dynamically
 
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
 
                         // Dynamically build bookingFieldsConfig from the first document
-                        // This ensures all fields from your bookings are displayed, not just hardcoded ones.
                         if (bookingFieldsConfig.length === 0) {
-                            // Collect all keys from the first booking document
                             Object.keys(booking).forEach(key => {
-                                // Exclude internal Firestore 'id' and our custom '_originalSource'
-                                // Also exclude 'Status' and 'Timestamp' as they are handled separately for display order
-                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp') {
+                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
                                     bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }); // Basic formatting for display
                                 }
                             });
                             // Add Timestamp and Status at the end for consistent display
                             if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
                                 bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                            }
+                            if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
+                                bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
                             }
                             if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
                                 bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
@@ -406,22 +608,24 @@
                             booking._originalSource = booking._originalSource || 'UNKNOWN';
                             deletedBookings.push(booking);
                         }
+                        // Completed bookings are no longer directly managed here, but their ScheduledDateTime
+                        // will be fetched by FullCalendar if they are in the 'bookings' collection.
                     });
 
                     // Sort bookings by Timestamp for consistent display
                     bookingsData.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : new Date(a.Timestamp);
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : new Date(b.Timestamp);
+                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
                         return dateA - dateB;
                     });
                     pendingBookings.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : new Date(a.Timestamp);
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : new Date(b.Timestamp);
+                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
                         return dateA - dateB;
                     });
                     deletedBookings.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : new Date(a.Timestamp);
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : new Date(b.Timestamp);
+                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
                         return dateA - dateB;
                     });
 
@@ -482,22 +686,19 @@
 
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
-                // Update only the 'Status' field and _originalSource
                 const updateData = { Status: change.newStatus };
 
                 // Handle _originalSource for Deleted status
                 if (change.newStatus === 'Deleted') {
-                    updateData._originalSource = change.originalSource || 'requests'; // Store original source when deleting
-                } else {
-                    // When reverting from Deleted, or moving to Pending/New, clear _originalSource if it's not relevant
-                    // Or set it back to what it was if it's an 'undo' operation that restores a previous state.
-                    // For simplicity, we'll only set it when moving TO Deleted.
-                    // If you need to persist original source for other states, you'd add more logic.
-                    if (change.originalSource && change.newStatus !== 'Completed') { // if it was deleted and now being undone
-                         updateData._originalSource = change.originalSource;
-                    } else {
-                         updateData._originalSource = FieldValue.delete(); // Remove the field if not needed
+                    updateData._originalSource = change.originalSource || 'UNKNOWN'; // Store original source when deleting
+                } else if (change.newStatus === 'Completed') {
+                    updateData._originalSource = FieldValue.delete(); // Remove originalSource if it exists
+                    if (change.scheduledTime) {
+                        updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime); // Store as Firebase Timestamp
                     }
+                }
+                else { // 'New' or 'Pending' (from anywhere else)
+                    updateData._originalSource = FieldValue.delete(); // Clear original source if not needed
                 }
                 batch.update(bookingDocRef, updateData);
             });
@@ -528,11 +729,12 @@
             // Ensure bookingFieldsConfig is populated. If not, try to infer from current booking.
             if (bookingFieldsConfig.length === 0) {
                  Object.keys(currentBooking).forEach(key => {
-                    if (key !== 'id' && key !== 'Status' && key !== '_originalSource') {
+                    if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
                         bookingFieldsConfig.push({ field: key, question: key });
                     }
                 });
                 if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
                 if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
             }
 
@@ -541,7 +743,7 @@
                 let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
 
                 // Format Timestamp if it's a Firebase Timestamp object or Date object
-                if (fieldConfig.field === 'Timestamp' && fieldValue) {
+                if ((fieldConfig.field === 'Timestamp' || fieldConfig.field === 'ScheduledDateTime') && fieldValue) {
                     if (fieldValue.toDate) { // Firestore Timestamp object
                         fieldValue = fieldValue.toDate().toLocaleString();
                     } else if (fieldValue instanceof Date) { // JavaScript Date object
@@ -570,17 +772,17 @@
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
             // Try to get relevant fields for display, prioritizing common ones
-            const fieldsToDisplay = ['Timestamp', 'Customer Name', 'Email', 'Subject', 'Service'];
+            const fieldsToDisplay = ['Timestamp', 'Customer_Name', 'Email', 'Subject', 'Service', 'ScheduledDateTime'];
             let displayedCount = 0;
 
             for (const fieldName of fieldsToDisplay) {
                 if (booking[fieldName] !== undefined && displayedCount < 3) {
                     let fieldValue = (booking[fieldName] || 'N/A');
-                    if (fieldName === 'Timestamp' && fieldValue) {
-                        if (fieldValue.toDate) {
+                    if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
+                        if (fieldValue && fieldValue.toDate) {
                             fieldValue = fieldValue.toDate().toLocaleDateString();
                         } else if (fieldValue instanceof Date) {
-                             fieldValue = fieldValue.toLocaleDateString();
+                            fieldValue = fieldValue.toLocaleDateString();
                         } else {
                             fieldValue = fieldValue.toString().trim();
                         }
@@ -598,11 +800,11 @@
                     const fieldName = bookingFieldsConfig[i].field;
                     if (!fieldsToDisplay.includes(fieldName) && booking[fieldName] !== undefined) {
                         let fieldValue = (booking[fieldName] || 'N/A');
-                        if (fieldName === 'Timestamp' && fieldValue) {
-                            if (fieldValue.toDate) {
+                        if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
+                            if (fieldValue && fieldValue.toDate) {
                                 fieldValue = fieldValue.toDate().toLocaleDateString();
                             } else if (fieldValue instanceof Date) {
-                                 fieldValue = fieldValue.toLocaleDateString();
+                                fieldValue = fieldValue.toLocaleDateString();
                             } else {
                                 fieldValue = fieldValue.toString().trim();
                             }
@@ -767,8 +969,9 @@
                 if (!bookingToProcess) return;
 
                 if (action === 'complete') {
-                    targetStatus = 'Completed';
-                    pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
+                    // Open the calendar modal for scheduling
+                    showCalendarModal(bookingToProcess);
+                    return; // Stop further processing here, it continues after calendar selection
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
                     originalSourceForStaging = 'pending';
@@ -786,6 +989,7 @@
                     }
                 }
                 
+                // Staging logic for actions other than 'complete' (which is handled by modal)
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
@@ -830,11 +1034,14 @@
                 }
             }
 
-            renderBookingCard();
-            renderPendingBookings();
-            renderDeletedBookings();
-            updateSaveButtonState();
-            console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
+            // Only re-render if not the 'complete' action (which opens the modal)
+            if (action !== 'complete') {
+                renderBookingCard();
+                renderPendingBookings();
+                renderDeletedBookings();
+                updateSaveButtonState();
+                console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
+            }
         }
 
         saveChangesBtn.addEventListener('click', async () => {
@@ -851,7 +1058,7 @@
 
                     if (result.success) {
                         showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = [];
+                        stagedChanges = []; // Clear staged changes after successful save
                         updateSaveButtonState();
                     } else {
                         showMessage("Failed to save changes: " + result.error, 'error');
