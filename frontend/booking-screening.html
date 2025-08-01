@@ -104,9 +104,9 @@
         border: 2px solid #3B82F6; /* blue-500 */
     }
 
-    /* Event display styles */
+    /* Event display styles - MODIFIED to PURPLE for completed events */
     .calendar-event {
-        background-color: #EF4444; /* red-500 for booked events */
+        background-color: #8B5CF6; /* Purple-500 for booked/scheduled events */
         color: white;
         padding: 2px 4px;
         border-radius: 4px;
@@ -115,39 +115,15 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        cursor: pointer;
+        /* cursor: pointer; REMOVED, as clickability is now controlled by the parent time-slot */
+        position: relative; /* Ensure z-index works */
+        z-index: 1; /* Ensure event div is above time-slot background */
     }
     .calendar-event.pending {
-        background-color: #F59E0B; /* amber-500 for pending events */
+        background-color: #F59E0B; /* amber-500 for pending events (kept as is) */
     }
 
-    /* NEW CSS for blocked off time slots */
-    .time-slot-unavailable {
-        background-color: #374151; /* gray-700 */
-        opacity: 0.7; /* Slightly dim it */
-        cursor: not-allowed !important; /* Change cursor */
-        position: relative;
-        /* Optional: Add a subtle crosshatch pattern for clearer "unavailable" */
-        background-image: linear-gradient(45deg, #2D3748 25%, transparent 25%, transparent 75%, #2D3748 75%, #2D3748),
-                          linear-gradient(45deg, #2D3748 25%, transparent 25%, transparent 75%, #2D3748 75%, #2D3748);
-        background-size: 8px 8px; /* Size of the pattern squares */
-        background-position: 0 0, 4px 4px; /* Offset the second pattern for crosshatch */
-    }
-
-    /* Ensure selected style overrides unavailable if user tries to click */
-    .time-slot-unavailable.selected {
-        /* This case should ideally not happen if JS prevents selection */
-        /* but if it does, ensure it's visually consistent with blocked */
-        background-color: #374151; /* Keep it grey, not blue */
-        border: 2px solid #6B7280; /* Darker grey border */
-        opacity: 0.8;
-    }
-
-    /* Make sure events still show on top within blocked slots */
-    .time-slot-unavailable .calendar-event {
-        z-index: 1; /* Ensure event div is above background */
-        position: relative; /* Needed for z-index to work */
-    }
+    /* Removed .time-slot-unavailable CSS entirely, as blocked visual is now the event itself */
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -297,7 +273,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        // REMOVED FieldValue, ADDED deleteField
         import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, deleteField, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
@@ -444,10 +419,12 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Booked (Booking)',
+                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
+                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Booked',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed'
+                            type: 'completed',
+                            originalData: data // Pass the full data object for detailed tooltip
                         });
                     }
                 });
@@ -463,10 +440,12 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Scheduled (Meeting)',
+                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
+                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed' // Use same completed style
+                            type: 'completed', // Use same completed style
+                            originalData: data // Pass the full data object for detailed tooltip
                         });
                     }
                 });
@@ -483,10 +462,12 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Pending',
+                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
+                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Pending',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'pending'
+                            type: 'pending',
+                            originalData: data // Pass the full data object for detailed tooltip
                         });
                     }
                 });
@@ -556,11 +537,24 @@
             fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
         }
 
+        // MODIFIED: Pass originalData to allow for detailed tooltips
         function addEventToCell(cellElement, event) {
             const eventDiv = document.createElement('div');
             eventDiv.className = `calendar-event mb-0.5 ${event.type === 'pending' ? 'pending' : ''}`;
-            eventDiv.textContent = event.title; // Show event title
-            eventDiv.title = `${event.title} (${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+            
+            // Display Phone_Number (or Customer_Name, or Email) directly on the event
+            eventDiv.textContent = event.title; 
+            
+            // Add a detailed tooltip on hover
+            eventDiv.title = `
+                ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
+                ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
+                ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
+            `.trim();
+
             cellElement.appendChild(eventDiv);
         }
 
@@ -717,7 +711,10 @@
                     });
                     
                     if (isSlotOccupied) {
-                        timeCell.classList.add('time-slot-unavailable'); // Add new class for visual blocking
+                        // If occupied, don't add cursor-pointer or hover effects
+                        // The calendar-event inside will provide the visual blocked effect
+                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                        // No click listener for NEW selection if occupied
                     } else {
                         timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                         timeCell.dataset.date = day.toISOString(); // Full date for the day
@@ -790,7 +787,10 @@
                 });
 
                 if (isSlotOccupied) {
-                    contentArea.classList.add('time-slot-unavailable'); // Add new class for visual blocking
+                    // If occupied, don't add cursor-pointer or hover effects
+                    // The calendar-event inside will provide the visual blocked effect
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    // No click listener for NEW selection if occupied
                 } else {
                     contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                     contentArea.dataset.date = day.toISOString();
@@ -935,9 +935,8 @@
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                    // bookingFieldsConfig = []; // Keep this commented out or initialize with fixed fields if preferred
-                                                    // Otherwise it will only take fields from the first doc in each snapshot.
-
+                    // bookingFieldsConfig is populated dynamically from first doc, which is fine for display
+                                                    
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
@@ -1045,15 +1044,12 @@
 
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
-                    // Corrected: Use deleteField()
                     updateData.ScheduledDateTime = deleteField(); 
                 } else if (change.newStatus === 'Completed') {
-                    // Corrected: Use deleteField()
                     updateData._originalSource = deleteField(); // Clear original source for completed
                     if (change.scheduledTime) { 
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
                     } else {
-                        // Corrected: Use deleteField()
                         updateData.ScheduledDateTime = deleteField();
                     }
 
@@ -1072,13 +1068,10 @@
 
                         // Clean up fields that are not relevant for scheduled_meetings
                         delete meetingData._originalSource; 
-                        // You might want to rename the original Timestamp to avoid confusion or keep it
                         if (meetingData.Timestamp) {
                             meetingData.BookingRequestTimestamp = meetingData.Timestamp; 
                             delete meetingData.Timestamp;
                         }
-                        // Remove any other temporary/internal fields you don't want in scheduled_meetings
-                        // e.g., delete meetingData.someInternalField;
 
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true }); // Use set with merge to create or update
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
@@ -1087,9 +1080,7 @@
 
                 }
                 else { // 'New' or 'Pending'
-                    // Corrected: Use deleteField()
                     updateData._originalSource = deleteField(); 
-                    // Corrected: Use deleteField()
                     updateData.ScheduledDateTime = deleteField(); 
                 }
                 batch.update(bookingDocRef, updateData);
@@ -1119,7 +1110,6 @@
             let cardContentArray = [];
 
             // Ensure bookingFieldsConfig is populated if it's somehow empty at this point
-            // This fallback handles cases where the first snapshot might be empty or incomplete
             if (bookingFieldsConfig.length === 0) {
                 Object.keys(currentBooking).forEach(key => {
                     if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
@@ -1465,7 +1455,6 @@
                             id: bookingId,
                             newStatus: 'Completed',
                             scheduledTime: selectedEventDate, // This is the Date object
-                            // NEW: Pass the full booking data for the scheduled_meetings collection
                             fullBookingData: currentBookingBeingScheduled 
                         };
 
