@@ -120,6 +120,34 @@
     .calendar-event.pending {
         background-color: #F59E0B; /* amber-500 for pending events */
     }
+
+    /* NEW CSS for blocked off time slots */
+    .time-slot-unavailable {
+        background-color: #374151; /* gray-700 */
+        opacity: 0.7; /* Slightly dim it */
+        cursor: not-allowed !important; /* Change cursor */
+        position: relative;
+        /* Optional: Add a subtle crosshatch pattern for clearer "unavailable" */
+        background-image: linear-gradient(45deg, #2D3748 25%, transparent 25%, transparent 75%, #2D3748 75%, #2D3748),
+                          linear-gradient(45deg, #2D3748 25%, transparent 25%, transparent 75%, #2D3748 75%, #2D3748);
+        background-size: 8px 8px; /* Size of the pattern squares */
+        background-position: 0 0, 4px 4px; /* Offset the second pattern for crosshatch */
+    }
+
+    /* Ensure selected style overrides unavailable if user tries to click */
+    .time-slot-unavailable.selected {
+        /* This case should ideally not happen if JS prevents selection */
+        /* but if it does, ensure it's visually consistent with blocked */
+        background-color: #374151; /* Keep it grey, not blue */
+        border: 2px solid #6B7280; /* Darker grey border */
+        opacity: 0.8;
+    }
+
+    /* Make sure events still show on top within blocked slots */
+    .time-slot-unavailable .calendar-event {
+        z-index: 1; /* Ensure event div is above background */
+        position: relative; /* Needed for z-index to work */
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -267,7 +295,6 @@
     </div>
 
     <script type="module">
-        // MODIFIED IMPORT: Changed FieldValue to deleteField
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
         // REMOVED FieldValue, ADDED deleteField
@@ -404,19 +431,20 @@
             try {
                 const events = [];
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
-                
-                // Query for 'Completed' bookings within the date range
-                const qCompleted = query(bookingsRef,
+                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings'); // New collection for scheduled meetings
+
+                // Query for 'Completed' bookings within the date range from bookings collection
+                const qCompletedBookings = query(bookingsRef,
                     where('Status', '==', 'Completed'),
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
-                const querySnapshotCompleted = await getDocs(qCompleted);
-                querySnapshotCompleted.docs.forEach(doc => {
+                const querySnapshotCompletedBookings = await getDocs(qCompletedBookings);
+                querySnapshotCompletedBookings.docs.forEach(doc => {
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Email || 'Booked',
+                            title: data.Customer_Name || data.Email || 'Booked (Booking)',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'completed'
@@ -424,8 +452,27 @@
                     }
                 });
 
+                // Query for 'Completed' meetings from scheduled_meetings collection
+                const qScheduledMeetings = query(scheduledMeetingsRef,
+                    where('Status', '==', 'Completed'), // Assuming scheduled_meetings also have a 'Status' field
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
+                    where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
+                );
+                const querySnapshotScheduledMeetings = await getDocs(qScheduledMeetings);
+                querySnapshotScheduledMeetings.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        events.push({
+                            title: data.Customer_Name || data.Email || 'Scheduled (Meeting)',
+                            start: data.ScheduledDateTime.toDate(),
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
+                            type: 'completed' // Use same completed style
+                        });
+                    }
+                });
+
+
                 // Query for 'Pending' bookings that might already have a scheduled time
-                // (if your chatbot provides a specific time that gets moved to pending)
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'),
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
@@ -572,7 +619,7 @@
                             dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
                         }
                         
-                        // Add click listener for selection
+                        // Add click listener for selection in month view (selecting a whole day)
                         dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
                         dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                         dayCell.addEventListener('click', (e) => {
@@ -582,7 +629,8 @@
                             
                             // Select this day
                             selectedEventDate = new Date(e.currentTarget.dataset.date);
-                            selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); // Default to current time for month selection
+                            // Default to a sensible time, perhaps start of day, or current time
+                            selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); 
                             confirmScheduleBtn.disabled = false;
                             e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
                             showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
@@ -654,32 +702,50 @@
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden cursor-pointer hover:bg-gray-700/50';
-                    timeCell.dataset.date = day.toISOString(); // Full date for the day
-                    timeCell.dataset.hour = hour; // Hour for selection
+                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden'; // Removed cursor/hover here
 
-                    // Add click listener for time slot selection
-                    timeCell.addEventListener('click', (e) => {
-                        // Clear previous selection
-                        document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                        document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
+                    // Calculate the full date and time for this specific cell/slot
+                    const cellDateTime = new Date(day);
+                    cellDateTime.setHours(hour, 0, 0, 0);
 
-                        // Set the selected date/time
-                        const selectedDate = new Date(e.currentTarget.dataset.date);
-                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
-                        selectedEventDate = selectedDate;
-                        confirmScheduleBtn.disabled = false;
-                        e.currentTarget.classList.add('selected');
-                        showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
-                        console.log("Selected week/day view date/time:", selectedEventDate);
+                    // Check if this time slot is already occupied by a fetched event
+                    const isSlotOccupied = fetchedCalendarEvents.some(event => {
+                        return event.start.getFullYear() === cellDateTime.getFullYear() &&
+                               event.start.getMonth() === cellDateTime.getMonth() &&
+                               event.start.getDate() === cellDateTime.getDate() &&
+                               event.start.getHours() === cellDateTime.getHours();
                     });
+                    
+                    if (isSlotOccupied) {
+                        timeCell.classList.add('time-slot-unavailable'); // Add new class for visual blocking
+                    } else {
+                        timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
+                        timeCell.dataset.date = day.toISOString(); // Full date for the day
+                        timeCell.dataset.hour = hour; // Hour for selection
+
+                        // Add click listener for time slot selection ONLY if not occupied
+                        timeCell.addEventListener('click', (e) => {
+                            // Clear previous selection
+                            document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                            document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
+
+                            // Set the selected date/time
+                            const selectedDate = new Date(e.currentTarget.dataset.date);
+                            selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                            selectedEventDate = selectedDate;
+                            confirmScheduleBtn.disabled = false;
+                            e.currentTarget.classList.add('selected');
+                            showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+                            console.log("Selected week/day view date/time:", selectedEventDate);
+                        });
+                    }
 
                     // Add events that fall within this hour slot
                     fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getFullYear() === day.getFullYear() &&
-                            event.start.getMonth() === day.getMonth() &&
-                            event.start.getDate() === day.getDate() &&
-                            event.start.getHours() === hour) {
+                        if (event.start.getFullYear() === cellDateTime.getFullYear() &&
+                            event.start.getMonth() === cellDateTime.getMonth() &&
+                            event.start.getDate() === cellDateTime.getDate() &&
+                            event.start.getHours() === cellDateTime.getHours()) {
                             addEventToCell(timeCell, event);
                         }
                     });
@@ -709,32 +775,50 @@
 
                 // Main content area for the hour
                 const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden cursor-pointer hover:bg-gray-700/50';
-                contentArea.dataset.date = day.toISOString();
-                contentArea.dataset.hour = hour;
+                contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden'; // Removed cursor/hover here
+                
+                // Calculate the full date and time for this specific cell/slot
+                const cellDateTime = new Date(day);
+                cellDateTime.setHours(hour, 0, 0, 0);
 
-                // Add click listener for time slot selection
-                contentArea.addEventListener('click', (e) => {
-                    // Clear previous selection
-                    document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                    document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                    // Set the selected date/time
-                    const selectedDate = new Date(e.currentTarget.dataset.date);
-                    selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
-                    selectedEventDate = selectedDate;
-                    confirmScheduleBtn.disabled = false;
-                    e.currentTarget.classList.add('selected');
-                    showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
-                    console.log("Selected day view date/time:", selectedEventDate);
+                // Check if this time slot is already occupied by a fetched event
+                const isSlotOccupied = fetchedCalendarEvents.some(event => {
+                    return event.start.getFullYear() === cellDateTime.getFullYear() &&
+                           event.start.getMonth() === cellDateTime.getMonth() &&
+                           event.start.getDate() === cellDateTime.getDate() &&
+                           event.start.getHours() === cellDateTime.getHours();
                 });
+
+                if (isSlotOccupied) {
+                    contentArea.classList.add('time-slot-unavailable'); // Add new class for visual blocking
+                } else {
+                    contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
+                    contentArea.dataset.date = day.toISOString();
+                    contentArea.dataset.hour = hour;
+
+                    // Add click listener for time slot selection ONLY if not occupied
+                    contentArea.addEventListener('click', (e) => {
+                        // Clear previous selection
+                        document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                        document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
+
+                        // Set the selected date/time
+                        const selectedDate = new Date(e.currentTarget.dataset.date);
+                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                        selectedEventDate = selectedDate;
+                        confirmScheduleBtn.disabled = false;
+                        e.currentTarget.classList.add('selected');
+                        showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+                        console.log("Selected day view date/time:", selectedEventDate);
+                    });
+                }
                 
                 // Add events that fall within this hour slot
                 fetchedCalendarEvents.forEach(event => {
-                    if (event.start.getFullYear() === day.getFullYear() &&
-                        event.start.getMonth() === day.getMonth() &&
-                        event.start.getDate() === day.getDate() &&
-                        event.start.getHours() === hour) {
+                    if (event.start.getFullYear() === cellDateTime.getFullYear() &&
+                        event.start.getMonth() === cellDateTime.getMonth() &&
+                        event.start.getDate() === cellDateTime.getDate() &&
+                        event.start.getHours() === cellDateTime.getHours()) {
                         addEventToCell(contentArea, event);
                     }
                 });
