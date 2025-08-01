@@ -270,6 +270,278 @@
         </div>
     </div>
 
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Booking Screening</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+    /* Custom CSS from analytics page (kept for visual consistency, though chat logs not present here) */
+    .chat-logs-container {
+        display: flex;
+        flex-direction: column-reverse; /* Stacks items from bottom to top */
+        overflow-y: auto;           /* Enables vertical scrolling */
+        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
+    }
+    .chat-log-message {
+        padding-bottom: 8px;
+    }
+    /* Optional: Add backdrop-filter for a subtle blur effect behind the overlay */
+    #loading-overlay {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
+    }
+
+    /* Monochrome Geometric Flip Loader CSS */
+    .geometric-loader {
+        width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
+        aspect-ratio: .5;
+        display: grid;
+        justify-items: center;  
+        align-items: center;
+    }
+    .geometric-loader::before {
+        content: "";
+        width: 30%;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        margin: auto auto 0;
+        background: #9CA3AF; /* Tailwind gray-400 - light gray/blue-gray */
+        animation: l9-0 .5s cubic-bezier(0,800,1,800) infinite;
+    }
+    .geometric-loader::after {
+        content: "";
+        width: 100%;
+        aspect-ratio: 1 / 0.866;
+        margin: 0 auto auto;
+        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
+        background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
+        animation: l9-1 .5s linear infinite;
+    }
+    @keyframes l9-0 {
+        0%,2%  {translate: 0   0%}
+        98%,to {translate: 0 -.2%}
+    }
+    @keyframes l9-1 {
+        0%,5%  {rotate:  0deg}
+        95%,to {rotate:-60deg}
+    }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
+
+    /* Custom calendar styles from user prompt */
+    #calendar-grid {
+        scrollbar-width: thin;
+        scrollbar-color: #4b5563 #1f2937;
+    }
+    #calendar-grid::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    #calendar-grid::-webkit-scrollbar-track {
+        background: #1f2937;
+    }
+    #calendar-grid::-webkit-scrollbar-thumb {
+        background-color: #4b5563;
+        border-radius: 4px;
+    }
+
+    /* Styles for selected time slots */
+    .time-slot.selected {
+        background-color: #1D4ED8; /* blue-700 */
+        border: 2px solid #3B82F6; /* blue-500 */
+    }
+    .day-cell-month-selected {
+        background-color: #1D4ED8; /* blue-700 */
+        border: 2px solid #3B82F6 !important; /* blue-500 */
+    }
+
+    /* Event display styles */
+    .calendar-event {
+        background-color: #EF4444; /* red-500 for booked events */
+        color: white;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        line-height: 1rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        cursor: pointer;
+    }
+    .calendar-event.pending {
+        background-color: #F59E0B; /* amber-500 for pending events (if you decide to display them) */
+    }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen overflow-auto">
+
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="container mx-auto flex items-center justify-between p-4 relative">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Booking Screening</h1>
+            <div class="flex items-center space-x-4">
+                <a href="analytics.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                    Back to Analytics
+                </a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex">
+            <div class="p-8 rounded-xl shadow-2xl bg-gray-900/70 w-full max-w-2xl h-[fit-content] flex items-center justify-center">
+                <div id="booking-screening-display" class="w-full max-w-2xl h-[fit-content] flex flex-col items-center">
+                    <h2 class="text-white text-2xl font-semibold mb-4">Booking Requests</h2>
+                    <div class="flex items-center justify-between w-full px-4">
+                        <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
+                        <div id="booking-card" class="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 rounded-2xl shadow-xl w-full max-w-2xl h-[450px] overflow-y-auto flex flex-col justify-start items-start">
+                            <p class="text-white text-center w-full">Loading booking requests...</p>
+                        </div>
+                        <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
+                    </div>
+                    <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
+                    <div class="flex justify-center space-x-4 mt-4 w-full">
+                        <button id="move-to-pending-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
+                            Move booking to pending
+                        </button>
+                        <button id="delete-booking-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
+                            Delete booking
+                        </button>
+                    </div>
+                    <button id="save-changes-btn" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition duration-220 w-full">
+                        Save Changes to Database
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-col w-full ml-8 space-y-8">
+                <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
+                    <h2 class="text-white text-2xl font-semibold mb-4">Pending Bookings</h2>
+                    <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
+                        <p class="text-white text-center w-full">No pending bookings.</p>
+                    </div>
+                </div>
+
+                <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
+                    <h2 class="text-white text-2xl font-semibold mb-4">Deleted Bookings</h2>
+                    <div id="deleted-bookings-list" class="bg-gradient-to-br from-red-800 to-orange-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
+                        <p class="text-white text-center w-full">No deleted bookings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="calendar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[99] hidden">
+        <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col text-white">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <div class="flex space-x-2 items-center">
+                    <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
+                </div>
+                <div class="flex space-x-2 items-center">
+                    <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
+                    <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month" selected>Month</option>
+                    </select>
+                    <button id="calendar-close" class="p-2 rounded-full hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
+                </div>
+            <div class="flex justify-end space-x-4 p-4 border-t border-gray-700">
+                <button id="confirm-schedule-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200" disabled>Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <form id="business-info-form">
+                <div class="mb-4">
+                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
+                        Please describe the changes you would like to make to your AI's business information:
+                    </label>
+                    <textarea id="update-details" name="updateDetails" rows="8"
+                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        Send Update Request
+                    </button>
+                    <p id="form-message" class="text-sm text-gray-400"></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
+        </video>
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
+
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
+        <div class="flex flex-col items-center">
+            <div id="loading-spinner" class="geometric-loader mb-4"></div>
+            <p id="loading-message" class="text-white text-lg font-semibold"></p>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
@@ -1431,5 +1703,7 @@
         });
 
     </script>
+</body>
+</html>
 </body>
 </html>
