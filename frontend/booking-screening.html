@@ -115,12 +115,29 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        /* cursor: pointer; REMOVED, as clickability is now controlled by the parent time-slot */
         position: relative; /* Ensure z-index works */
         z-index: 1; /* Ensure event div is above time-slot background */
+        /* Removed margin-bottom (mb-0.5) to allow parent gap to control spacing */
     }
     .calendar-event.pending {
         background-color: #F59E0B; /* amber-500 for pending events (kept as is) */
+    }
+
+    /* NEW: Add flex and gap to time-slot for better event stacking */
+    .time-slot {
+        display: flex;
+        flex-direction: column;
+        gap: 2px; /* Smaller gap for tighter packing, adjust as needed */
+        /* Ensure overflow-hidden is there as it is */
+        overflow: hidden; /* Keep this to clip events that don't fit */
+    }
+
+    /* NEW: For month view, apply similar styling to the events container */
+    .month-day-events-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2px; /* Consistent gap */
+        overflow-y: auto; /* Keep scrolling for too many events */
     }
 
     /* Removed .time-slot-unavailable CSS entirely, as blocked visual is now the event itself */
@@ -475,7 +492,6 @@
                 return events;
             } catch (error) {
                 console.error("Error fetching calendar events:", error);
-                // The query requires an index error will appear here. It's expected until you create the index in Firebase.
                 showMessage("Error loading calendar events. Check console for index requirement.", 'error');
                 return [];
             }
@@ -540,7 +556,8 @@
         // MODIFIED: Pass originalData to allow for detailed tooltips
         function addEventToCell(cellElement, event) {
             const eventDiv = document.createElement('div');
-            eventDiv.className = `calendar-event mb-0.5 ${event.type === 'pending' ? 'pending' : ''}`;
+            // Removed mb-0.5 from here, parent gap will handle spacing
+            eventDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
             
             // Display Phone_Number (or Customer_Name, or Email) directly on the event
             eventDiv.textContent = event.title; 
@@ -637,7 +654,8 @@
                     dayCell.appendChild(dateNumDiv);
                     
                     const eventsContainer = document.createElement('div');
-                    eventsContainer.className = 'text-xs space-y-1 overflow-y-auto h-16';
+                    // MODIFIED: Added month-day-events-container class for gap styling
+                    eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
                     
                     // Add events for this cell's date
                     fetchedCalendarEvents.forEach(event => {
@@ -696,7 +714,8 @@
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden'; // Removed cursor/hover here
+                    // time-slot class will handle flex/gap
+                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative'; 
 
                     // Calculate the full date and time for this specific cell/slot
                     const cellDateTime = new Date(day);
@@ -712,7 +731,6 @@
                     
                     if (isSlotOccupied) {
                         // If occupied, don't add cursor-pointer or hover effects
-                        // The calendar-event inside will provide the visual blocked effect
                         timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
                         // No click listener for NEW selection if occupied
                     } else {
@@ -772,7 +790,8 @@
 
                 // Main content area for the hour
                 const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden'; // Removed cursor/hover here
+                // time-slot class will handle flex/gap
+                contentArea.className = 'time-slot flex-1 h-full relative'; 
                 
                 // Calculate the full date and time for this specific cell/slot
                 const cellDateTime = new Date(day);
@@ -788,7 +807,6 @@
 
                 if (isSlotOccupied) {
                     // If occupied, don't add cursor-pointer or hover effects
-                    // The calendar-event inside will provide the visual blocked effect
                     contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
                     // No click listener for NEW selection if occupied
                 } else {
