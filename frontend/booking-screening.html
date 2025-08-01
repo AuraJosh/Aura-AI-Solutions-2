@@ -270,6 +270,7 @@
         // MODIFIED IMPORT: Changed FieldValue to deleteField
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        // REMOVED FieldValue, ADDED deleteField
         import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, deleteField, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration (Using global __firebase_config if available)
@@ -960,22 +961,51 @@
 
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
-                    // MODIFIED: Use deleteField()
+                    // Corrected: Use deleteField()
                     updateData.ScheduledDateTime = deleteField(); 
                 } else if (change.newStatus === 'Completed') {
-                    // MODIFIED: Use deleteField()
-                    updateData._originalSource = deleteField();
+                    // Corrected: Use deleteField()
+                    updateData._originalSource = deleteField(); // Clear original source for completed
                     if (change.scheduledTime) { 
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
                     } else {
-                        // MODIFIED: Use deleteField()
+                        // Corrected: Use deleteField()
                         updateData.ScheduledDateTime = deleteField();
                     }
+
+                    // --- NEW LOGIC FOR CREATING SCHEDULED_MEETINGS ENTRY (Pattern B) ---
+                    if (change.fullBookingData) { 
+                        const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id); 
+                        
+                        // Create a copy to avoid modifying the original data reference and ensure cleanliness
+                        const meetingData = { ...change.fullBookingData }; 
+                        
+                        // Set/Override essential fields for the scheduled meeting
+                        meetingData.Status = 'Completed'; 
+                        meetingData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
+                        meetingData.BookedBy = currentUserUid; 
+                        meetingData.ScheduledAt = Timestamp.now();
+
+                        // Clean up fields that are not relevant for scheduled_meetings
+                        delete meetingData._originalSource; 
+                        // You might want to rename the original Timestamp to avoid confusion or keep it
+                        if (meetingData.Timestamp) {
+                            meetingData.BookingRequestTimestamp = meetingData.Timestamp; 
+                            delete meetingData.Timestamp;
+                        }
+                        // Remove any other temporary/internal fields you don't want in scheduled_meetings
+                        // e.g., delete meetingData.someInternalField;
+
+                        batch.set(scheduledMeetingDocRef, meetingData, { merge: true }); // Use set with merge to create or update
+                        console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
+                    }
+                    // --- END NEW LOGIC ---
+
                 }
                 else { // 'New' or 'Pending'
-                    // MODIFIED: Use deleteField()
+                    // Corrected: Use deleteField()
                     updateData._originalSource = deleteField(); 
-                    // MODIFIED: Use deleteField()
+                    // Corrected: Use deleteField()
                     updateData.ScheduledDateTime = deleteField(); 
                 }
                 batch.update(bookingDocRef, updateData);
@@ -1350,7 +1380,9 @@
                         const updateData = {
                             id: bookingId,
                             newStatus: 'Completed',
-                            scheduledTime: selectedEventDate // This is the Date object
+                            scheduledTime: selectedEventDate, // This is the Date object
+                            // NEW: Pass the full booking data for the scheduled_meetings collection
+                            fullBookingData: currentBookingBeingScheduled 
                         };
 
                         if (existingStagedIndex !== -1) {
