@@ -270,278 +270,6 @@
         </div>
     </div>
 
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aura Booking Screening</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-03MPB9XG9B');
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" href="media/favicon.png" type="image/png">
-    <style>
-    /* Custom CSS from analytics page (kept for visual consistency, though chat logs not present here) */
-    .chat-logs-container {
-        display: flex;
-        flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;           /* Enables vertical scrolling */
-        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
-        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
-    }
-    .chat-log-message {
-        padding-bottom: 8px;
-    }
-    /* Optional: Add backdrop-filter for a subtle blur effect behind the overlay */
-    #loading-overlay {
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
-    }
-
-    /* Monochrome Geometric Flip Loader CSS */
-    .geometric-loader {
-        width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
-        aspect-ratio: .5;
-        display: grid;
-        justify-items: center;  
-        align-items: center;
-    }
-    .geometric-loader::before {
-        content: "";
-        width: 30%;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        margin: auto auto 0;
-        background: #9CA3AF; /* Tailwind gray-400 - light gray/blue-gray */
-        animation: l9-0 .5s cubic-bezier(0,800,1,800) infinite;
-    }
-    .geometric-loader::after {
-        content: "";
-        width: 100%;
-        aspect-ratio: 1 / 0.866;
-        margin: 0 auto auto;
-        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
-        background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
-        animation: l9-1 .5s linear infinite;
-    }
-    @keyframes l9-0 {
-        0%,2%  {translate: 0   0%}
-        98%,to {translate: 0 -.2%}
-    }
-    @keyframes l9-1 {
-        0%,5%  {rotate:  0deg}
-        95%,to {rotate:-60deg}
-    }
-    /* Basic styling for custom message box */
-    .message-box {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 0.5rem;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
-    .message-box.error { background-color: #EF4444; /* red-500 */ }
-    .message-box.success { background-color: #22C55E; /* green-500 */ }
-
-    /* Custom calendar styles from user prompt */
-    #calendar-grid {
-        scrollbar-width: thin;
-        scrollbar-color: #4b5563 #1f2937;
-    }
-    #calendar-grid::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-    }
-    #calendar-grid::-webkit-scrollbar-track {
-        background: #1f2937;
-    }
-    #calendar-grid::-webkit-scrollbar-thumb {
-        background-color: #4b5563;
-        border-radius: 4px;
-    }
-
-    /* Styles for selected time slots */
-    .time-slot.selected {
-        background-color: #1D4ED8; /* blue-700 */
-        border: 2px solid #3B82F6; /* blue-500 */
-    }
-    .day-cell-month-selected {
-        background-color: #1D4ED8; /* blue-700 */
-        border: 2px solid #3B82F6 !important; /* blue-500 */
-    }
-
-    /* Event display styles */
-    .calendar-event {
-        background-color: #EF4444; /* red-500 for booked events */
-        color: white;
-        padding: 2px 4px;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        line-height: 1rem;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        cursor: pointer;
-    }
-    .calendar-event.pending {
-        background-color: #F59E0B; /* amber-500 for pending events (if you decide to display them) */
-    }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen overflow-auto">
-
-    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
-        <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="container mx-auto flex items-center justify-between p-4 relative">
-            <div class="flex items-center space-x-4">
-                <div class="relative h-20 w-[150px]">
-                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
-                </div>
-                <span class="text-white text-base">Aura AI Solutions</span>
-            </div>
-            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Booking Screening</h1>
-            <div class="flex items-center space-x-4">
-                <a href="analytics.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                    Back to Analytics
-                </a>
-                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
-            </div>
-        </div>
-    </header>
-
-    <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex">
-            <div class="p-8 rounded-xl shadow-2xl bg-gray-900/70 w-full max-w-2xl h-[fit-content] flex items-center justify-center">
-                <div id="booking-screening-display" class="w-full max-w-2xl h-[fit-content] flex flex-col items-center">
-                    <h2 class="text-white text-2xl font-semibold mb-4">Booking Requests</h2>
-                    <div class="flex items-center justify-between w-full px-4">
-                        <button id="prev-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&lt;</button>
-                        <div id="booking-card" class="bg-gradient-to-br from-purple-800 to-indigo-900 p-8 rounded-2xl shadow-xl w-full max-w-2xl h-[450px] overflow-y-auto flex flex-col justify-start items-start">
-                            <p class="text-white text-center w-full">Loading booking requests...</p>
-                        </div>
-                        <button id="next-booking-btn" class="text-white text-5xl p-2 rounded-full hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition duration-200">&gt;</button>
-                    </div>
-                    <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
-                    <div class="flex justify-center space-x-4 mt-4 w-full">
-                        <button id="move-to-pending-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
-                            Move booking to pending
-                        </button>
-                        <button id="delete-booking-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
-                            Delete booking
-                        </button>
-                    </div>
-                    <button id="save-changes-btn" class="mt-6 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition duration-220 w-full">
-                        Save Changes to Database
-                    </button>
-                </div>
-            </div>
-
-            <div class="flex flex-col w-full ml-8 space-y-8">
-                <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
-                    <h2 class="text-white text-2xl font-semibold mb-4">Pending Bookings</h2>
-                    <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
-                        <p class="text-white text-center w-full">No pending bookings.</p>
-                    </div>
-                </div>
-
-                <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
-                    <h2 class="text-white text-2xl font-semibold mb-4">Deleted Bookings</h2>
-                    <div id="deleted-bookings-list" class="bg-gradient-to-br from-red-800 to-orange-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
-                        <p class="text-white text-center w-full">No deleted bookings.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div id="calendar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[99] hidden">
-        <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col text-white">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700">
-                <div class="flex space-x-2 items-center">
-                    <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
-                </div>
-                <div class="flex space-x-2 items-center">
-                    <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
-                    <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                        <option value="day">Day</option>
-                        <option value="week">Week</option>
-                        <option value="month" selected>Month</option>
-                    </select>
-                    <button id="calendar-close" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
-                </div>
-            <div class="flex justify-end space-x-4 p-4 border-t border-gray-700">
-                <button id="confirm-schedule-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200" disabled>Confirm Booking</button>
-            </div>
-        </div>
-    </div>
-
-
-    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
-            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
-            <form id="business-info-form">
-                <div class="mb-4">
-                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
-                        Please describe the changes you would like to make to your AI's business information:
-                    </label>
-                    <textarea id="update-details" name="updateDetails" rows="8"
-                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
-                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
-                        Send Update Request
-                    </button>
-                    <p id="form-message" class="text-sm text-gray-400"></p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
-        </video>
-        <div class="absolute inset-0 bg-black/60"></div>
-    </div>
-
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
-        <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="geometric-loader mb-4"></div>
-            <p id="loading-message" class="text-white text-lg font-semibold"></p>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
@@ -618,12 +346,14 @@
         }
 
         function updateSaveButtonState() {
-            saveChangesBtn.disabled = (stagedChanges.length + stagedScheduledMeetings.length) === 0;
-            if ((stagedChanges.length + stagedScheduledMeetings.length) > 0) {
-                saveChangesBtn.textContent = `Save Changes (${stagedChanges.length + stagedScheduledMeetings.length})`;
+            const totalStaged = stagedChanges.length + stagedScheduledMeetings.length;
+            saveChangesBtn.disabled = totalStaged === 0;
+            if (totalStaged > 0) {
+                saveChangesBtn.textContent = `Save Changes (${totalStaged})`;
             } else {
                 saveChangesBtn.textContent = 'Save Changes to Database';
             }
+            console.log(`[updateSaveButtonState] Staged Changes: ${stagedChanges.length}, Staged Scheduled: ${stagedScheduledMeetings.length}, Total: ${totalStaged}, Button Disabled: ${saveChangesBtn.disabled}`);
         }
 
         function showMessage(message, type = 'info') {
@@ -670,8 +400,9 @@
         // --- CUSTOM CALENDAR LOGIC ---
 
         async function fetchCalendarEvents(startDate, endDate) {
+            console.log("[fetchCalendarEvents] Fetching events for range:", startDate, "to", endDate);
             if (!currentAccountId) {
-                console.warn("Account ID not available for fetching calendar events.");
+                console.warn("[fetchCalendarEvents] Account ID not available for fetching calendar events.");
                 return [];
             }
             try {
@@ -685,12 +416,12 @@
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
-                console.log("Querying for Scheduled Meetings from 'scheduled_meetings' collection...");
+                console.log("[fetchCalendarEvents] Querying for Scheduled Meetings from 'scheduled_meetings' collection...");
                 const querySnapshotScheduled = await getDocs(qScheduled);
-                console.log("Scheduled Meetings query snapshot size:", querySnapshotScheduled.size);
+                console.log("[fetchCalendarEvents] Scheduled Meetings query snapshot size:", querySnapshotScheduled.size);
                 querySnapshotScheduled.docs.forEach(doc => {
                     const data = doc.data();
-                    console.log("Fetched Scheduled Meeting data:", data);
+                    console.log("[fetchCalendarEvents] Fetched Scheduled Meeting data:", data);
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
                             title: data.Customer_Name || data.Email || 'Meeting',
@@ -700,7 +431,7 @@
                             originalBookingId: data.originalBookingId || null // Link back to original booking if needed
                         });
                     } else {
-                        console.warn("Scheduled meeting missing ScheduledDateTime or invalid:", data);
+                        console.warn("[fetchCalendarEvents] Scheduled meeting missing ScheduledDateTime or invalid:", data);
                     }
                 });
 
@@ -711,15 +442,16 @@
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'), // Or whatever status means it has a scheduled time but isn't confirmed
+                    // Only include if they *might* have a ScheduledDateTime set from some other process
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
-                console.log("Querying for Pending bookings from 'bookings' collection...");
+                console.log("[fetchCalendarEvents] Querying for Pending bookings from 'bookings' collection...");
                 const querySnapshotPending = await getDocs(qPending);
-                console.log("Pending query snapshot size:", querySnapshotPending.size);
+                console.log("[fetchCalendarEvents] Pending query snapshot size:", querySnapshotPending.size);
                 querySnapshotPending.docs.forEach(doc => {
                     const data = doc.data();
-                    console.log("Fetched Pending booking data:", data);
+                    console.log("[fetchCalendarEvents] Fetched Pending booking data:", data);
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
                             title: data.Customer_Name || data.Email || 'Pending Booking',
@@ -728,14 +460,14 @@
                             type: 'pending'
                         });
                     } else {
-                        console.warn("Pending booking missing ScheduledDateTime or invalid:", data);
+                        console.warn("[fetchCalendarEvents] Pending booking missing ScheduledDateTime or invalid:", data);
                     }
                 });
                 
-                console.log("Total events fetched for calendar:", events);
+                console.log("[fetchCalendarEvents] Total events fetched for calendar:", events);
                 return events;
             } catch (error) {
-                console.error("Error fetching calendar events:", error);
+                console.error("[fetchCalendarEvents] Error fetching calendar events:", error);
                 showMessage("Error loading calendar events.", 'error');
                 return [];
             }
@@ -753,6 +485,7 @@
 
             calendarOverlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scrolling background
+            console.log("[openBookingCalendarModal] Opening calendar for booking:", bookingData.id);
             renderCalendar(); // Render the calendar when opening
         }
         
@@ -797,10 +530,9 @@
                 calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             }
 
-            // Fetch events before rendering
+            console.log("[renderCalendar] About to fetch events for view:", currentView, "from", fetchStartDate, "to", fetchEndDate);
             fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
 
-            // Now call the specific render function with the fetched events
             if (currentView === 'month') {
                 renderMonthView();
             } else if (currentView === 'week') {
@@ -808,6 +540,7 @@
             } else {
                 renderDayView();
             }
+            console.log("[renderCalendar] Calendar rendered for view:", currentView);
         }
 
         function addEventToCell(cellElement, event) {
@@ -824,10 +557,11 @@
             });
 
             cellElement.appendChild(eventDiv);
+            console.log(`[addEventToCell] Added event: ${event.title} to cell. Event type: ${event.type}`);
         }
 
         function renderMonthView() {
-            // Create header with day names
+            console.log("[renderMonthView] Rendering Month View.");
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
@@ -888,6 +622,7 @@
                             selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); // Default to current time for month selection
                             confirmScheduleBtn.disabled = false;
                             e.currentTarget.classList.add('day-cell-month-selected');
+                            console.log("[MonthView] Date selected:", selectedEventDate);
                             showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour in week/day view)`, 'info');
                         });
 
@@ -915,96 +650,50 @@
             }
         }
 
-        function renderWeekView() {
-            const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-            startOfWeek.setHours(0,0,0,0);
+    function renderWeekView() {
+        console.log("[renderWeekView] Rendering Week View.");
+        const startOfWeek = new Date(currentDate);
+        startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+        startOfWeek.setHours(0,0,0,0);
 
-            const headerRow = document.createElement('div');
-            headerRow.className = 'grid grid-cols-8 gap-1';
-            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
+        const headerRow = document.createElement('div');
+        headerRow.className = 'grid grid-cols-8 gap-1';
+        headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
+        for (let i = 0; i < 7; i++) {
+            const day = new Date(startOfWeek);
+            day.setDate(startOfWeek.getDate() + i);
+            const isToday = day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() && day.getFullYear() === new Date().getFullYear();
+            
+            headerRow.innerHTML += `
+                <div class="text-center p-2 border-b border-gray-700">
+                    <div class="text-gray-400 text-sm">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                    <div class="${isToday ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">
+                        ${day.getDate()}
+                    </div>
+                </div>
+            `;
+        }
+        calendarGrid.appendChild(headerRow);
+
+        for (let hour = 8; hour < 20; hour++) {
+            const timeRow = document.createElement('div');
+            timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
+            
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
+            timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
+            timeRow.appendChild(timeLabel);
+
             for (let i = 0; i < 7; i++) {
                 const day = new Date(startOfWeek);
                 day.setDate(startOfWeek.getDate() + i);
-                const isToday = day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() && day.getFullYear() === new Date().getFullYear();
                 
-                headerRow.innerHTML += `
-                    <div class="text-center p-2 border-b border-gray-700">
-                        <div class="text-gray-400 text-sm">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div class="${isToday ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">
-                            ${day.getDate()}
-                        </div>
-                    </div>
-                `;
-            }
-            calendarGrid.appendChild(headerRow);
+                const timeCell = document.createElement('div');
+                timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden cursor-pointer hover:bg-gray-700/50';
+                timeCell.dataset.date = day.toISOString();
+                timeCell.dataset.hour = hour;
 
-            for (let hour = 8; hour < 20; hour++) {
-                const timeRow = document.createElement('div');
-                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
-                
-                const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
-                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
-                timeRow.appendChild(timeLabel);
-
-                for (let i = 0; i < 7; i++) {
-                    const day = new Date(startOfWeek);
-                    day.setDate(startOfWeek.getDate() + i);
-                    
-                    const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative flex flex-col overflow-hidden cursor-pointer hover:bg-gray-700/50';
-                    timeCell.dataset.date = day.toISOString();
-                    timeCell.dataset.hour = hour;
-
-                    timeCell.addEventListener('click', (e) => {
-                        document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                        document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                        const selectedDate = new Date(e.currentTarget.dataset.date);
-                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
-                        selectedEventDate = selectedDate;
-                        confirmScheduleBtn.disabled = false;
-                        e.currentTarget.classList.add('selected');
-                        showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
-                    });
-
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getFullYear() === day.getFullYear() &&
-                            event.start.getMonth() === day.getMonth() &&
-                            event.start.getDate() === day.getDate() &&
-                            event.start.getHours() === hour) {
-                            addEventToCell(timeCell, event);
-                        }
-                    });
-                    
-                    timeRow.appendChild(timeCell);
-                }
-                calendarGrid.appendChild(timeRow);
-            }
-        }
-
-        function renderDayView() {
-            const day = currentDate;
-
-            const timeSlotsContainer = document.createElement('div');
-            timeSlotsContainer.className = 'space-y-1';
-
-            for (let hour = 8; hour < 20; hour++) {
-                const timeSlot = document.createElement('div');
-                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
-                
-                const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
-                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
-                timeSlot.appendChild(timeLabel);
-
-                const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden cursor-pointer hover:bg-gray-700/50';
-                contentArea.dataset.date = day.toISOString();
-                contentArea.dataset.hour = hour;
-
-                contentArea.addEventListener('click', (e) => {
+                timeCell.addEventListener('click', (e) => {
                     document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                     document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
 
@@ -1013,344 +702,426 @@
                     selectedEventDate = selectedDate;
                     confirmScheduleBtn.disabled = false;
                     e.currentTarget.classList.add('selected');
+                    console.log("[WeekView] Time slot selected:", selectedEventDate);
                     showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                 });
-                
+
                 fetchedCalendarEvents.forEach(event => {
                     if (event.start.getFullYear() === day.getFullYear() &&
                         event.start.getMonth() === day.getMonth() &&
                         event.start.getDate() === day.getDate() &&
                         event.start.getHours() === hour) {
-                        addEventToCell(contentArea, event);
+                        addEventToCell(timeCell, event);
                     }
                 });
-
-                timeSlot.appendChild(contentArea);
-                timeSlotsContainer.appendChild(timeSlot);
+                
+                timeRow.appendChild(timeCell);
             }
-            calendarGrid.appendChild(timeSlotsContainer);
+            calendarGrid.appendChild(timeRow);
         }
+    }
 
-        // Calendar event listeners (for navigation and view change)
-        calendarClose.addEventListener('click', () => {
-            calendarOverlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        });
+    function renderDayView() {
+        console.log("[renderDayView] Rendering Day View.");
+        const day = currentDate;
 
-        calendarPrev.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() - 7);
-            } else { // day
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
-            renderCalendar();
-        });
+        const timeSlotsContainer = document.createElement('div');
+        timeSlotsContainer.className = 'space-y-1';
 
-        calendarNext.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() + 7);
-            } else { // day
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            renderCalendar();
-        });
+        for (let hour = 8; hour < 20; hour++) {
+            const timeSlot = document.createElement('div');
+            timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
+            
+            const timeLabel = document.createElement('div');
+            timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
+            timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
+            timeSlot.appendChild(timeLabel);
 
-        calendarToday.addEventListener('click', () => {
-            currentDate = new Date();
-            renderCalendar();
-        });
+            const contentArea = document.createElement('div');
+            contentArea.className = 'time-slot flex-1 h-full relative overflow-hidden cursor-pointer hover:bg-gray-700/50';
+            contentArea.dataset.date = day.toISOString();
+            contentArea.dataset.hour = hour;
 
-        calendarViewSelect.addEventListener('change', (e) => {
-            currentView = e.target.value;
-            renderCalendar();
-        });
+            contentArea.addEventListener('click', (e) => {
+                document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
 
-        // --- Core Booking App Logic ---
-
-        onAuthStateChanged(auth, async (user) => {
-            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
-                try {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token from Canvas.");
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                    showMessage("Authentication failed. Please try logging in again.", 'error');
-                    window.location.href = "login.html";
+                const selectedDate = new Date(e.currentTarget.dataset.date);
+                selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
+                selectedEventDate = selectedDate;
+                confirmScheduleBtn.disabled = false;
+                e.currentTarget.classList.add('selected');
+                console.log("[DayView] Time slot selected:", selectedEventDate);
+                showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+            });
+            
+            fetchedCalendarEvents.forEach(event => {
+                if (event.start.getFullYear() === day.getFullYear() &&
+                    event.start.getMonth() === day.getMonth() &&
+                    event.start.getDate() === day.getDate() &&
+                    event.start.getHours() === hour) {
+                    addEventToCell(contentArea, event);
                 }
-                return;
-            }
-
-            if (!user) {
-                if (authInitialized) {
-                    window.location.href = "login.html";
-                } else {
-                    console.log("Auth state not yet resolved, waiting for user object...");
-                }
-                return;
-            }
-
-            if (!authInitialized) {
-                authInitialized = true;
-                currentUserUid = user.uid;
-                console.log("Logged-in user ID (Firebase UID):", currentUserUid);
-                initializeBookingData();
-            }
-        });
-
-        async function initializeBookingData() {
-            showLoading("Finding your account...");
-
-            try {
-                const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
-                const userMappingSnap = await getDoc(userMappingDocRef);
-
-                if (!userMappingSnap.exists()) {
-                    const errorMessage = `No account mapping found for your user ID: ${currentUserUid}. Please contact support.`;
-                    bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    pendingBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    hideLoading();
-                    return;
-                }
-
-                currentAccountId = userMappingSnap.data().accountId;
-                console.log("Mapped Account ID:", currentAccountId);
-
-                if (!currentAccountId) {
-                    const errorMessage = `Account ID not found in mapping for user ID: ${currentUserUid}. Please contact support.`;
-                    bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    pendingBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    hideLoading();
-                    return;
-                }
-
-                showLoading("Loading your booking data...");
-
-                const bookingsCollectionRef = collection(db, 'accounts', currentAccountId, 'bookings');
-                onSnapshot(bookingsCollectionRef, (snapshot) => {
-                    bookingsData = [];
-                    pendingBookings = [];
-                    deletedBookings = [];
-                    bookingFieldsConfig = []; 
-
-                    snapshot.forEach(doc => {
-                        const booking = { id: doc.id, ...doc.data() };
-                        const status = booking.Status ? booking.Status.toString().trim() : '';
-
-                        if (bookingFieldsConfig.length === 0) {
-                             Object.keys(booking).forEach(key => {
-                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                                    bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
-                                }
-                            });
-                            if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
-                                bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
-                            }
-                            if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
-                                bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
-                            }
-                            if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
-                                bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
-                            }
-                        }
-
-                        // Filter out 'Scheduled' bookings from these lists as they now go to scheduled_meetings
-                        if (status === 'New' || status === '') {
-                            bookingsData.push(booking);
-                        } else if (status === 'Pending') {
-                            pendingBookings.push(booking);
-                        } else if (status === 'Deleted') {
-                            booking._originalSource = booking._originalSource || 'UNKNOWN';
-                            deletedBookings.push(booking);
-                        }
-                    });
-
-                    bookingsData.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
-                        return dateA - dateB;
-                    });
-                    pendingBookings.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
-                        return dateA - dateB;
-                    });
-                    deletedBookings.sort((a, b) => {
-                        const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
-                        const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
-                        return dateA - dateB;
-                    });
-
-                    if (bookingsData.length > 0) {
-                        currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
-                    } else {
-                        currentBookingIndex = 0;
-                    }
-
-                    renderBookingCard();
-                    renderPendingBookings();
-                    renderDeletedBookings();
-                    updateSaveButtonState();
-                    hideLoading();
-                    console.log("Booking data updated from Firestore.");
-                }, (error) => {
-                    console.error("Error listening to bookings:", error);
-                    const errorMessage = `<p class="text-red-400 text-center w-full">Failed to load booking data: ${error.message}. Please check security rules or contact support.</p>`;
-                    bookingCardElement.innerHTML = errorMessage;
-                    pendingBookingsListElement.innerHTML = errorMessage;
-                    deletedBookingsListElement.innerHTML = errorMessage;
-                    hideLoading();
-                });
-
-            } catch (error) {
-                console.error('Error during initial setup or data fetch:', error);
-                const fetchErrorMessage = `<p class="text-red-400 text-center w-full">Failed to initialize booking data: ${error.message}.</p>`;
-                bookingCardElement.innerHTML = fetchErrorMessage;
-                pendingBookingsListElement.innerHTML = fetchErrorMessage;
-                deletedBookingsListElement.innerHTML = fetchErrorMessage;
-                hideLoading();
-            }
-        }
-
-        // Logout button
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                window.location.href = "login.html";
-            } catch (err) {
-                showMessage("Logout failed: " + err.message, 'error');
-            }
-        });
-
-        // Modified function to send batch updates
-        async function sendBatchBookingUpdates(updates) {
-            if (!currentAccountId) {
-                console.error("Account not identified, cannot send update.");
-                return { success: false, error: "Account not identified." };
-            }
-
-            if (updates.length === 0 && stagedScheduledMeetings.length === 0) { // Check both staged arrays
-                return { success: true, message: "No changes to save." };
-            }
-
-            const batch = writeBatch(db);
-
-            // 1. Handle updates for the 'bookings' collection (status changes for original requests)
-            updates.forEach(change => {
-                const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
-                const updateData = { Status: change.newStatus };
-
-                if (change.newStatus === 'Deleted') {
-                    updateData._originalSource = change.originalSource || 'UNKNOWN';
-                } else if (change.newStatus === 'Scheduled') { // New status: 'Scheduled' for original booking
-                    updateData._originalSource = FieldValue.delete(); // Clear originalSource
-                    // ScheduledDateTime will be stored in the new collection, not here.
-                }
-                else { // 'New' or 'Pending' or 'Undo' from Deleted to New/Pending
-                    updateData._originalSource = FieldValue.delete();
-                }
-                batch.update(bookingDocRef, updateData);
             });
 
-            // 2. Handle creations for the 'scheduled_meetings' collection
-            for (const meeting of stagedScheduledMeetings) {
-                const newMeetingRef = doc(collection(db, 'accounts', currentAccountId, 'scheduled_meetings')); // Auto-ID
-                batch.set(newMeetingRef, {
-                    // Copy relevant fields from the original booking
-                    originalBookingId: meeting.originalBookingId,
-                    Customer_Name: meeting.Customer_Name,
-                    Email: meeting.Email,
-                    Subject: meeting.Subject,
-                    Service: meeting.Service,
-                    ScheduledDateTime: Timestamp.fromDate(meeting.scheduledTime),
-                    DurationHours: meeting.durationHours || 1, // Default to 1 hour
-                    CreatedAt: Timestamp.now()
-                    // Add any other fields you want to copy to the scheduled meeting
-                });
-            }
+            timeSlot.appendChild(contentArea);
+            timeSlotsContainer.appendChild(timeSlot);
+        }
+        calendarGrid.appendChild(timeSlotsContainer);
+    }
 
+    // Calendar event listeners (for navigation and view change)
+    calendarClose.addEventListener('click', () => {
+        calendarOverlay.classList.add('hidden');
+        document.body.style.overflow = '';
+        console.log("[calendarClose] Calendar modal closed.");
+    });
+
+    calendarPrev.addEventListener('click', () => {
+        if (currentView === 'month') {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+        } else if (currentView === 'week') {
+            currentDate.setDate(currentDate.getDate() - 7);
+        } else { // day
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
+        console.log("[calendarPrev] New date:", currentDate);
+        renderCalendar();
+    });
+
+    calendarNext.addEventListener('click', () => {
+        if (currentView === 'month') {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        } else if (currentView === 'week') {
+            currentDate.setDate(currentDate.getDate() + 7);
+        } else { // day
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        console.log("[calendarNext] New date:", currentDate);
+        renderCalendar();
+    });
+
+    calendarToday.addEventListener('click', () => {
+        currentDate = new Date();
+        console.log("[calendarToday] Reset to today:", currentDate);
+        renderCalendar();
+    });
+
+    calendarViewSelect.addEventListener('change', (e) => {
+        currentView = e.target.value;
+        console.log("[calendarViewSelect] Changed view to:", currentView);
+        renderCalendar();
+    });
+
+    // --- Core Booking App Logic ---
+
+    onAuthStateChanged(auth, async (user) => {
+        if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
             try {
-                await batch.commit();
-                // Clear both staged arrays on successful commit
-                stagedScheduledMeetings = []; 
-                stagedChanges = []; // Also clear general stagedChanges
-
-                return { success: true, message: "Booking statuses and scheduled meetings updated successfully." };
+                await signInWithCustomToken(auth, __initial_auth_token);
+                console.log("[onAuthStateChanged] Signed in with custom token from Canvas.");
             } catch (error) {
-                console.error('Error committing batch updates:', error);
-                return { success: false, error: `Failed to save changes: ${error.message}` };
+                console.error("[onAuthStateChanged] Error signing in with custom token:", error);
+                showMessage("Authentication failed. Please try logging in again.", 'error');
+                window.location.href = "login.html";
             }
+            return;
         }
 
-        function renderBookingCard() {
-            if (bookingsData.length === 0) {
-                bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No new booking requests found for this account.</p>';
-                prevButton.disabled = true;
-                nextButton.disabled = true;
-                moveToPendingBtn.disabled = true;
-                deleteBookingBtn.disabled = true;
-                cardCounterElement.textContent = '';
+        if (!user) {
+            if (authInitialized) {
+                window.location.href = "login.html";
+            } else {
+                console.log("[onAuthStateChanged] Auth state not yet resolved, waiting for user object...");
+            }
+            return;
+        }
+
+        if (!authInitialized) {
+            authInitialized = true;
+            currentUserUid = user.uid;
+            console.log("[onAuthStateChanged] Logged-in user ID (Firebase UID):", currentUserUid);
+            initializeBookingData();
+        }
+    });
+
+    async function initializeBookingData() {
+        showLoading("Finding your account...");
+
+        try {
+            const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
+            const userMappingSnap = await getDoc(userMappingDocRef);
+
+            if (!userMappingSnap.exists()) {
+                const errorMessage = `No account mapping found for your user ID: ${currentUserUid}. Please contact support.`;
+                bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                pendingBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                hideLoading();
                 return;
             }
 
-            const currentBooking = bookingsData[currentBookingIndex];
-            let cardContentArray = [];
+            currentAccountId = userMappingSnap.data().accountId;
+            console.log("[initializeBookingData] Mapped Account ID:", currentAccountId);
 
-            if (bookingFieldsConfig.length === 0) {
-                 Object.keys(currentBooking).forEach(key => {
-                    if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                        bookingFieldsConfig.push({ field: key, question: key });
-                    }
-                });
-                if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
-                // Note: ScheduledDateTime is less relevant here for New/Pending, as it will be moved.
-                // But keeping it for consistency if needed for other statuses.
-                if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
-                if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
+            if (!currentAccountId) {
+                const errorMessage = `Account ID not found in mapping for user ID: ${currentUserUid}. Please contact support.`;
+                bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                pendingBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                hideLoading();
+                return;
             }
 
+            showLoading("Loading your booking data...");
 
-            bookingFieldsConfig.forEach(fieldConfig => {
-                let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
+            const bookingsCollectionRef = collection(db, 'accounts', currentAccountId, 'bookings');
+            onSnapshot(bookingsCollectionRef, (snapshot) => {
+                bookingsData = [];
+                pendingBookings = [];
+                deletedBookings = [];
+                bookingFieldsConfig = []; 
 
-                if ((fieldConfig.field === 'Timestamp' || fieldConfig.field === 'ScheduledDateTime') && fieldValue) {
-                    if (fieldValue.toDate) {
-                        fieldValue = fieldValue.toDate().toLocaleString();
+                snapshot.forEach(doc => {
+                    const booking = { id: doc.id, ...doc.data() };
+                    const status = booking.Status ? booking.Status.toString().trim() : '';
+
+                    if (bookingFieldsConfig.length === 0) {
+                         Object.keys(booking).forEach(key => {
+                            if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
+                                bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
+                            }
+                        });
+                        if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
+                            bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                        }
+                        if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
+                            bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
+                        }
+                        if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
+                            bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
+                        }
+                    }
+
+                    // Filter out 'Scheduled' bookings from these lists as they now go to scheduled_meetings
+                    if (status === 'New' || status === '') {
+                        bookingsData.push(booking);
+                    } else if (status === 'Pending') {
+                        pendingBookings.push(booking);
+                    } else if (status === 'Deleted') {
+                        booking._originalSource = booking._originalSource || 'UNKNOWN';
+                        deletedBookings.push(booking);
+                    }
+                });
+
+                bookingsData.sort((a, b) => {
+                    const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                    const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
+                    return dateA - dateB;
+                });
+                pendingBookings.sort((a, b) => {
+                    const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                    const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
+                    return dateA - dateB;
+                });
+                deletedBookings.sort((a, b) => {
+                    const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
+                    const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
+                    return dateA - dateB;
+                });
+
+                if (bookingsData.length > 0) {
+                    currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
+                } else {
+                    currentBookingIndex = 0;
+                }
+
+                renderBookingCard();
+                renderPendingBookings();
+                renderDeletedBookings();
+                updateSaveButtonState(); // Call after initial data load
+                hideLoading();
+                console.log("[initializeBookingData] Booking data updated from Firestore on snapshot.");
+            }, (error) => {
+                console.error("[initializeBookingData] Error listening to bookings:", error);
+                const errorMessage = `<p class="text-red-400 text-center w-full">Failed to load booking data: ${error.message}. Please check security rules or contact support.</p>`;
+                bookingCardElement.innerHTML = errorMessage;
+                pendingBookingsListElement.innerHTML = errorMessage;
+                deletedBookingsListElement.innerHTML = errorMessage;
+                hideLoading();
+            });
+
+        } catch (error) {
+            console.error('[initializeBookingData] Error during initial setup or data fetch:', error);
+            const fetchErrorMessage = `<p class="text-red-400 text-center w-full">Failed to initialize booking data: ${error.message}.</p>`;
+            bookingCardElement.innerHTML = fetchErrorMessage;
+            pendingBookingsListElement.innerHTML = fetchErrorMessage;
+            deletedBookingsListElement.innerHTML = fetchErrorMessage;
+            hideLoading();
+        }
+    }
+
+    // Logout button
+    document.getElementById("logout-btn").addEventListener("click", async () => {
+        try {
+            await signOut(auth);
+            window.location.href = "login.html";
+        } catch (err) {
+            showMessage("Logout failed: " + err.message, 'error');
+        }
+    });
+
+    async function sendBatchBookingUpdates(updates) {
+        console.log("[sendBatchBookingUpdates] Function called.");
+        console.log("[sendBatchBookingUpdates] updates (for bookings collection):", updates);
+        console.log("[sendBatchBookingUpdates] stagedScheduledMeetings (for new collection):", stagedScheduledMeetings);
+
+        if (!currentAccountId) {
+            console.error("[sendBatchBookingUpdates] Account not identified, cannot send update.");
+            return { success: false, error: "Account not identified." };
+        }
+
+        if (updates.length === 0 && stagedScheduledMeetings.length === 0) {
+            console.log("[sendBatchBookingUpdates] No changes to save.");
+            return { success: true, message: "No changes to save." };
+        }
+
+        const batch = writeBatch(db);
+
+        updates.forEach(change => {
+            const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
+            const updateData = { Status: change.newStatus };
+
+            if (change.newStatus === 'Deleted') {
+                updateData._originalSource = change.originalSource || 'UNKNOWN';
+            } else if (change.newStatus === 'Scheduled') {
+                updateData._originalSource = FieldValue.delete(); // FIX: Call delete() as a function
+                // ScheduledDateTime is NOT stored in original booking anymore, but in scheduled_meetings
+            }
+            else {
+                updateData._originalSource = FieldValue.delete(); // FIX: Call delete() as a function
+            }
+            batch.update(bookingDocRef, updateData);
+            console.log(`[sendBatchBookingUpdates] Batching update for original booking ${change.id} to Status: ${change.newStatus}`);
+        });
+
+        for (const meeting of stagedScheduledMeetings) {
+            const newMeetingRef = doc(collection(db, 'accounts', currentAccountId, 'scheduled_meetings'));
+            const dataToSet = {
+                originalBookingId: meeting.originalBookingId,
+                Customer_Name: meeting.Customer_Name,
+                Email: meeting.Email,
+                Subject: meeting.Subject,
+                Service: meeting.Service,
+                ScheduledDateTime: Timestamp.fromDate(meeting.scheduledTime),
+                DurationHours: meeting.durationHours || 1,
+                CreatedAt: Timestamp.now()
+            };
+            batch.set(newMeetingRef, dataToSet);
+            console.log(`[sendBatchBookingUpdates] Batching new scheduled meeting from original booking ${meeting.originalBookingId}`);
+        }
+
+        try {
+            await batch.commit();
+            console.log("[sendBatchBookingUpdates] Batch commit successful.");
+            stagedScheduledMeetings = []; 
+            stagedChanges = []; 
+            return { success: true, message: "Booking statuses and scheduled meetings updated successfully." };
+        } catch (error) {
+            console.error('[sendBatchBookingUpdates] Error committing batch updates:', error);
+            return { success: false, error: `Failed to save changes: ${error.message}` };
+        }
+    }
+
+    function renderBookingCard() {
+        if (bookingsData.length === 0) {
+            bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No new booking requests found for this account.</p>';
+            prevButton.disabled = true;
+            nextButton.disabled = true;
+            moveToPendingBtn.disabled = true;
+            deleteBookingBtn.disabled = true;
+            cardCounterElement.textContent = '';
+            return;
+        }
+
+        const currentBooking = bookingsData[currentBookingIndex];
+        let cardContentArray = [];
+
+        if (bookingFieldsConfig.length === 0) {
+             Object.keys(currentBooking).forEach(key => {
+                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
+                    bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
+                }
+            });
+            if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
+                bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+            }
+            if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
+                bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
+            }
+            if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
+                bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
+            }
+        }
+
+
+        bookingFieldsConfig.forEach(fieldConfig => {
+            let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
+
+            if ((fieldConfig.field === 'Timestamp' || fieldConfig.field === 'ScheduledDateTime') && fieldValue) {
+                if (fieldValue.toDate) {
+                    fieldValue = fieldValue.toDate().toLocaleString();
+                } else if (fieldValue instanceof Date) {
+                    fieldValue = fieldValue.toLocaleString();
+                } else {
+                    fieldValue = fieldValue.toString().trim();
+                }
+            } else {
+                fieldValue = fieldValue.toString().trim();
+            }
+            cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
+        });
+
+        const combinedContent = cardContentArray.join('<br><br>');
+
+        bookingCardElement.innerHTML = `
+            <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
+        `;
+
+        updateNavigationButtons();
+        cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
+        moveToPendingBtn.disabled = false;
+        deleteBookingBtn.disabled = false;
+    }
+
+    function renderShortenedBookingItem(booking, type, indexInList) {
+        let displayValues = [];
+        const fieldsToDisplay = ['Timestamp', 'Customer_Name', 'Email', 'Subject', 'Service', 'ScheduledDateTime'];
+        let displayedCount = 0;
+
+        for (const fieldName of fieldsToDisplay) {
+            if (booking[fieldName] !== undefined && displayedCount < 3) {
+                let fieldValue = (booking[fieldName] || 'N/A');
+                if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
+                    if (fieldValue && fieldValue.toDate) {
+                        fieldValue = fieldValue.toDate().toLocaleDateString();
                     } else if (fieldValue instanceof Date) {
-                        fieldValue = fieldValue.toLocaleString();
+                        fieldValue = fieldValue.toLocaleDateString();
                     } else {
                         fieldValue = fieldValue.toString().trim();
                     }
                 } else {
                     fieldValue = fieldValue.toString().trim();
                 }
-                cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
-            });
-
-            const combinedContent = cardContentArray.join('<br><br>');
-
-            bookingCardElement.innerHTML = `
-                <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
-            `;
-
-            updateNavigationButtons();
-            cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
-            moveToPendingBtn.disabled = false;
-            deleteBookingBtn.disabled = false;
+                displayValues.push(fieldValue);
+                displayedCount++;
+            }
         }
 
-        function renderShortenedBookingItem(booking, type, indexInList) {
-            let displayValues = [];
-            const fieldsToDisplay = ['Timestamp', 'Customer_Name', 'Email', 'Subject', 'Service', 'ScheduledDateTime'];
-            let displayedCount = 0;
-
-            for (const fieldName of fieldsToDisplay) {
-                if (booking[fieldName] !== undefined && displayedCount < 3) {
+        if (displayedCount < 3 && bookingFieldsConfig.length > 0) {
+            for (let i = 0; i < bookingFieldsConfig.length && displayedCount < 3; i++) {
+                const fieldName = bookingFieldsConfig[i].field;
+                if (!fieldsToDisplay.includes(fieldName) && booking[fieldName] !== undefined) {
                     let fieldValue = (booking[fieldName] || 'N/A');
                     if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
                         if (fieldValue && fieldValue.toDate) {
@@ -1367,343 +1138,350 @@
                     displayedCount++;
                 }
             }
-
-            if (displayedCount < 3 && bookingFieldsConfig.length > 0) {
-                for (let i = 0; i < bookingFieldsConfig.length && displayedCount < 3; i++) {
-                    const fieldName = bookingFieldsConfig[i].field;
-                    if (!fieldsToDisplay.includes(fieldName) && booking[fieldName] !== undefined) {
-                        let fieldValue = (booking[fieldName] || 'N/A');
-                        if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
-                            if (fieldValue && fieldValue.toDate) {
-                                fieldValue = fieldValue.toDate().toLocaleDateString();
-                            } else if (fieldValue instanceof Date) {
-                                fieldValue = fieldValue.toLocaleDateString();
-                            } else {
-                                fieldValue = fieldValue.toString().trim();
-                            }
-                        } else {
-                            fieldValue = fieldValue.toString().trim();
-                        }
-                        displayValues.push(fieldValue);
-                        displayedCount++;
-                    }
-                }
-            }
+        }
 
 
-            const displayString = displayValues.join(' | ');
+        const displayString = displayValues.join(' | ');
 
-            let buttonsHtml = '';
-            if (type === 'pending') {
-                buttonsHtml = `
-                    <button class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="complete">Complete</button>
-                    <button class="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="delete">Delete</button>
-                    <button class="ml-2 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="undo">Undo</button>
-                `;
-            } else if (type === 'deleted') {
-                buttonsHtml = `
-                    <button class="ml-4 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="deleted" data-action="undo">Undo</button>
-                `;
-            }
-
-            return `
-                <div class="bg-white/10 p-3 rounded-lg flex justify-between items-center text-sm">
-                    <span class="font-medium">${displayString}</span>
-                    <div class="flex items-center"> ${buttonsHtml}
-                    </div>
-                </div>
+        let buttonsHtml = '';
+        if (type === 'pending') {
+            buttonsHtml = `
+                <button class="ml-4 px-3 py-1 bg-green-600 hover:bg-green-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="complete">Complete</button>
+                <button class="ml-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="delete">Delete</button>
+                <button class="ml-2 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="pending" data-action="undo">Undo</button>
+            `;
+        } else if (type === 'deleted') {
+            buttonsHtml = `
+                <button class="ml-4 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="deleted" data-action="undo">Undo</button>
             `;
         }
 
-        function renderPendingBookings() {
-            if (pendingBookings.length === 0) {
-                pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
-            } else {
-                pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
-                pendingBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
-                    button.addEventListener('click', handleListButtonAction);
-                });
-            }
+        return `
+            <div class="bg-white/10 p-3 rounded-lg flex justify-between items-center text-sm">
+                <span class="font-medium">${displayString}</span>
+                <div class="flex items-center"> ${buttonsHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderPendingBookings() {
+        if (pendingBookings.length === 0) {
+            pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
+        } else {
+            pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
+            pendingBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
+                button.addEventListener('click', handleListButtonAction);
+            });
         }
+    }
 
-        function renderDeletedBookings() {
-            if (deletedBookings.length === 0) {
-                deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
-            } else {
-                deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
-                deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
-                    button.addEventListener('click', handleListButtonAction);
-                });
-            }
+    function renderDeletedBookings() {
+        if (deletedBookings.length === 0) {
+            deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
+        } else {
+            deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
+            deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
+                button.addEventListener('click', handleListButtonAction);
+            });
         }
+    }
 
-        function updateNavigationButtons() {
-            prevButton.disabled = currentBookingIndex === 0;
-            nextButton.disabled = bookingsData.length === 0 || currentBookingIndex === bookingsData.length - 1;
-        }
+    function updateNavigationButtons() {
+        prevButton.disabled = currentBookingIndex === 0;
+        nextButton.disabled = bookingsData.length === 0 || currentBookingIndex === bookingsData.length - 1;
+    }
 
-        function showNextCard() {
-            if (currentBookingIndex < bookingsData.length - 1) {
-                currentBookingIndex++;
-                renderBookingCard();
-            }
-        }
-
-        function showPrevCard() {
-            if (currentBookingIndex > 0) {
-                currentBookingIndex--;
-                renderBookingCard();
-            }
-        }
-
-        prevButton.addEventListener('click', showPrevCard);
-        nextButton.addEventListener('click', showNextCard);
-
-        function moveBookingToPending() {
-            if (bookingsData.length === 0) return;
-
-            const bookingToMove = bookingsData[currentBookingIndex];
-            
-            const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToMove.id);
-            if (existingStagedIndex !== -1) {
-                stagedChanges[existingStagedIndex].newStatus = 'Pending';
-                stagedChanges[existingStagedIndex].originalSource = 'requests';
-            } else {
-                stagedChanges.push({
-                    id: bookingToMove.id,
-                    newStatus: 'Pending',
-                    originalSource: 'requests'
-                });
-            }
-
-            bookingsData.splice(currentBookingIndex, 1);
-            bookingToMove.Status = 'Pending';
-            pendingBookings.push(bookingToMove);
-            adjustCurrentBookingIndex();
+    function showNextCard() {
+        if (currentBookingIndex < bookingsData.length - 1) {
+            currentBookingIndex++;
             renderBookingCard();
-            renderPendingBookings();
-            updateSaveButtonState();
-            console.log("Staged move to pending for booking ID:", bookingToMove.id);
         }
+    }
 
-        function deleteBooking() {
-            if (bookingsData.length === 0) return;
-
-            const bookingToDelete = bookingsData[currentBookingIndex];
-
-            const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToDelete.id);
-            if (existingStagedIndex !== -1) {
-                stagedChanges[existingStagedIndex].newStatus = 'Deleted';
-                stagedChanges[existingStagedIndex].originalSource = 'requests';
-            } else {
-                stagedChanges.push({
-                    id: bookingToDelete.id,
-                    newStatus: 'Deleted',
-                    originalSource: 'requests'
-                });
-            }
-
-            bookingsData.splice(currentBookingIndex, 1);
-            bookingToDelete.Status = 'Deleted';
-            bookingToDelete._originalSource = 'requests';
-            deletedBookings.push(bookingToDelete);
-            adjustCurrentBookingIndex();
+    function showPrevCard() {
+        if (currentBookingIndex > 0) {
+            currentBookingIndex--;
             renderBookingCard();
-            renderDeletedBookings();
-            updateSaveButtonState();
-            console.log("Staged delete for booking ID:", bookingToDelete.id);
+        }
+    }
+
+    prevButton.addEventListener('click', showPrevCard);
+    nextButton.addEventListener('click', showNextCard);
+
+    function moveBookingToPending() {
+        if (bookingsData.length === 0) return;
+
+        const bookingToMove = bookingsData[currentBookingIndex];
+        
+        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToMove.id);
+        if (existingStagedIndex !== -1) {
+            stagedChanges[existingStagedIndex].newStatus = 'Pending';
+            stagedChanges[existingStagedIndex].originalSource = 'requests';
+        } else {
+            stagedChanges.push({
+                id: bookingToMove.id,
+                newStatus: 'Pending',
+                originalSource: 'requests'
+            });
         }
 
-        function adjustCurrentBookingIndex() {
-            if (bookingsData.length > 0) {
-                if (currentBookingIndex >= bookingsData.length) {
+        bookingsData.splice(currentBookingIndex, 1);
+        bookingToMove.Status = 'Pending';
+        pendingBookings.push(bookingToMove);
+        adjustCurrentBookingIndex();
+        renderBookingCard();
+        renderPendingBookings();
+        updateSaveButtonState();
+        console.log("[moveBookingToPending] Staged move to pending for booking ID:", bookingToMove.id);
+    }
+
+    function deleteBooking() {
+        if (bookingsData.length === 0) return;
+
+        const bookingToDelete = bookingsData[currentBookingIndex];
+
+        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToDelete.id);
+        if (existingStagedIndex !== -1) {
+            stagedChanges[existingStagedIndex].newStatus = 'Deleted';
+            stagedChanges[existingStagedIndex].originalSource = 'requests';
+        } else {
+            stagedChanges.push({
+                id: bookingToDelete.id,
+                newStatus: 'Deleted',
+                originalSource: 'requests'
+            });
+        }
+
+        bookingsData.splice(currentBookingIndex, 1);
+        bookingToDelete.Status = 'Deleted';
+        bookingToDelete._originalSource = 'requests';
+        deletedBookings.push(bookingToDelete);
+        adjustCurrentBookingIndex();
+        renderBookingCard();
+        renderDeletedBookings();
+        updateSaveButtonState();
+        console.log("[deleteBooking] Staged delete for booking ID:", bookingToDelete.id);
+    }
+
+    function adjustCurrentBookingIndex() {
+        if (bookingsData.length > 0) {
+            if (currentBookingIndex >= bookingsData.length) {
+                currentBookingIndex = bookingsData.length - 1;
+            }
+        } else {
+            currentBookingIndex = 0;
+        }
+    }
+
+    moveToPendingBtn.addEventListener('click', moveBookingToPending);
+    deleteBookingBtn.addEventListener('click', deleteBooking);
+
+    function handleListButtonAction(event) {
+        const button = event.target;
+        const bookingId = button.dataset.id;
+        const listType = button.dataset.listType;
+        const action = button.dataset.action;
+
+        let bookingToProcess;
+        let targetStatus;
+        let originalSourceForStaging;
+
+        if (listType === 'pending') {
+            bookingToProcess = pendingBookings.find(b => b.id === bookingId);
+            if (!bookingToProcess) return;
+
+            if (action === 'complete') {
+                console.log("[handleListButtonAction] 'Complete' action triggered. Opening calendar modal.");
+                openBookingCalendarModal(bookingToProcess);
+                return;
+            } else if (action === 'delete') {
+                targetStatus = 'Deleted';
+                originalSourceForStaging = 'pending';
+                pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
+                bookingToProcess.Status = 'Deleted';
+                bookingToProcess._originalSource = 'pending';
+                deletedBookings.push(bookingToProcess);
+                console.log("[handleListButtonAction] Staged delete from pending:", bookingId);
+            } else if (action === 'undo') {
+                targetStatus = 'New'; // Undo from pending brings it back to New requests
+                pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
+                bookingToProcess.Status = 'New';
+                // Remove existing staged change if any for this booking (e.g., if it was pending and then delete was staged)
+                const existingChangeIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
+                if (existingChangeIndex !== -1) {
+                    stagedChanges.splice(existingChangeIndex, 1); // Remove the old staged change
+                }
+                bookingsData.push(bookingToProcess);
+                if (bookingsData.length > 0) {
                     currentBookingIndex = bookingsData.length - 1;
                 }
-            } else {
-                currentBookingIndex = 0;
+                console.log("[handleListButtonAction] Staged undo from pending to new:", bookingId);
             }
-        }
+            
+            // This staging logic applies to delete and undo actions from pending
+            // 'Complete' action handles its own staging via the calendar modal.
+            if (action !== 'complete') {
+                const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
+                if (existingStagedIndex !== -1) {
+                    stagedChanges[existingStagedIndex].newStatus = targetStatus;
+                    stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
+                } else {
+                    stagedChanges.push({
+                        id: bookingToProcess.id,
+                        newStatus: targetStatus,
+                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
+                    });
+                }
+            }
 
-        moveToPendingBtn.addEventListener('click', moveBookingToPending);
-        deleteBookingBtn.addEventListener('click', deleteBooking);
+        } else if (listType === 'deleted') {
+            bookingToProcess = deletedBookings.find(b => b.id === bookingId);
+            if (!bookingToProcess) return;
 
-        function handleListButtonAction(event) {
-            const button = event.target;
-            const bookingId = button.dataset.id;
-            const listType = button.dataset.listType;
-            const action = button.dataset.action;
+            if (action === 'undo') {
+                targetStatus = bookingToProcess._originalSource === 'requests' ? 'New' : 'Pending';
+                originalSourceForStaging = bookingToProcess._originalSource;
 
-            let bookingToProcess;
-            let targetStatus;
-            let originalSourceForStaging;
-
-            if (listType === 'pending') {
-                bookingToProcess = pendingBookings.find(b => b.id === bookingId);
-                if (!bookingToProcess) return;
-
-                if (action === 'complete') {
-                    openBookingCalendarModal(bookingToProcess);
-                    return;
-                } else if (action === 'delete') {
-                    targetStatus = 'Deleted';
-                    originalSourceForStaging = 'pending';
-                    pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                    bookingToProcess.Status = 'Deleted';
-                    bookingToProcess._originalSource = 'pending';
-                    deletedBookings.push(bookingToProcess);
-                } else if (action === 'undo') {
-                    targetStatus = 'New';
-                    pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                    bookingToProcess.Status = 'New';
+                deletedBookings = deletedBookings.filter(b => b.id !== bookingId);
+                bookingToProcess.Status = targetStatus;
+                // Remove existing staged change if any for this booking
+                const existingChangeIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
+                if (existingChangeIndex !== -1) {
+                    stagedChanges.splice(existingChangeIndex, 1); // Remove the old staged change
+                }
+                
+                if (originalSourceForStaging === 'requests') {
                     bookingsData.push(bookingToProcess);
                     if (bookingsData.length > 0) {
                         currentBookingIndex = bookingsData.length - 1;
                     }
+                } else if (originalSourceForStaging === 'pending') {
+                    pendingBookings.push(bookingToProcess);
                 }
-                
-                const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
-                if (existingStagedIndex !== -1) {
-                    stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
-                } else {
-                    stagedChanges.push({
-                        id: bookingToProcess.id,
-                        newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
-                    });
-                }
-
-            } else if (listType === 'deleted') {
-                bookingToProcess = deletedBookings.find(b => b.id === bookingId);
-                if (!bookingToProcess) return;
-
-                if (action === 'undo') {
-                    targetStatus = bookingToProcess._originalSource === 'requests' ? 'New' : 'Pending';
-                    originalSourceForStaging = bookingToProcess._originalSource;
-
-                    deletedBookings = deletedBookings.filter(b => b.id !== bookingId);
-                    bookingToProcess.Status = targetStatus;
-                    if (originalSourceForStaging === 'requests') {
-                        bookingsData.push(bookingToProcess);
-                        if (bookingsData.length > 0) {
-                            currentBookingIndex = bookingsData.length - 1;
-                        }
-                    } else if (originalSourceForStaging === 'pending') {
-                        pendingBookings.push(bookingToProcess);
-                    }
-                }
-                const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
-                if (existingStagedIndex !== -1) {
-                    stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
-                } else {
-                    stagedChanges.push({
-                        id: bookingToProcess.id,
-                        newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
-                    });
-                }
+                console.log("[handleListButtonAction] Staged undo from deleted:", bookingId, "to", targetStatus);
             }
 
-            if (action !== 'complete') {
-                renderBookingCard();
-                renderPendingBookings();
-                renderDeletedBookings();
-                updateSaveButtonState();
-                console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
+            // Staging for undo from deleted
+            const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
+            if (existingStagedIndex !== -1) {
+                stagedChanges[existingStagedIndex].newStatus = targetStatus;
+                stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
+            } else {
+                stagedChanges.push({
+                    id: bookingToProcess.id,
+                    newStatus: targetStatus,
+                    originalSource: originalSourceForStaging || bookingToProcess._originalSource
+                });
             }
         }
 
-        // Handle confirmation from calendar modal
-        confirmScheduleBtn.addEventListener('click', async () => {
-            if (selectedEventDate && currentBookingBeingScheduled) {
-                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
-                    showLoading("Completing booking...");
+        // Only re-render if not the 'complete' action (which opens the modal)
+        if (action !== 'complete') {
+            renderBookingCard();
+            renderPendingBookings();
+            renderDeletedBookings();
+            updateSaveButtonState(); // Crucial call to update button state
+            console.log(`[handleListButtonAction] After action '${action}', Staged Changes: ${stagedChanges.length}`);
+        }
+    }
 
-                    try {
-                        const originalBookingId = currentBookingBeingScheduled.id;
-
-                        // 1. Stage update for the original booking to 'Scheduled' status
-                        const existingStagedChangeIndex = stagedChanges.findIndex(s => s.id === originalBookingId);
-                        if (existingStagedChangeIndex !== -1) {
-                            stagedChanges[existingStagedChangeIndex].newStatus = 'Scheduled';
-                        } else {
-                            stagedChanges.push({
-                                id: originalBookingId,
-                                newStatus: 'Scheduled',
-                                // No originalSource needed here, as it's a final state for the original request
-                            });
-                        }
-
-                        // 2. Stage creation of a new document in 'scheduled_meetings'
-                        stagedScheduledMeetings.push({
-                            originalBookingId: originalBookingId,
-                            Customer_Name: currentBookingBeingScheduled.Customer_Name || currentBookingBeingScheduled.Name || 'N/A', // Prioritize Customer_Name, fallback to Name
-                            Email: currentBookingBeingScheduled.Email || 'N/A',
-                            Subject: currentBookingBeingScheduled.Subject || 'Client Meeting',
-                            Service: currentBookingBeingScheduled.Service || 'General Consultation',
-                            scheduledTime: selectedEventDate, // The selected Date object
-                            // Add other fields you want to transfer to the scheduled meeting
-                            // e.g., currentBookingBeingScheduled.SomeOtherField
-                        });
-
-                        // Visually update the UI immediately
-                        pendingBookings = pendingBookings.filter(b => b.id !== originalBookingId);
-                        renderPendingBookings();
-                        updateSaveButtonState();
-
-                        showMessage("Booking staged for scheduling! Click 'Save Changes' to finalize.", 'success');
-                        hideLoading();
-                        calendarOverlay.classList.add('hidden'); // Close calendar modal
-                        document.body.style.overflow = '';
-
-                        // Clear selected date as it's been staged
-                        selectedEventDate = null; 
-
-                    } catch (error) {
-                        console.error("Error during booking scheduling staging:", error);
-                        showMessage("Failed to stage booking for scheduling: " + error.message, 'error');
-                        hideLoading();
-                    }
-                }, () => {
-                    showMessage("Booking confirmation cancelled.", 'info');
-                });
-            } else {
-                showMessage("Please select a date and time for the booking.", 'info');
-            }
-        });
-
-        saveChangesBtn.addEventListener('click', async () => {
-            if (stagedChanges.length === 0 && stagedScheduledMeetings.length === 0) {
-                showMessage("No changes to save.", 'info');
-                return;
-            }
-
-            showConfirm(`Are you sure you want to save ${stagedChanges.length + stagedScheduledMeetings.length} changes to the database?`, async () => {
-                showLoading("Saving changes to Database...");
+    // Handle confirmation from calendar modal
+    confirmScheduleBtn.addEventListener('click', async () => {
+        if (selectedEventDate && currentBookingBeingScheduled) {
+            showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
+                showLoading("Completing booking...");
 
                 try {
-                    const result = await sendBatchBookingUpdates(stagedChanges);
+                    const originalBookingId = currentBookingBeingScheduled.id;
 
-                    if (result.success) {
-                        showMessage("Changes saved successfully!", 'success');
-                        // stagedChanges and stagedScheduledMeetings are cleared inside sendBatchBookingUpdates now
-                        updateSaveButtonState();
-                        // Re-fetch calendar events to update display after save
-                        renderCalendar(); 
+                    // 1. Stage update for the original booking to 'Scheduled' status
+                    const existingStagedChangeIndex = stagedChanges.findIndex(s => s.id === originalBookingId);
+                    if (existingStagedChangeIndex !== -1) {
+                        stagedChanges[existingStagedChangeIndex].newStatus = 'Scheduled';
+                        // If it was previously staged for deletion, we need to correct its originalSource for undo logic
+                        stagedChanges[existingStagedChangeIndex].originalSource = currentBookingBeingScheduled._originalSource || 'requests'; 
                     } else {
-                        showMessage("Failed to save changes: " + result.error, 'error');
+                        stagedChanges.push({
+                            id: originalBookingId,
+                            newStatus: 'Scheduled',
+                            originalSource: currentBookingBeingScheduled._originalSource || 'requests' // Store where it came from
+                        });
                     }
-                } finally {
+                    console.log("[confirmScheduleBtn] Staged original booking for 'Scheduled' status. stagedChanges:", stagedChanges);
+
+                    // 2. Stage creation of a new document in 'scheduled_meetings'
+                    const newScheduledMeetingData = {
+                        originalBookingId: originalBookingId,
+                        Customer_Name: currentBookingBeingScheduled.Customer_Name || currentBookingBeingScheduled.Name || 'N/A',
+                        Email: currentBookingBeingScheduled.Email || 'N/A',
+                        Subject: currentBookingBeingScheduled.Subject || 'Client Meeting',
+                        Service: currentBookingBeingScheduled.Service || 'General Consultation',
+                        scheduledTime: selectedEventDate, // The selected Date object
+                        // Add other fields you want to transfer to the scheduled meeting
+                        // e.g., currentBookingBeingScheduled.SomeOtherField
+                    };
+                    stagedScheduledMeetings.push(newScheduledMeetingData);
+                    console.log("[confirmScheduleBtn] Staged new scheduled meeting. stagedScheduledMeetings:", stagedScheduledMeetings);
+
+
+                    // Visually update the UI immediately
+                    pendingBookings = pendingBookings.filter(b => b.id !== originalBookingId);
+                    renderPendingBookings();
+                    adjustCurrentBookingIndex(); // Adjust current booking index for main display if pending list changes
+                    renderBookingCard(); // Re-render main card in case index shifted
+
+                    updateSaveButtonState(); // Crucial call to update button state
+
+                    showMessage("Booking staged for scheduling! Click 'Save Changes' to finalize.", 'success');
+                    hideLoading();
+                    calendarOverlay.classList.add('hidden'); // Close calendar modal
+                    document.body.style.overflow = '';
+
+                    selectedEventDate = null; // Clear selected date as it's been staged
+
+                } catch (error) {
+                    console.error("[confirmScheduleBtn] Error during booking scheduling staging:", error);
+                    showMessage("Failed to stage booking for scheduling: " + error.message, 'error');
                     hideLoading();
                 }
             }, () => {
-                showMessage("Save cancelled.", 'info');
+                showMessage("Booking confirmation cancelled.", 'info');
             });
-        });
+        } else {
+            showMessage("Please select a date and time for the booking.", 'info');
+        }
+    });
 
-    </script>
-</body>
-</html>
-</body>
-</html>
+    saveChangesBtn.addEventListener('click', async () => {
+        const totalStaged = stagedChanges.length + stagedScheduledMeetings.length;
+        if (totalStaged === 0) {
+            showMessage("No changes to save.", 'info');
+            return;
+        }
+
+        showConfirm(`Are you sure you want to save ${totalStaged} changes to the database?`, async () => {
+            showLoading("Saving changes to Database...");
+
+            try {
+                const result = await sendBatchBookingUpdates(stagedChanges);
+
+                if (result.success) {
+                    showMessage("Changes saved successfully!", 'success');
+                    // stagedChanges and stagedScheduledMeetings are cleared inside sendBatchBookingUpdates now
+                    updateSaveButtonState();
+                    // Re-fetch calendar events to update display after save
+                    renderCalendar(); 
+                    initializeBookingData(); // Re-initialize main lists as statuses have changed
+                } else {
+                    showMessage("Failed to save changes: " + result.error, 'error');
+                }
+            } finally {
+                hideLoading();
+            }
+        }, () => {
+            showMessage("Save cancelled.", 'info');
+        });
+    });
+
+</script>
