@@ -19,8 +19,8 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;           /* Enables vertical scrolling */
-        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
@@ -347,6 +347,7 @@
             } else {
                 saveChangesBtn.textContent = 'Save Changes to Database';
             }
+            console.log("updateSaveButtonState called. stagedChanges length:", stagedChanges.length);
         }
 
         function showMessage(message, type = 'info') {
@@ -582,6 +583,7 @@
                             confirmScheduleBtn.disabled = false;
                             e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
                             showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
+                            console.log("Selected month view date:", selectedEventDate);
                         });
 
                         dayCounter++;
@@ -666,6 +668,7 @@
                         confirmScheduleBtn.disabled = false;
                         e.currentTarget.classList.add('selected');
                         showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+                        console.log("Selected week/day view date/time:", selectedEventDate);
                     });
 
                     // Add events that fall within this hour slot
@@ -720,6 +723,7 @@
                     confirmScheduleBtn.disabled = false;
                     e.currentTarget.classList.add('selected');
                     showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
+                    console.log("Selected day view date/time:", selectedEventDate);
                 });
                 
                 // Add events that fall within this hour slot
@@ -776,7 +780,7 @@
             renderCalendar();
         });
 
-        // --- Core Booking App Logic (Mostly Unchanged) ---
+        // --- Core Booking App Logic ---
 
         // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
@@ -844,27 +848,29 @@
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                    bookingFieldsConfig = []; 
+                    // bookingFieldsConfig = []; // Keep this commented out or initialize with fixed fields if preferred
+                                                    // Otherwise it will only take fields from the first doc in each snapshot.
 
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
 
+                        // Populate bookingFieldsConfig only once or from a definitive source
                         if (bookingFieldsConfig.length === 0) {
                              Object.keys(booking).forEach(key => {
-                                if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                                    bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
-                                }
-                            });
-                            if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
-                                bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
-                            }
-                            if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
-                                bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
-                            }
-                            if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
-                                bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
-                            }
+                                 if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
+                                     bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
+                                 }
+                             });
+                             if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
+                                 bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
+                             }
+                             if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
+                                 bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
+                             }
+                             if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
+                                 bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
+                             }
                         }
 
                         if (status === 'New' || status === '') {
@@ -872,7 +878,7 @@
                         } else if (status === 'Pending') {
                             pendingBookings.push(booking);
                         } else if (status === 'Deleted') {
-                            booking._originalSource = booking._originalSource || 'UNKNOWN';
+                            booking._originalSource = booking._originalSource || 'UNKNOWN'; // Ensure original source is preserved
                             deletedBookings.push(booking);
                         }
                     });
@@ -952,14 +958,19 @@
 
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
+                    updateData.ScheduledDateTime = FieldValue.delete(); // Clear scheduled time for deleted
                 } else if (change.newStatus === 'Completed') {
-                    updateData._originalSource = FieldValue.delete();
-                    if (change.scheduledTime) {
+                    updateData._originalSource = FieldValue.delete(); // Clear original source for completed
+                    if (change.scheduledTime) { 
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
+                    } else {
+                        // If it's marked complete without a specific calendar selection (unlikely with UI)
+                        updateData.ScheduledDateTime = FieldValue.delete(); // Ensure ScheduledDateTime is cleared or set to null if not provided
                     }
                 }
-                else {
-                    updateData._originalSource = FieldValue.delete();
+                else { // 'New' or 'Pending'
+                    updateData._originalSource = FieldValue.delete(); // Clear _originalSource
+                    updateData.ScheduledDateTime = FieldValue.delete(); // Clear ScheduledDateTime if not completed
                 }
                 batch.update(bookingDocRef, updateData);
             });
@@ -987,10 +998,12 @@
             const currentBooking = bookingsData[currentBookingIndex];
             let cardContentArray = [];
 
+            // Ensure bookingFieldsConfig is populated if it's somehow empty at this point
+            // This fallback handles cases where the first snapshot might be empty or incomplete
             if (bookingFieldsConfig.length === 0) {
-                 Object.keys(currentBooking).forEach(key => {
+                Object.keys(currentBooking).forEach(key => {
                     if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                        bookingFieldsConfig.push({ field: key, question: key });
+                        bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
                     }
                 });
                 if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
@@ -1104,9 +1117,7 @@
                 pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
             } else {
                 pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
-                pendingBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
-                    button.addEventListener('click', handleListButtonAction);
-                });
+                // Event listeners are now handled by delegation on the parent
             }
         }
 
@@ -1115,9 +1126,7 @@
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
             } else {
                 deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
-                deletedBookingsListElement.querySelectorAll('button[data-action]').forEach(button => {
-                    button.addEventListener('click', handleListButtonAction);
-                });
+                // Event listeners are now handled by delegation on the parent
             }
         }
 
@@ -1152,6 +1161,7 @@
             if (existingStagedIndex !== -1) {
                 stagedChanges[existingStagedIndex].newStatus = 'Pending';
                 stagedChanges[existingStagedIndex].originalSource = 'requests';
+                delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
             } else {
                 stagedChanges.push({
                     id: bookingToMove.id,
@@ -1168,6 +1178,7 @@
             renderPendingBookings();
             updateSaveButtonState();
             console.log("Staged move to pending for booking ID:", bookingToMove.id);
+            console.log("Staged Changes after move to pending:", JSON.parse(JSON.stringify(stagedChanges)));
         }
 
         function deleteBooking() {
@@ -1179,6 +1190,7 @@
             if (existingStagedIndex !== -1) {
                 stagedChanges[existingStagedIndex].newStatus = 'Deleted';
                 stagedChanges[existingStagedIndex].originalSource = 'requests';
+                delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
             } else {
                 stagedChanges.push({
                     id: bookingToDelete.id,
@@ -1196,6 +1208,7 @@
             renderDeletedBookings();
             updateSaveButtonState();
             console.log("Staged delete for booking ID:", bookingToDelete.id);
+            console.log("Staged Changes after delete:", JSON.parse(JSON.stringify(stagedChanges)));
         }
 
         function adjustCurrentBookingIndex() {
@@ -1211,8 +1224,14 @@
         moveToPendingBtn.addEventListener('click', moveBookingToPending);
         deleteBookingBtn.addEventListener('click', deleteBooking);
 
+        // Event delegation for pending and deleted lists
+        pendingBookingsListElement.addEventListener('click', handleListButtonAction);
+        deletedBookingsListElement.addEventListener('click', handleListButtonAction);
+
         function handleListButtonAction(event) {
-            const button = event.target;
+            const button = event.target.closest('button[data-action]'); // Use .closest to handle clicks on child elements of the button
+            if (!button) return; // Not a button with data-action
+
             const bookingId = button.dataset.id;
             const listType = button.dataset.listType;
             const action = button.dataset.action;
@@ -1227,7 +1246,7 @@
 
                 if (action === 'complete') {
                     openBookingCalendarModal(bookingToProcess);
-                    return;
+                    return; // Exit, as calendar modal handles staging for completion
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
                     originalSourceForStaging = 'pending';
@@ -1239,6 +1258,8 @@
                     targetStatus = 'New';
                     pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = 'New';
+                    // Reset _originalSource if it's going back to 'New' requests
+                    delete bookingToProcess._originalSource; 
                     bookingsData.push(bookingToProcess);
                     if (bookingsData.length > 0) {
                         currentBookingIndex = bookingsData.length - 1;
@@ -1248,12 +1269,18 @@
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
+                    // Only set originalSource if it's for 'Deleted' status, otherwise clear it.
+                    if (targetStatus === 'Deleted') {
+                        stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging;
+                    } else {
+                        delete stagedChanges[existingStagedIndex].originalSource;
+                    }
+                    delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
                 } else {
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
+                        originalSource: targetStatus === 'Deleted' ? originalSourceForStaging : undefined // Only set if target is Deleted
                     });
                 }
 
@@ -1267,6 +1294,7 @@
 
                     deletedBookings = deletedBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = targetStatus;
+                    // When undoing a delete, put it back to its _originalSource's list
                     if (originalSourceForStaging === 'requests') {
                         bookingsData.push(bookingToProcess);
                         if (bookingsData.length > 0) {
@@ -1279,23 +1307,29 @@
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging || bookingToProcess._originalSource;
+                    // Restore originalSource for staging purposes if moving back to pending, clear if to new
+                    if (targetStatus === 'Pending') {
+                        stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging;
+                    } else {
+                        delete stagedChanges[existingStagedIndex].originalSource;
+                    }
+                    delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
                 } else {
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: originalSourceForStaging || bookingToProcess._originalSource
+                        originalSource: targetStatus === 'Pending' ? originalSourceForStaging : undefined // Only set if target is Pending
                     });
                 }
             }
 
-            if (action !== 'complete') {
-                renderBookingCard();
-                renderPendingBookings();
-                renderDeletedBookings();
-                updateSaveButtonState();
-                console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
-            }
+            // These are always called, unless `complete` action which `return`s early
+            renderBookingCard();
+            renderPendingBookings();
+            renderDeletedBookings();
+            updateSaveButtonState();
+            console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
+            console.log("Staged Changes after list action:", JSON.parse(JSON.stringify(stagedChanges)));
         }
 
         confirmScheduleBtn.addEventListener('click', async () => {
@@ -1310,26 +1344,29 @@
                         const updateData = {
                             id: bookingId,
                             newStatus: 'Completed',
-                            scheduledTime: selectedEventDate
+                            scheduledTime: selectedEventDate // This is the Date object
                         };
 
                         if (existingStagedIndex !== -1) {
-                            stagedChanges[existingStagedIndex] = updateData;
+                            stagedChanges[existingStagedIndex] = updateData; // Overwrite previous stage
                         } else {
                             stagedChanges.push(updateData);
                         }
 
+                        // Update local arrays immediately for UI reflection
                         pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                         currentBookingBeingScheduled.Status = 'Completed';
-                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate);
+                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate); // Update local object for display
+                        delete currentBookingBeingScheduled._originalSource; // Clear _originalSource for completed
 
                         renderPendingBookings();
-                        updateSaveButtonState();
+                        updateSaveButtonState(); // Reflect changes in save button
 
                         showMessage("Booking staged for completion! Click 'Save Changes' to finalize.", 'success');
                         hideLoading();
                         calendarOverlay.classList.add('hidden');
                         document.body.style.overflow = '';
+                        console.log("Staged Changes after calendar completion:", JSON.parse(JSON.stringify(stagedChanges)));
 
                     } catch (error) {
                         console.error("Error during booking completion staging:", error);
@@ -1345,6 +1382,7 @@
         });
 
         saveChangesBtn.addEventListener('click', async () => {
+            console.log("Save Changes button clicked!"); // Debug log
             if (stagedChanges.length === 0) {
                 showMessage("No changes to save.", 'info');
                 return;
@@ -1358,8 +1396,8 @@
 
                     if (result.success) {
                         showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = [];
-                        updateSaveButtonState();
+                        stagedChanges = []; // Clear staged changes only upon successful commit
+                        updateSaveButtonState(); // Update button state to reflect cleared changes
                     } else {
                         showMessage("Failed to save changes: " + result.error, 'error');
                     }
