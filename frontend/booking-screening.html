@@ -265,32 +265,37 @@
 
     <div id="calendar-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[99] hidden">
         <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl h-[90vh] flex flex-col text-white">
-            <div class="flex justify-between items-center p-4 border-b border-gray-700">
-                <div class="flex space-x-2 items-center">
-                    <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
+            <div class="flex flex-col p-4 border-b border-gray-700">
+                <div class="flex justify-between items-center mb-2">
+                    <div class="flex space-x-2 items-center">
+                        <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
+                    </div>
+                    <div class="flex space-x-2 items-center">
+                        <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
+                        <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month" selected>Month</option>
+                        </select>
+                        <button id="calendar-close" class="p-2 rounded-full hover:bg-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex space-x-2 items-center">
-                    <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
-                    <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                        <option value="day">Day</option>
-                        <option value="week">Week</option>
-                        <option value="month" selected>Month</option>
-                    </select>
-                    <button id="calendar-close" class="p-2 rounded-full hover:bg-gray-700">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                <div id="client-available-times" class="text-sm text-gray-300 text-center">
+                    Client's available times: Not specified
                 </div>
             </div>
             <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
@@ -395,6 +400,7 @@
         const calendarViewSelect = document.getElementById('calendar-view'); // Renamed to avoid conflict
         const calendarClose = document.getElementById('calendar-close');
         const confirmScheduleBtn = document.getElementById('confirm-schedule-btn');
+        const clientAvailableTimesElement = document.getElementById('client-available-times'); // NEW: Client availability element
 
 
         let currentDate = new Date();
@@ -559,12 +565,18 @@
         }
 
 
+        // MODIFIED: This function now sets the client's available times in the header
         function openBookingCalendarModal(bookingData) {
             currentBookingBeingScheduled = bookingData;
             selectedEventDate = null; // Reset selection
             confirmScheduleBtn.disabled = true; // Disable until a time is selected
             calendarOverlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scrolling background
+            
+            // NEW: Populate the client's available times in the calendar header
+            const availableTimes = bookingData.Available_Times || 'Not specified';
+            clientAvailableTimesElement.textContent = `Client's available times: ${availableTimes}`;
+
             renderCalendar(); // Render the calendar when opening
         }
         
