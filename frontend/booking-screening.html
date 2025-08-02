@@ -27,49 +27,44 @@
         padding-bottom: 8px;
     }
     /* Optional: Add backdrop-filter for a subtle blur effect behind the overlay */
-    /* --- Loading Animation Styles --- */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.6); /* Changed from 0.8 to 0.6 for less darkness */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    #loading-overlay {
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
+    }
+
+    /* Monochrome Geometric Flip Loader CSS */
+    .geometric-loader {
+        width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
+        aspect-ratio: .5;
+        display: grid;
+        justify-items: center;  
         align-items: center;
-        z-index: 9999; /* Ensure it's on top of everything */
-        color: white;
-        font-size: 1.2rem;
     }
-    
-    .loader {
-        height: 60px;
-        aspect-ratio: 2;
-        border-bottom: 3px solid #0000;
-        background:
-            linear-gradient(90deg,#524656 50%,#0000 0)
-            -25% 100%/50% 3px repeat-x border-box;
-        position: relative;
-        animation: l3-0 .75s linear infinite;
-        margin-bottom: 20px; /* Space between loader and text */
-    }
-    .loader:before {
+    .geometric-loader::before {
         content: "";
-        position: absolute;
-        inset: auto 42.5% 0;
+        width: 30%;
         aspect-ratio: 1;
         border-radius: 50%;
-        background: #8A2BE2; /* Changed from #CF4647 (red) to #8A2BE2 (BlueViolet/purple) */
-        animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
+        margin: auto auto 0;
+        background: #9CA3AF; /* Tailwind gray-400 - light gray/blue-gray */
+        animation: l9-0 .5s cubic-bezier(0,800,1,800) infinite;
     }
-    @keyframes l3-0 {
-        to {background-position: -125% 100%}
+    .geometric-loader::after {
+        content: "";
+        width: 100%;
+        aspect-ratio: 1 / 0.866;
+        margin: 0 auto auto;
+        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
+        background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
+        animation: l9-1 .5s linear infinite;
     }
-    @keyframes l3-1 {
-        0%,2% {bottom: 0%}
-        98%,to {bottom:.1%}
+    @keyframes l9-0 {
+        0%,2%  {translate: 0   0%}
+        98%,to {translate: 0 -.2%}
+    }
+    @keyframes l9-1 {
+        0%,5%  {rotate:  0deg}
+        95%,to {rotate:-60deg}
     }
     /* Basic styling for custom message box */
     .message-box {
@@ -120,11 +115,23 @@
         color: white; /* Text color for booked slots */
         cursor: not-allowed !important; /* Indicate it's not clickable */
         border: 1px solid #7C3AED; /* Slightly darker purple border */
-        /* MODIFIED: Add rounded corners here */
         border-radius: 0.5rem; 
     }
     .time-slot.occupied-slot:hover {
         background-color: #7C3AED !important; /* Darken on hover for booked slots */
+    }
+
+    /* NEW: Style for past time slots */
+    .time-slot.past-slot {
+        background-color: #374151; /* gray-700 */
+        cursor: not-allowed !important;
+        opacity: 0.5;
+        border-radius: 0.5rem;
+    }
+    .day-cell-month-past {
+        background-color: #374151; /* gray-700 */
+        cursor: not-allowed !important;
+        opacity: 0.5;
     }
 
     /* Event display styles - MODIFIED for single block view */
@@ -459,6 +466,13 @@
             };
         }
 
+        // NEW: Helper function to check if a date/time is in the past
+        function isPastTime(date) {
+            const now = new Date();
+            // Compare the date/time objects directly
+            return date < now;
+        }
+
         // --- CUSTOM CALENDAR LOGIC ---
 
         // Function to fetch calendar events from Firebase
@@ -688,24 +702,29 @@
                             dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
                         }
                         
-                        // Add click listener for selection in month view (selecting a whole day)
-                        dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
-                        dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
-                        dayCell.addEventListener('click', (e) => {
-                            // Clear previous selection
-                            document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                            document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-                            
-                            // Select this day
-                            selectedEventDate = new Date(e.currentTarget.dataset.date);
-                            // Default to a sensible time, perhaps start of day, or current time
-                            selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); 
-                            confirmScheduleBtn.disabled = false;
-                            e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
-                            showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
-                            console.log("Selected month view date:", selectedEventDate);
-                        });
-
+                        // NEW: Disable past days in month view
+                        if (isPastTime(cellDate)) {
+                            dayCell.classList.add('day-cell-month-past');
+                        } else {
+                            // Add click listener for selection in month view (selecting a whole day)
+                            dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
+                            dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
+                            dayCell.addEventListener('click', (e) => {
+                                // Clear previous selection
+                                document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
+                                document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
+                                
+                                // Select this day
+                                selectedEventDate = new Date(e.currentTarget.dataset.date);
+                                // Default to a sensible time, perhaps start of day, or current time
+                                selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); 
+                                confirmScheduleBtn.disabled = false;
+                                e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
+                                showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
+                                console.log("Selected month view date:", selectedEventDate);
+                            });
+                        }
+                        
                         dayCounter++;
                     }
                     
@@ -777,6 +796,9 @@
                     // Calculate the full date and time for this specific cell/slot
                     const cellDateTime = new Date(day);
                     cellDateTime.setHours(hour, 0, 0, 0);
+                    
+                    // NEW: Check if the time slot is in the past
+                    const isSlotInPast = isPastTime(cellDateTime);
 
                     // Check if this time slot is already occupied by a fetched event
                     const isSlotOccupied = fetchedCalendarEvents.some(event => {
@@ -786,16 +808,19 @@
                                event.start.getHours() === cellDateTime.getHours();
                     });
                     
-                    // MODIFIED: Apply occupied-slot class and handle clickability
+                    // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
                     if (isSlotOccupied) {
                         timeCell.classList.add('occupied-slot'); // Mark as occupied
                         timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    } else if (isSlotInPast) {
+                        timeCell.classList.add('past-slot'); // Mark as past and unavailable
+                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                     } else {
                         timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                         timeCell.dataset.date = day.toISOString(); // Full date for the day
                         timeCell.dataset.hour = hour; // Hour for selection
 
-                        // Add click listener for time slot selection ONLY if not occupied
+                        // Add click listener for time slot selection ONLY if not occupied or in the past
                         timeCell.addEventListener('click', (e) => {
                             // Clear previous selection
                             document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
@@ -853,6 +878,9 @@
                 const cellDateTime = new Date(day);
                 cellDateTime.setHours(hour, 0, 0, 0);
 
+                // NEW: Check if the time slot is in the past
+                const isSlotInPast = isPastTime(cellDateTime);
+
                 // Check if this time slot is already occupied by a fetched event
                 const isSlotOccupied = fetchedCalendarEvents.some(event => {
                     return event.start.getFullYear() === cellDateTime.getFullYear() &&
@@ -861,16 +889,19 @@
                            event.start.getHours() === cellDateTime.getHours();
                 });
 
-                // MODIFIED: Apply occupied-slot class and handle clickability
+                // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
                 if (isSlotOccupied) {
                     contentArea.classList.add('occupied-slot'); // Mark as occupied
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                } else if (isSlotInPast) {
+                    contentArea.classList.add('past-slot'); // Mark as past and unavailable
                     contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
                 } else {
                     contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                     contentArea.dataset.date = day.toISOString();
                     contentArea.dataset.hour = hour;
 
-                    // Add click listener for time slot selection ONLY if not occupied
+                    // Add click listener for time slot selection ONLY if not occupied or in the past
                     contentArea.addEventListener('click', (e) => {
                         // Clear previous selection
                         document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
