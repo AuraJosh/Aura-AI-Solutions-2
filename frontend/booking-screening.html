@@ -565,7 +565,7 @@
         }
 
 
-        // MODIFIED: This function now sets the client's available times in the header
+        // MODIFIED: This function now correctly sets the client's available times in the header
         function openBookingCalendarModal(bookingData) {
             currentBookingBeingScheduled = bookingData;
             selectedEventDate = null; // Reset selection
@@ -573,8 +573,8 @@
             calendarOverlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent scrolling background
             
-            // NEW: Populate the client's available times in the calendar header
-            const availableTimes = bookingData.Available_Times || 'Not specified';
+            // CORRECTED: Use 'Preferred_Time' field, and fall back to a default message
+            const availableTimes = bookingData.Preferred_Time || 'Not specified';
             clientAvailableTimesElement.textContent = `Client's available times: ${availableTimes}`;
 
             renderCalendar(); // Render the calendar when opening
