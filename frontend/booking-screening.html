@@ -19,53 +19,61 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;          /* Enables vertical scrolling */
-        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;        /* Enables vertical scrolling */
+        height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
         padding-bottom: 8px;
     }
-    /* Optional: Add backdrop-filter for a subtle blur effect behind the overlay */
-    #loading-overlay {
-        backdrop-filter: blur(5px);
-        -webkit-backdrop-filter: blur(5px); /* For Safari compatibility */
+
+    /* --- Loading Animation Styles (Consistent with Analytics Page) --- */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Consistent with analytics page (0.5 for less darkness) */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's on top of everything */
+        color: white;
+        font-size: 1.2rem;
     }
 
-    /* Monochrome Geometric Flip Loader CSS */
-    .geometric-loader {
-        width: 60px; /* w-16 is 64px, adjusting to 60px for exact match */
-        aspect-ratio: .5;
-        display: grid;
-        justify-items: center;  
-        align-items: center;
+    .loader {
+        height: 60px;
+        aspect-ratio: 2;
+        border-bottom: 3px solid #0000;
+        background:
+            linear-gradient(90deg,#524656 50%,#0000 0)
+            -25% 100%/50% 3px repeat-x border-box;
+        position: relative;
+        animation: l3-0 .75s linear infinite;
+        margin-bottom: 20px; /* Space between loader and text */
     }
-    .geometric-loader::before {
+    .loader:before {
         content: "";
-        width: 30%;
+        position: absolute;
+        inset: auto 42.5% 0;
         aspect-ratio: 1;
         border-radius: 50%;
-        margin: auto auto 0;
-        background: #9CA3AF; /* Tailwind gray-400 - light gray/blue-gray */
-        animation: l9-0 .5s cubic-bezier(0,800,1,800) infinite;
+        background: #4e3abd; /* Purple color, consistent with analytics page */
+        animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
     }
-    .geometric-loader::after {
-        content: "";
-        width: 100%;
-        aspect-ratio: 1 / 0.866;
-        margin: 0 auto auto;
-        clip-path: polygon(50% -50%,100% 50%,50% 150%,0 50%);
-        background: #3B82F6; /* Tailwind blue-500 - matches your UI accents */
-        animation: l9-1 .5s linear infinite;
+    @keyframes l3-0 {
+        to {background-position: -125% 100%}
     }
-    @keyframes l9-0 {
-        0%,2%  {translate: 0   0%}
-        98%,to {translate: 0 -.2%}
+    @keyframes l3-1 {
+        0%,2% {bottom: 0%}
+        98%,to {bottom:.1%}
     }
-    @keyframes l9-1 {
-        0%,5%  {rotate:  0deg}
-        95%,to {rotate:-60deg}
-    }
+    /* --- End Loading Animation Styles --- */
+
+
     /* Basic styling for custom message box */
     .message-box {
         position: fixed;
@@ -116,7 +124,7 @@
         cursor: not-allowed !important; /* Indicate it's not clickable */
         border: 1px solid #7C3AED; /* Slightly darker purple border */
         /* MODIFIED: Add rounded corners here */
-        border-radius: 0.5rem; 
+        border-radius: 0.5rem;
     }
     .time-slot.occupied-slot:hover {
         background-color: #7C3AED !important; /* Darken on hover for booked slots */
@@ -322,11 +330,9 @@
         <div class="absolute inset-0 bg-black/60"></div>
     </div>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
-        <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="geometric-loader mb-4"></div>
-            <p id="loading-message" class="text-white text-lg font-semibold"></p>
-        </div>
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loader"></div>
+        <p id="loading-message">Loading data...</p>
     </div>
 
     <script type="module">
@@ -370,7 +376,7 @@
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
 
         const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingSpinner = document.getElementById('loading-spinner');
+        // const loadingSpinner = document.getElementById('loading-spinner'); // No longer needed, removed the element
         const loadingMessage = document.getElementById('loading-message');
 
         // Custom Calendar Elements
@@ -1005,7 +1011,7 @@
                     pendingBookings = [];
                     deletedBookings = [];
                     // bookingFieldsConfig is populated dynamically from first doc, which is fine for display
-                                                    
+                                                            
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
@@ -1304,7 +1310,7 @@
             if (deletedBookings.length === 0) {
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
             } else {
-                deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
+                deletedBookingsListElement.innerHTML = deletedBook bookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
                 // Event listeners are now handled by delegation on the parent
             }
         }
