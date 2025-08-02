@@ -104,8 +104,69 @@
         border: 2px solid #3B82F6; /* blue-500 */
     }
 
-    /* Event display styles - MODIFIED to PURPLE for completed events */
+    /* NEW: Styles for occupied time slots (single block view) */
+    .time-slot.occupied-slot {
+        background-color: #8B5CF6; /* Purple-500 - matches your UI accents for booked/scheduled events */
+        position: relative; /* Essential for child absolute positioning */
+        overflow: hidden; /* Ensure text doesn't spill out */
+        display: flex; /* Allow content to align */
+        align-items: center; /* Vertically center content */
+        justify-content: center; /* Horizontally center content */
+        color: white; /* Text color for booked slots */
+        cursor: not-allowed !important; /* Indicate it's not clickable */
+        border: 1px solid #7C3AED; /* Slightly darker purple border */
+    }
+    .time-slot.occupied-slot:hover {
+        background-color: #7C3AED !important; /* Darken on hover for booked slots */
+    }
+
+    /* Event display styles - MODIFIED for single block view */
     .calendar-event {
+        /* These styles now define how the event content looks *within* the occupied slot */
+        color: white; /* Text color of the event name */
+        padding: 2px 4px; /* Small padding for text */
+        border-radius: 4px;
+        font-size: 0.7rem;
+        line-height: 1rem;
+        text-align: center; /* Center the event text */
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        /* Position over parent .occupied-slot */
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex; /* For centering text */
+        align-items: center;
+        justify-content: center;
+        z-index: 2; /* Ensure event text is above background */
+        background-color: transparent; /* Event itself doesn't have a background anymore */
+    }
+    /* Specific styling for pending events (text only now, background is handled by parent .occupied-slot) */
+    .calendar-event.pending {
+        color: #F59E0B; /* Amber-500 text for pending */
+        /* background-color: transparent; */ /* Ensure no background for pending event div */
+    }
+    .time-slot.occupied-slot .calendar-event.pending {
+        background-color: #CC8A00; /* Amber-700 for pending occupied slots */
+        border: 1px solid #F59E0B; /* Amber-500 border */
+        color: white; /* Text color inside pending occupied slot */
+    }
+
+
+    /* NEW: For month view, apply similar styling to the events container for stacking */
+    .month-day-events-container {
+        display: flex;
+        flex-direction: column;
+        gap: 2px; /* Consistent gap for stacking multiple small event boxes */
+        overflow-y: auto; /* Keep scrolling for too many events */
+        flex-grow: 1; /* Allow it to take up available space */
+    }
+
+    /* NEW: Styling for individual event boxes in month view (smaller, stacked) */
+    .month-day-event-item {
         background-color: #8B5CF6; /* Purple-500 for booked/scheduled events */
         color: white;
         padding: 2px 4px;
@@ -115,32 +176,11 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        position: relative; /* Ensure z-index works */
-        z-index: 1; /* Ensure event div is above time-slot background */
-        /* Removed margin-bottom (mb-0.5) to allow parent gap to control spacing */
+        z-index: 1;
     }
-    .calendar-event.pending {
-        background-color: #F59E0B; /* amber-500 for pending events (kept as is) */
+    .month-day-event-item.pending {
+        background-color: #F59E0B; /* Amber-500 for pending events */
     }
-
-    /* NEW: Add flex and gap to time-slot for better event stacking */
-    .time-slot {
-        display: flex;
-        flex-direction: column;
-        gap: 2px; /* Smaller gap for tighter packing, adjust as needed */
-        /* Ensure overflow-hidden is there as it is */
-        overflow: hidden; /* Keep this to clip events that don't fit */
-    }
-
-    /* NEW: For month view, apply similar styling to the events container */
-    .month-day-events-container {
-        display: flex;
-        flex-direction: column;
-        gap: 2px; /* Consistent gap */
-        overflow-y: auto; /* Keep scrolling for too many events */
-    }
-
-    /* Removed .time-slot-unavailable CSS entirely, as blocked visual is now the event itself */
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -520,6 +560,7 @@
                 fetchStartDate = new Date(year, month, 1);
                 fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59); // End of month
                 calendarTitle.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole month
                 renderMonthView(fetchStartDate, fetchEndDate);
             } else if (currentView === 'week') {
                 const startOfWeek = new Date(currentDate);
@@ -537,6 +578,7 @@
                     ${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - 
                     ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 `;
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole week
                 renderWeekView(fetchStartDate, fetchEndDate);
             } else { // Day View
                 const startOfDay = new Date(currentDate);
@@ -548,31 +590,40 @@
                 fetchEndDate = endOfDay;
 
                 calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole day
                 renderDayView(fetchStartDate, fetchEndDate);
             }
-            fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
         }
 
-        // MODIFIED: Pass originalData to allow for detailed tooltips
-        function addEventToCell(cellElement, event) {
-            const eventDiv = document.createElement('div');
-            // Removed mb-0.5 from here, parent gap will handle spacing
-            eventDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
-            
-            // Display Phone_Number (or Customer_Name, or Email) directly on the event
-            eventDiv.textContent = event.title; 
-            
-            // Add a detailed tooltip on hover
-            eventDiv.title = `
-                ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-            `.trim();
-
-            cellElement.appendChild(eventDiv);
+        // MODIFIED: addEventToCell now differentiates rendering based on view type
+        function addEventToCell(cellElement, event, viewType) {
+            if (viewType === 'month') {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
+                eventDiv.textContent = event.title; 
+                eventDiv.title = `
+                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
+                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
+                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
+                `.trim();
+                cellElement.appendChild(eventDiv);
+            } else { // 'week' or 'day' view - single block event
+                const eventTextDiv = document.createElement('div');
+                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`; // Apply pending class to text
+                eventTextDiv.textContent = event.title; 
+                eventTextDiv.title = `
+                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
+                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
+                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
+                `.trim();
+                cellElement.appendChild(eventTextDiv);
+            }
         }
 
         function renderMonthView(fetchStartDate, fetchEndDate) {
@@ -662,7 +713,7 @@
                         if (event.start.getDate() === cellDate.getDate() &&
                             event.start.getMonth() === cellDate.getMonth() &&
                             event.start.getFullYear() === cellDate.getFullYear()) {
-                            addEventToCell(eventsContainer, event);
+                            addEventToCell(eventsContainer, event, 'month'); // Pass 'month' view type
                         }
                     });
                     dayCell.appendChild(eventsContainer);
@@ -714,7 +765,6 @@
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
-                    // time-slot class will handle flex/gap
                     timeCell.className = 'time-slot h-full border-r border-gray-700 relative'; 
 
                     // Calculate the full date and time for this specific cell/slot
@@ -729,10 +779,10 @@
                                event.start.getHours() === cellDateTime.getHours();
                     });
                     
+                    // MODIFIED: Apply occupied-slot class and handle clickability
                     if (isSlotOccupied) {
-                        // If occupied, don't add cursor-pointer or hover effects
+                        timeCell.classList.add('occupied-slot'); // Mark as occupied
                         timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
-                        // No click listener for NEW selection if occupied
                     } else {
                         timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                         timeCell.dataset.date = day.toISOString(); // Full date for the day
@@ -761,7 +811,7 @@
                             event.start.getMonth() === cellDateTime.getMonth() &&
                             event.start.getDate() === cellDateTime.getDate() &&
                             event.start.getHours() === cellDateTime.getHours()) {
-                            addEventToCell(timeCell, event);
+                            addEventToCell(timeCell, event, 'week'); // Pass 'week' view type
                         }
                     });
                     
@@ -790,7 +840,6 @@
 
                 // Main content area for the hour
                 const contentArea = document.createElement('div');
-                // time-slot class will handle flex/gap
                 contentArea.className = 'time-slot flex-1 h-full relative'; 
                 
                 // Calculate the full date and time for this specific cell/slot
@@ -805,10 +854,10 @@
                            event.start.getHours() === cellDateTime.getHours();
                 });
 
+                // MODIFIED: Apply occupied-slot class and handle clickability
                 if (isSlotOccupied) {
-                    // If occupied, don't add cursor-pointer or hover effects
+                    contentArea.classList.add('occupied-slot'); // Mark as occupied
                     contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
-                    // No click listener for NEW selection if occupied
                 } else {
                     contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                     contentArea.dataset.date = day.toISOString();
@@ -837,7 +886,7 @@
                         event.start.getMonth() === cellDateTime.getMonth() &&
                         event.start.getDate() === cellDateTime.getDate() &&
                         event.start.getHours() === cellDateTime.getHours()) {
-                        addEventToCell(contentArea, event);
+                        addEventToCell(contentArea, event, 'day'); // Pass 'day' view type
                     }
                 });
 
