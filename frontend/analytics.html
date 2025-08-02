@@ -19,8 +19,8 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;           /* Enables vertical scrolling */
-        height: 240px;              /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        overflow-y: auto;        /* Enables vertical scrolling */
+        height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
         justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
@@ -40,9 +40,59 @@
     .message-box.info { background-color: #3B82F6; /* blue-500 */ }
     .message-box.error { background-color: #EF4444; /* red-500 */ }
     .message-box.success { background-color: #22C55E; /* green-500 */ }
+
+    /* --- Loading Animation Styles --- */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's on top of everything */
+        color: white;
+        font-size: 1.2rem;
+    }
+
+    .loader {
+        height: 60px;
+        aspect-ratio: 2;
+        border-bottom: 3px solid #0000;
+        background:
+            linear-gradient(90deg,#524656 50%,#0000 0)
+            -25% 100%/50% 3px repeat-x border-box;
+        position: relative;
+        animation: l3-0 .75s linear infinite;
+        margin-bottom: 20px; /* Space between loader and text */
+    }
+    .loader:before {
+        content: "";
+        position: absolute;
+        inset: auto 42.5% 0;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #CF4647;
+        animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
+    }
+    @keyframes l3-0 {
+        to {background-position: -125% 100%}
+    }
+    @keyframes l3-1 {
+        0%,2% {bottom: 0%}
+        98%,to {bottom:.1%}
+    }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
+
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Loading your analytics data...</p>
+    </div>
 
     <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
         <div class="container mx-auto flex items-center justify-between p-4">
@@ -63,8 +113,7 @@
 
     <main class="pt-40 px-4 flex justify-center relative z-10">
         <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-            <p class="text-white text-center">Loading your analytics data...</p>
-        </div>
+            </div>
     </main>
 
     <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
@@ -120,6 +169,21 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
 
         let authInitialized = false; // Flag to ensure data loading happens only once
+        const loadingOverlay = document.getElementById('loading-overlay'); // Get the loading overlay element
+
+        // Function to show the loading overlay
+        function showLoading() {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex'; // Use flex to center content
+            }
+        }
+
+        // Function to hide the loading overlay
+        function hideLoading() {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
 
         // --- Custom Message Function (replaces alert) ---
         function showMessage(message, type = 'info') {
@@ -146,6 +210,7 @@
                     // User is NOT logged in, redirect to login
                     console.log("User is not logged in. Redirecting to login.");
                     window.location.href = "login.html";
+                    hideLoading(); // Hide loading if redirecting
                 }
             }
         });
@@ -164,13 +229,16 @@
 
         // Function to fetch data from the Google Apps Script
         async function loadCustomerData(userIdentifier) {
+            showLoading(); // Show loading animation before fetching data
+
             const dataTableContainer = document.getElementById('data-table-container');
             if (!dataTableContainer) {
                 console.error("Error: Element with ID 'data-table-container' not found.");
+                hideLoading(); // Hide loading even if element is missing
                 return;
             }
 
-            dataTableContainer.innerHTML = '<p class="text-white text-center">Loading your analytics data...</p>';
+            dataTableContainer.innerHTML = ''; // Clear previous loading text
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
@@ -183,6 +251,7 @@
                 
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
+                    hideLoading(); // Hide loading on error
                     return;
                 }
                 
@@ -304,7 +373,12 @@
                                     </div>
                                 ` : `
                                     <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock detailed chat logs.</p>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
                                         </div>
+                                    </div>
                                     <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
                                     </div>
                                 `}
@@ -325,9 +399,9 @@
                                 <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
                                 <a href="form.html"
-                                            id="feedback-btn"
-                                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
-                                            Provide Feedback
+                                        id="feedback-btn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                        Provide Feedback
                                 </a>
 
                                 <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
@@ -394,6 +468,8 @@
             } catch (error) {
                 console.error('Error fetching or parsing data:', error);
                 dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
+            } finally {
+                hideLoading(); // Always hide loading animation after fetch attempt
             }
         }
 
@@ -412,7 +488,8 @@
         }
 
         if (updateInfoBtn) {
-            updateInfoBtn.addEventListener('click', () => {
+            updateInfoBtn.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
                 updateInfoModal.classList.remove('hidden');
             });
         }
