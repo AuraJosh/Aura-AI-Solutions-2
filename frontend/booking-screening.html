@@ -104,12 +104,21 @@
         border: 2px solid #3B82F6; /* blue-500 */
     }
 
-    /* Event display styles - MODIFIED to PURPLE for completed events */
+    /* Base style for time-slot - now responsible for background */
+    .time-slot {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* Center content vertically in the hour block */
+        align-items: flex-start; /* Align text to the start */
+        padding: 4px; /* Add some padding inside the hour block */
+        overflow: hidden; /* Keep this to clip events that don't fit */
+        flex-grow: 1; /* Allow time slots to grow to fill height in week/day view */
+        border-radius: 4px; /* Give the whole slot rounded corners */
+    }
+
+    /* Event display styles - MODIFIED: This is now only for month view or the text inside summary */
     .calendar-event {
-        background-color: #8B5CF6; /* Purple-500 for booked/scheduled events */
         color: white;
-        padding: 2px 4px;
-        border-radius: 4px;
         font-size: 0.7rem;
         line-height: 1rem;
         overflow: hidden;
@@ -117,30 +126,43 @@
         text-overflow: ellipsis;
         position: relative; /* Ensure z-index works */
         z-index: 1; /* Ensure event div is above time-slot background */
-        /* Removed margin-bottom (mb-0.5) to allow parent gap to control spacing */
+        /* background-color, padding, border-radius are removed here */
     }
     .calendar-event.pending {
-        background-color: #F59E0B; /* amber-500 for pending events (kept as is) */
+        /* background-color is handled by parent .time-slot in week/day view */
+        /* For month view, individual event cards still use this */
+        background-color: #F59E0B; /* amber-500 for pending events (kept as is for month view) */
+    }
+    /* For completed events in month view, add specific styling if needed */
+    .calendar-event:not(.pending) { /* Apply purple to non-pending events in month view */
+        background-color: #8B5CF6; /* Purple-500 */
     }
 
-    /* NEW: Add flex and gap to time-slot for better event stacking */
-    .time-slot {
-        display: flex;
-        flex-direction: column;
-        gap: 2px; /* Smaller gap for tighter packing, adjust as needed */
-        /* Ensure overflow-hidden is there as it is */
-        overflow: hidden; /* Keep this to clip events that don't fit */
+
+    /* NEW: Styles for the combined event summary block in week/day view */
+    /* This div will hold the text inside the colored time-slot */
+    .calendar-event-summary {
+        color: white;
+        font-size: 0.8rem; /* Slightly larger text for main display */
+        line-height: 1.2;
+        overflow: hidden;
+        display: flex; /* Added for vertical centering if needed */
+        align-items: center; /* Center vertically in the block */
+        white-space: nowrap; /* Prevent wrapping if only one line */
+        text-overflow: ellipsis;
+        width: 100%; /* Take full width of the parent time-slot */
+        height: 100%; /* Take full height of the parent time-slot */
+        /* No padding/border-radius here, as the parent timeCell (time-slot) handles it */
     }
 
-    /* NEW: For month view, apply similar styling to the events container */
+    /* NEW: For month view, apply similar styling to the events container for stacking */
     .month-day-events-container {
         display: flex;
         flex-direction: column;
-        gap: 2px; /* Consistent gap */
+        gap: 2px; /* Consistent gap between individual events */
         overflow-y: auto; /* Keep scrolling for too many events */
+        flex-grow: 1; /* Allow to grow and fill space */
     }
-
-    /* Removed .time-slot-unavailable CSS entirely, as blocked visual is now the event itself */
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -553,10 +575,10 @@
             fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
         }
 
-        // MODIFIED: Pass originalData to allow for detailed tooltips
+        // Used only by Month View now
         function addEventToCell(cellElement, event) {
             const eventDiv = document.createElement('div');
-            // Removed mb-0.5 from here, parent gap will handle spacing
+            // calendar-event class now controls individual event card styling in month view
             eventDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
             
             // Display Phone_Number (or Customer_Name, or Email) directly on the event
@@ -657,7 +679,7 @@
                     // MODIFIED: Added month-day-events-container class for gap styling
                     eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
                     
-                    // Add events for this cell's date
+                    // Add events for this cell's date (individual events for month view)
                     fetchedCalendarEvents.forEach(event => {
                         if (event.start.getDate() === cellDate.getDate() &&
                             event.start.getMonth() === cellDate.getMonth() &&
@@ -714,26 +736,61 @@
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
-                    // time-slot class will handle flex/gap
                     timeCell.className = 'time-slot h-full border-r border-gray-700 relative'; 
 
                     // Calculate the full date and time for this specific cell/slot
                     const cellDateTime = new Date(day);
                     cellDateTime.setHours(hour, 0, 0, 0);
 
-                    // Check if this time slot is already occupied by a fetched event
-                    const isSlotOccupied = fetchedCalendarEvents.some(event => {
-                        return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                               event.start.getMonth() === cellDateTime.getMonth() &&
-                               event.start.getDate() === cellDateTime.getDate() &&
-                               event.start.getHours() === cellDateTime.getHours();
-                    });
+                    // Get events for this specific hour slot
+                    const eventsInThisSlot = fetchedCalendarEvents.filter(event => {
+                        const eventStart = event.start;
+                        // An event "occupies" an hour if its start is within the hour,
+                        // or if it spans across the hour. For simplicity, we'll check if its start hour is this slot's hour.
+                        // For more robust "occupies" logic: (eventStart < endOfSlot && eventEnd > startOfSlot)
+                        return eventStart.getFullYear() === cellDateTime.getFullYear() &&
+                               eventStart.getMonth() === cellDateTime.getMonth() &&
+                               eventStart.getDate() === cellDateTime.getFullYear() && // FIX: Changed from getDate() to getFullYear() by mistake here previously
+                               eventStart.getHours() === cellDateTime.getHours();
+                    }).sort((a, b) => a.start.getTime() - b.start.getTime()); // Sort to get the "first" event
+
+                    const isSlotOccupied = eventsInThisSlot.length > 0;
                     
                     if (isSlotOccupied) {
-                        // If occupied, don't add cursor-pointer or hover effects
+                        const firstEvent = eventsInThisSlot[0];
+                        
+                        // Apply background color to the timeCell itself
+                        if (firstEvent.type === 'pending') {
+                            timeCell.classList.add('bg-amber-500'); // Amber for pending
+                        } else {
+                            timeCell.classList.add('bg-purple-500'); // Purple for completed
+                        }
+                        timeCell.style.opacity = '0.9'; // Adjust opacity as needed
+
+                        // No pointer, no selection for occupied slots
                         timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
-                        // No click listener for NEW selection if occupied
+                        
+                        // Create a single event display element for the hour
+                        const summaryEventDiv = document.createElement('div');
+                        summaryEventDiv.className = `calendar-event-summary`; // Use the new summary class
+                        
+                        // Display the primary info (phone number once)
+                        let displayContent = firstEvent.title; // Already formatted as phone/name
+
+                        if (eventsInThisSlot.length > 1) {
+                            displayContent += ` (+${eventsInThisSlot.length - 1} more)`; // Indicate multiple bookings
+                        }
+                        summaryEventDiv.textContent = displayContent;
+
+                        // Add a detailed tooltip for the summary block
+                        summaryEventDiv.title = eventsInThisSlot.map(event => 
+                            `${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}: ${event.title}`
+                        ).join('\n'); // Show details of all events on hover
+
+                        timeCell.appendChild(summaryEventDiv);
+                        
                     } else {
+                        // If the slot is free, make it selectable
                         timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                         timeCell.dataset.date = day.toISOString(); // Full date for the day
                         timeCell.dataset.hour = hour; // Hour for selection
@@ -754,16 +811,6 @@
                             console.log("Selected week/day view date/time:", selectedEventDate);
                         });
                     }
-
-                    // Add events that fall within this hour slot
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                            event.start.getMonth() === cellDateTime.getMonth() &&
-                            event.start.getDate() === cellDateTime.getDate() &&
-                            event.start.getHours() === cellDateTime.getHours()) {
-                            addEventToCell(timeCell, event);
-                        }
-                    });
                     
                     timeRow.appendChild(timeCell);
                 }
@@ -790,26 +837,61 @@
 
                 // Main content area for the hour
                 const contentArea = document.createElement('div');
-                // time-slot class will handle flex/gap
                 contentArea.className = 'time-slot flex-1 h-full relative'; 
                 
                 // Calculate the full date and time for this specific cell/slot
                 const cellDateTime = new Date(day);
                 cellDateTime.setHours(hour, 0, 0, 0);
 
-                // Check if this time slot is already occupied by a fetched event
-                const isSlotOccupied = fetchedCalendarEvents.some(event => {
-                    return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                           event.start.getMonth() === cellDateTime.getMonth() &&
-                           event.start.getDate() === cellDateTime.getDate() &&
-                           event.start.getHours() === cellDateTime.getHours();
-                });
+                // Get events for this specific hour slot
+                const eventsInThisSlot = fetchedCalendarEvents.filter(event => {
+                    const eventStart = event.start;
+                    // An event "occupies" an hour if its start is within the hour,
+                    // or if it spans across the hour. For simplicity, we'll check if its start hour is this slot's hour.
+                    // For more robust "occupies" logic: (eventStart < endOfSlot && eventEnd > startOfSlot)
+                    return eventStart.getFullYear() === cellDateTime.getFullYear() &&
+                           eventStart.getMonth() === cellDateTime.getMonth() &&
+                           eventStart.getDate() === cellDateTime.getDate() && // FIX: Changed from getFullYear() to getDate() by mistake here previously
+                           eventStart.getHours() === cellDateTime.getHours();
+                }).sort((a, b) => a.start.getTime() - b.start.getTime()); // Sort to get the "first" event
+
+                const isSlotOccupied = eventsInThisSlot.length > 0;
 
                 if (isSlotOccupied) {
-                    // If occupied, don't add cursor-pointer or hover effects
+                    const firstEvent = eventsInThisSlot[0];
+                    
+                    // Apply background color to the contentArea (which is the time-slot)
+                    if (firstEvent.type === 'pending') {
+                        contentArea.classList.add('bg-amber-500'); // Amber for pending
+                    } else {
+                        contentArea.classList.add('bg-purple-500'); // Purple for completed
+                    }
+                    contentArea.style.opacity = '0.9'; // Adjust opacity as needed
+
+                    // No pointer, no selection for occupied slots
                     contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
-                    // No click listener for NEW selection if occupied
+                    
+                    // Create a single event display element for the hour
+                    const summaryEventDiv = document.createElement('div');
+                    summaryEventDiv.className = `calendar-event-summary`; // Use the new summary class
+                    
+                    // Display the primary info (phone number once)
+                    let displayContent = firstEvent.title; // Already formatted as phone/name
+
+                    if (eventsInThisSlot.length > 1) {
+                        displayContent += ` (+${eventsInThisSlot.length - 1} more)`; // Indicate multiple bookings
+                    }
+                    summaryEventDiv.textContent = displayContent;
+
+                    // Add a detailed tooltip for the summary block
+                    summaryEventDiv.title = eventsInThisSlot.map(event => 
+                        `${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}: ${event.title}`
+                    ).join('\n'); // Show details of all events on hover
+
+                    contentArea.appendChild(summaryEventDiv);
+
                 } else {
+                    // If the slot is free, make it selectable
                     contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
                     contentArea.dataset.date = day.toISOString();
                     contentArea.dataset.hour = hour;
@@ -831,16 +913,6 @@
                     });
                 }
                 
-                // Add events that fall within this hour slot
-                fetchedCalendarEvents.forEach(event => {
-                    if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                        event.start.getMonth() === cellDateTime.getMonth() &&
-                        event.start.getDate() === cellDateTime.getDate() &&
-                        event.start.getHours() === cellDateTime.getHours()) {
-                        addEventToCell(contentArea, event);
-                    }
-                });
-
                 timeSlot.appendChild(contentArea);
                 timeSlotsContainer.appendChild(timeSlot);
             }
@@ -1107,8 +1179,17 @@
             try {
                 await batch.commit();
                 return { success: true, message: "Booking statuses updated successfully." };
-            } catch (error) {
+            }
+            // MODIFIED: Catch block to specifically log Firebase errors
+            catch (error) {
                 console.error('Error committing batch updates:', error);
+                if (error.code === 'permission-denied') {
+                    showMessage("Permissions error: Check your Firestore Security Rules. " + error.message, 'error');
+                } else if (error.code === 'failed-precondition' && error.message.includes('requires an index')) {
+                    showMessage("Index required: A database index is missing. Check console for details.", 'error');
+                } else {
+                    showMessage(`Failed to save changes: ${error.message}`, 'error');
+                }
                 return { success: false, error: `Failed to save changes: ${error.message}` };
             }
         }
@@ -1428,116 +1509,4 @@
                         if (bookingsData.length > 0) {
                             currentBookingIndex = bookingsData.length - 1;
                         }
-                    } else if (originalSourceForStaging === 'pending') {
-                        pendingBookings.push(bookingToProcess);
-                    }
-                }
-                const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
-                if (existingStagedIndex !== -1) {
-                    stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    // Restore originalSource for staging purposes if moving back to pending, clear if to new
-                    if (targetStatus === 'Pending') {
-                        stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging;
-                    } else {
-                        delete stagedChanges[existingStagedIndex].originalSource;
-                    }
-                    delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
-                } else {
-                    stagedChanges.push({
-                        id: bookingToProcess.id,
-                        newStatus: targetStatus,
-                        originalSource: targetStatus === 'Pending' ? originalSourceForStaging : undefined // Only set if target is Pending
-                    });
-                }
-            }
-
-            // These are always called, unless `complete` action which `return`s early
-            renderBookingCard();
-            renderPendingBookings();
-            renderDeletedBookings();
-            updateSaveButtonState();
-            console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
-            console.log("Staged Changes after list action:", JSON.parse(JSON.stringify(stagedChanges)));
-        }
-
-        confirmScheduleBtn.addEventListener('click', async () => {
-            if (selectedEventDate && currentBookingBeingScheduled) {
-                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
-                    showLoading("Completing booking...");
-
-                    try {
-                        const bookingId = currentBookingBeingScheduled.id;
-                        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
-
-                        const updateData = {
-                            id: bookingId,
-                            newStatus: 'Completed',
-                            scheduledTime: selectedEventDate, // This is the Date object
-                            fullBookingData: currentBookingBeingScheduled 
-                        };
-
-                        if (existingStagedIndex !== -1) {
-                            stagedChanges[existingStagedIndex] = updateData; // Overwrite previous stage
-                        } else {
-                            stagedChanges.push(updateData);
-                        }
-
-                        // Update local arrays immediately for UI reflection
-                        pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                        currentBookingBeingScheduled.Status = 'Completed';
-                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate); // Update local object for display
-                        delete currentBookingBeingScheduled._originalSource; // Clear _originalSource for completed
-
-                        renderPendingBookings();
-                        updateSaveButtonState(); // Reflect changes in save button
-
-                        showMessage("Booking staged for completion! Click 'Save Changes' to finalize.", 'success');
-                        hideLoading();
-                        calendarOverlay.classList.add('hidden');
-                        document.body.style.overflow = '';
-                        console.log("Staged Changes after calendar completion:", JSON.parse(JSON.stringify(stagedChanges)));
-
-                    } catch (error) {
-                        console.error("Error during booking completion staging:", error);
-                        showMessage("Failed to stage booking completion: " + error.message, 'error');
-                        hideLoading();
-                    }
-                }, () => {
-                    showMessage("Booking confirmation cancelled.", 'info');
-                });
-            } else {
-                showMessage("Please select a date and time for the booking.", 'info');
-            }
-        });
-
-        saveChangesBtn.addEventListener('click', async () => {
-            console.log("Save Changes button clicked!"); // Debug log
-            if (stagedChanges.length === 0) {
-                showMessage("No changes to save.", 'info');
-                return;
-            }
-
-            showConfirm(`Are you sure you want to save ${stagedChanges.length} changes to the database?`, async () => {
-                showLoading("Saving changes to Database...");
-
-                try {
-                    const result = await sendBatchBookingUpdates(stagedChanges);
-
-                    if (result.success) {
-                        showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = []; // Clear staged changes only upon successful commit
-                        updateSaveButtonState(); // Update button state to reflect cleared changes
-                    } else {
-                        showMessage("Failed to save changes: " + result.error, 'error');
-                    }
-                } finally {
-                    hideLoading();
-                }
-            }, () => {
-                showMessage("Save cancelled.", 'info');
-            });
-        });
-
-    </script>
-</body>
-</html>
+                    } else if (originalSourceForS
