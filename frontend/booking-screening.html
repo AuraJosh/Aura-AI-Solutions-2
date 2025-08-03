@@ -124,7 +124,7 @@
         color: white; /* Text color for booked slots */
         cursor: not-allowed !important; /* Indicate it's not clickable */
         border: 1px solid #7C3AED; /* Slightly darker purple border */
-        border-radius: 0.5rem; 
+        border-radius: 0.5rem;  
     }
     .time-slot.occupied-slot:hover {
         background-color: #7C3AED !important; /* Darken on hover for booked slots */
@@ -501,28 +501,7 @@
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
                 const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings'); // New collection for scheduled meetings
 
-                // Query for 'Completed' bookings within the date range from bookings collection
-                const qCompletedBookings = query(bookingsRef,
-                    where('Status', '==', 'Completed'),
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
-                    where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
-                );
-                const querySnapshotCompletedBookings = await getDocs(qCompletedBookings);
-                querySnapshotCompletedBookings.docs.forEach(doc => {
-                    const data = doc.data();
-                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
-                        events.push({
-                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
-                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Booked',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed',
-                            originalData: data // Pass the full data object for detailed tooltip
-                        });
-                    }
-                });
-
-                // Query for 'Completed' meetings from scheduled_meetings collection
+                // Query for 'Completed' meetings from scheduled_meetings collection (Primary source for completed)
                 const qScheduledMeetings = query(scheduledMeetingsRef,
                     where('Status', '==', 'Completed'), // Assuming scheduled_meetings also have a 'Status' field
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
@@ -533,7 +512,6 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
                             title: data.Phone_Number || data.Customer_Name || data.Email || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
@@ -543,11 +521,10 @@
                     }
                 });
 
-
-                // Query for 'Pending' bookings that might already have a scheduled time
+                // Query for 'Pending' bookings from bookings collection (only pending status, as completed are now in scheduled_meetings)
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'),
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)), // Include if Pending bookings can have a scheduled time in calendar
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
                 const querySnapshotPending = await getDocs(qPending);
@@ -555,7 +532,6 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            // MODIFIED: Prioritize Phone_Number, then Customer_Name, then Email
                             title: data.Phone_Number || data.Customer_Name || data.Email || 'Pending',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
@@ -905,9 +881,9 @@
                 // Check if this time slot is already occupied by a fetched event
                 const isSlotOccupied = fetchedCalendarEvents.some(event => {
                     return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                           event.start.getMonth() === cellDateTime.getMonth() &&
-                           event.start.getDate() === cellDateTime.getDate() &&
-                           event.start.getHours() === cellDateTime.getHours();
+                               event.start.getMonth() === cellDateTime.getMonth() &&
+                               event.start.getDate() === cellDateTime.getDate() &&
+                               event.start.getHours() === cellDateTime.getHours();
                 });
 
                 // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
@@ -1062,7 +1038,7 @@
                     pendingBookings = [];
                     deletedBookings = [];
                     // bookingFieldsConfig is populated dynamically from first doc, which is fine for display
-                                                    
+                                                            
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
