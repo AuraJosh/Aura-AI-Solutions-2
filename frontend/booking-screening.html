@@ -1544,6 +1544,7 @@
             console.log("Staged Changes after list action:", JSON.parse(JSON.stringify(stagedChanges)));
         }
 
+        // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly
         confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
                 showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
@@ -1551,40 +1552,38 @@
 
                     try {
                         const bookingId = currentBookingBeingScheduled.id;
-                        const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
-
-                        const updateData = {
+                        
+                        // Create a single-element array for the batch update
+                        const updatesToCommit = [{
                             id: bookingId,
                             newStatus: 'Completed',
                             scheduledTime: selectedEventDate, // This is the Date object
                             fullBookingData: currentBookingBeingScheduled 
-                        };
+                        }];
 
-                        if (existingStagedIndex !== -1) {
-                            stagedChanges[existingStagedIndex] = updateData; // Overwrite previous stage
+                        const result = await sendBatchBookingUpdates(updatesToCommit);
+
+                        if (result.success) {
+                            showMessage("Booking confirmed and saved successfully!", 'success');
+                            // After successful save, update local data to reflect the change
+                            // Firestore onSnapshot listener will eventually update `pendingBookings` and `fetchedCalendarEvents`
+                            // but we can make an immediate local adjustment for responsiveness
+                            pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
+                            renderPendingBookings();
+                            // No need to clear stagedChanges for *this* specific action, as it's directly committed.
+                            // The global stagedChanges array still holds other pending/deleted changes.
                         } else {
-                            stagedChanges.push(updateData);
+                            showMessage("Failed to confirm and save booking: " + result.error, 'error');
                         }
-
-                        // Update local arrays immediately for UI reflection
-                        pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                        currentBookingBeingScheduled.Status = 'Completed';
-                        currentBookingBeingScheduled.ScheduledDateTime = Timestamp.fromDate(selectedEventDate); // Update local object for display
-                        delete currentBookingBeingScheduled._originalSource; // Clear _originalSource for completed
-
-                        renderPendingBookings();
-                        updateSaveButtonState(); // Reflect changes in save button
-
-                        showMessage("Booking staged for completion! Click 'Save Changes' to finalize.", 'success');
+                    } catch (error) {
+                        console.error("Error during booking completion:", error);
+                        showMessage("An unexpected error occurred during booking completion: " + error.message, 'error');
+                    } finally {
                         hideLoading();
                         calendarOverlay.classList.add('hidden');
                         document.body.style.overflow = '';
-                        console.log("Staged Changes after calendar completion:", JSON.parse(JSON.stringify(stagedChanges)));
-
-                    } catch (error) {
-                        console.error("Error during booking completion staging:", error);
-                        showMessage("Failed to stage booking completion: " + error.message, 'error');
-                        hideLoading();
+                        // Re-render calendar to reflect the newly booked slot
+                        renderCalendar(); 
                     }
                 }, () => {
                     showMessage("Booking confirmation cancelled.", 'info');
