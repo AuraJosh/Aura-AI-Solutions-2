@@ -717,6 +717,7 @@
                                 // Default to a sensible time, perhaps start of day, or current time
                                 selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); 
                                 confirmScheduleBtn.disabled = false;
+                                // --- MODIFIED LINE: Added .selected class ---
                                 e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
                                 showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
                                 console.log("Selected month view date:", selectedEventDate);
@@ -829,6 +830,8 @@
                             selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
                             selectedEventDate = selectedDate;
                             confirmScheduleBtn.disabled = false;
+                            // --- MODIFIED LINE: Added .selected class ---
+                            e.currentTarget.classList.add('selected'); // Add the 'selected' class here
                             showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                             console.log("Selected week/day view date/time:", selectedEventDate);
                         });
@@ -909,6 +912,8 @@
                         selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
                         selectedEventDate = selectedDate;
                         confirmScheduleBtn.disabled = false;
+                        // --- MODIFIED LINE: Added .selected class ---
+                        e.currentTarget.classList.add('selected'); // Add the 'selected' class here
                         showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                         console.log("Selected day view date/time:", selectedEventDate);
                     });
@@ -1268,7 +1273,8 @@
                 // Only add to display if the value is not 'N/A' or empty after processing
                 if (fieldValue !== 'N/A' && fieldValue !== '') {
                     const label = formatFieldNameAsLabel(fieldName);
-                    cardContentArray.push(`<strong style="font-size: 1.1em;">${label}</strong>: ${fieldValue}`);
+                    // --- MODIFIED LINE: Changed font-size from 1.1em to 1em ---
+                    cardContentArray.push(`<strong style="font-size: 1em;">${label}</strong>: ${fieldValue}`);
                 }
             });
 
