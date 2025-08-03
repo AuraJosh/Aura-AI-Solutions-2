@@ -377,9 +377,9 @@
         let bookingsData = []; // 'New' bookings
         let pendingBookings = [];
         let deletedBookings = [];
-        let stagedChanges = [];
+        let stagedChanges = []; // For 'Pending' and 'Deleted' actions that need explicit save
         let currentBookingIndex = 0;
-        let bookingFieldsConfig = [];
+        // bookingFieldsConfig is no longer needed as we'll use explicit lists for display
         let currentUserUid = null;
         let currentAccountId = null;
         let authInitialized = false; // Flag to track if auth state is resolved
@@ -623,6 +623,7 @@
                     ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                     ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
                     ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
                     ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
                     ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
@@ -636,6 +637,7 @@
                     ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                     ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
                     ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
                     ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
                     ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
@@ -1013,7 +1015,7 @@
                     const errorMessage = `No account mapping found for your user ID: ${currentUserUid}. Please contact support.`;
                     bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
                     pendingBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                    deletedBookingsListElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p親
                     hideLoading();
                     return;
                 }
@@ -1037,29 +1039,12 @@
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                    // bookingFieldsConfig is populated dynamically from first doc, which is fine for display
+                    // Removed dynamic bookingFieldsConfig population.
+                    // Display fields are now defined explicitly in renderBookingCard and renderShortenedBookingItem.
                                                             
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
-
-                        // Populate bookingFieldsConfig only once or from a definitive source
-                        if (bookingFieldsConfig.length === 0) {
-                             Object.keys(booking).forEach(key => {
-                                 if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                                     bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
-                                 }
-                             });
-                             if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) {
-                                 bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
-                             }
-                             if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) {
-                                 bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
-                             }
-                             if (!bookingFieldsConfig.some(f => f.field === 'Status')) {
-                                 bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
-                             }
-                        }
 
                         if (status === 'New' || status === '') {
                             bookingsData.push(booking);
@@ -1174,6 +1159,9 @@
                             meetingData.BookingRequestTimestamp = meetingData.Timestamp; 
                             delete meetingData.Timestamp;
                         }
+                        // Also remove Status and ScheduledDateTime from the booking data if they were explicitly there
+                        delete meetingData.Status; 
+                        delete meetingData.ScheduledDateTime;
 
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true }); // Use set with merge to create or update
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
@@ -1211,23 +1199,24 @@
             const currentBooking = bookingsData[currentBookingIndex];
             let cardContentArray = [];
 
-            // Ensure bookingFieldsConfig is populated if it's somehow empty at this point
-            if (bookingFieldsConfig.length === 0) {
-                Object.keys(currentBooking).forEach(key => {
-                    if (key !== 'id' && key !== 'Status' && key !== '_originalSource' && key !== 'Timestamp' && key !== 'ScheduledDateTime') {
-                        bookingFieldsConfig.push({ field: key, question: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) });
-                    }
-                });
-                if (!bookingFieldsConfig.some(f => f.field === 'Timestamp')) bookingFieldsConfig.push({ field: 'Timestamp', question: 'Timestamp' });
-                if (!bookingFieldsConfig.some(f => f.field === 'ScheduledDateTime')) bookingFieldsConfig.push({ field: 'ScheduledDateTime', question: 'Scheduled Date/Time' });
-                if (!bookingFieldsConfig.some(f => f.field === 'Status')) bookingFieldsConfig.push({ field: 'Status', question: 'Status' });
-            }
+            // Define the specific fields to display on the main card and their human-readable labels
+            // Order matters here for display. ScheduledDateTime and Status are intentionally omitted.
+            const fieldsToDisplayOnCard = [
+                { field: 'Customer_Name', question: 'Customer Name' },
+                { field: 'Contact_Name', question: 'Contact Name' }, // Added new field
+                { field: 'Email', question: 'Email' },
+                { field: 'Phone_Number', question: 'Phone Number' },
+                { field: 'Service', question: 'Service' },
+                { field: 'Subject', question: 'Subject' },
+                { field: 'Message', question: 'Message' },
+                { field: 'Preferred_Time', question: 'Preferred Time' },
+                { field: 'Timestamp', question: 'Request Time' }
+            ];
 
-
-            bookingFieldsConfig.forEach(fieldConfig => {
+            fieldsToDisplayOnCard.forEach(fieldConfig => {
                 let fieldValue = (currentBooking[fieldConfig.field] || 'N/A');
 
-                if ((fieldConfig.field === 'Timestamp' || fieldConfig.field === 'ScheduledDateTime') && fieldValue) {
+                if (fieldConfig.field === 'Timestamp' && fieldValue) {
                     if (fieldValue.toDate) {
                         fieldValue = fieldValue.toDate().toLocaleString();
                     } else if (fieldValue instanceof Date) {
@@ -1236,9 +1225,14 @@
                         fieldValue = fieldValue.toString().trim();
                     }
                 } else {
+                    // For all other fields, just convert to string and trim
                     fieldValue = fieldValue.toString().trim();
                 }
-                cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
+                
+                // Add to display if the value is not empty or 'N/A' (or always if desired)
+                if (fieldValue !== 'N/A' && fieldValue !== '') {
+                    cardContentArray.push(`<strong style="font-size: 1.1em;">${fieldConfig.question}</strong>: ${fieldValue}`);
+                }
             });
 
             const combinedContent = cardContentArray.join('<br><br>');
@@ -1255,50 +1249,42 @@
 
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
-            const fieldsToDisplay = ['Timestamp', 'Customer_Name', 'Email', 'Subject', 'Service', 'ScheduledDateTime'];
+            // Define preferred fields for shortened display
+            const fieldsToDisplayShort = [
+                'Timestamp', 'Customer_Name', 'Contact_Name', 'Email', 'Phone_Number', 'Subject', 'Service', 'ScheduledDateTime'
+            ];
             let displayedCount = 0;
 
-            for (const fieldName of fieldsToDisplay) {
-                if (booking[fieldName] !== undefined && displayedCount < 3) {
+            for (const fieldName of fieldsToDisplayShort) {
+                // Skip ScheduledDateTime if it's N/A (or for 'New' bookings where it won't exist yet)
+                if (fieldName === 'ScheduledDateTime' && (!booking[fieldName] || booking[fieldName] === 'N/A')) {
+                    continue; 
+                }
+                if (booking[fieldName] !== undefined && displayedCount < 3) { // Limit to 3 fields
                     let fieldValue = (booking[fieldName] || 'N/A');
                     if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
                         if (fieldValue && fieldValue.toDate) {
                             fieldValue = fieldValue.toDate().toLocaleDateString();
+                            if (fieldName === 'ScheduledDateTime') {
+                                fieldValue += ' ' + booking[fieldName].toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            }
                         } else if (fieldValue instanceof Date) {
                             fieldValue = fieldValue.toLocaleDateString();
+                            if (fieldName === 'ScheduledDateTime') {
+                                fieldValue += ' ' + fieldValue.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            }
                         } else {
                             fieldValue = fieldValue.toString().trim();
                         }
                     } else {
                         fieldValue = fieldValue.toString().trim();
                     }
-                    displayValues.push(fieldValue);
-                    displayedCount++;
-                }
-            }
-
-            if (displayedCount < 3 && bookingFieldsConfig.length > 0) {
-                for (let i = 0; i < bookingFieldsConfig.length && displayedCount < 3; i++) {
-                    const fieldName = bookingFieldsConfig[i].field;
-                    if (!fieldsToDisplay.includes(fieldName) && booking[fieldName] !== undefined) {
-                        let fieldValue = (booking[fieldName] || 'N/A');
-                        if (fieldName === 'Timestamp' || fieldName === 'ScheduledDateTime') {
-                            if (fieldValue && fieldValue.toDate) {
-                                fieldValue = fieldValue.toDate().toLocaleDateString();
-                            } else if (fieldValue instanceof Date) {
-                                fieldValue = fieldValue.toLocaleDateString();
-                            } else {
-                                fieldValue = fieldValue.toString().trim();
-                            }
-                        } else {
-                            fieldValue = fieldValue.toString().trim();
-                        }
+                    if (fieldValue !== 'N/A' && fieldValue !== '') {
                         displayValues.push(fieldValue);
                         displayedCount++;
                     }
                 }
             }
-
 
             const displayString = displayValues.join(' | ');
 
@@ -1348,6 +1334,7 @@
         }
 
         function showNextCard() {
+            if (bookingsData.length === 0) return; // Prevent errors if no bookings
             if (currentBookingIndex < bookingsData.length - 1) {
                 currentBookingIndex++;
                 renderBookingCard();
@@ -1355,6 +1342,7 @@
         }
 
         function showPrevCard() {
+            if (bookingsData.length === 0) return; // Prevent errors if no bookings
             if (currentBookingIndex > 0) {
                 currentBookingIndex--;
                 renderBookingCard();
@@ -1382,9 +1370,10 @@
                 });
             }
 
-            bookingsData.splice(currentBookingIndex, 1);
+            // Update local arrays immediately for UI reflection (will be replaced by Firestore snapshot)
+            bookingsData = bookingsData.filter(b => b.id !== bookingToMove.id); // Remove from new
             bookingToMove.Status = 'Pending';
-            pendingBookings.push(bookingToMove);
+            pendingBookings.push(bookingToMove); // Add to pending
             adjustCurrentBookingIndex();
             renderBookingCard();
             renderPendingBookings();
@@ -1411,10 +1400,11 @@
                 });
             }
 
-            bookingsData.splice(currentBookingIndex, 1);
+            // Update local arrays immediately for UI reflection (will be replaced by Firestore snapshot)
+            bookingsData = bookingsData.filter(b => b.id !== bookingToDelete.id); // Remove from new
             bookingToDelete.Status = 'Deleted';
             bookingToDelete._originalSource = 'requests';
-            deletedBookings.push(bookingToDelete);
+            deletedBookings.push(bookingToDelete); // Add to deleted
             adjustCurrentBookingIndex();
             renderBookingCard();
             renderDeletedBookings();
@@ -1458,7 +1448,7 @@
 
                 if (action === 'complete') {
                     openBookingCalendarModal(bookingToProcess);
-                    return; // Exit, as calendar modal handles staging for completion
+                    return; // Exit, as calendar modal handles saving for completion
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
                     originalSourceForStaging = 'pending';
@@ -1544,11 +1534,11 @@
             console.log("Staged Changes after list action:", JSON.parse(JSON.stringify(stagedChanges)));
         }
 
-        // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly
+        // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly and automatically saves
         confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
                 showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
-                    showLoading("Completing booking...");
+                    showLoading("Completing and saving booking...");
 
                     try {
                         const bookingId = currentBookingBeingScheduled.id;
@@ -1565,13 +1555,8 @@
 
                         if (result.success) {
                             showMessage("Booking confirmed and saved successfully!", 'success');
-                            // After successful save, update local data to reflect the change
-                            // Firestore onSnapshot listener will eventually update `pendingBookings` and `fetchedCalendarEvents`
-                            // but we can make an immediate local adjustment for responsiveness
-                            pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
-                            renderPendingBookings();
-                            // No need to clear stagedChanges for *this* specific action, as it's directly committed.
-                            // The global stagedChanges array still holds other pending/deleted changes.
+                            // The onSnapshot listener will handle the UI update due to data change in Firestore.
+                            // We close the calendar overlay immediately.
                         } else {
                             showMessage("Failed to confirm and save booking: " + result.error, 'error');
                         }
@@ -1582,8 +1567,8 @@
                         hideLoading();
                         calendarOverlay.classList.add('hidden');
                         document.body.style.overflow = '';
-                        // Re-render calendar to reflect the newly booked slot
-                        renderCalendar(); 
+                        // Re-render calendar to reflect the newly booked slot, relying on Firestore's onSnapshot.
+                        // renderCalendar() will be implicitly triggered by the onSnapshot listener if data changes.
                     }
                 }, () => {
                     showMessage("Booking confirmation cancelled.", 'info');
