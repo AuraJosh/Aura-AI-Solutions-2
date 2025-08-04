@@ -456,13 +456,17 @@
         }
         
         function renderMonthView(fetchStartDate, fetchEndDate) {
+            // Clear the calendar grid before rendering
+            calendarGrid.innerHTML = '';
+        
             const currentDayMs = new Date().setHours(0,0,0,0);
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
-
+        
+            // Create the header row for days of the week
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
@@ -472,10 +476,11 @@
                 headerRow.appendChild(dayHeader);
             });
             calendarGrid.appendChild(headerRow);
-
+        
             let dayCounter = 1;
             let nextMonthDayCounter = 1;
-
+        
+            // Loop to build the month grid (up to 6 weeks)
             for (let i = 0; i < 6; i++) {
                 const weekRow = document.createElement('div');
                 weekRow.className = 'grid grid-cols-7 gap-1';
