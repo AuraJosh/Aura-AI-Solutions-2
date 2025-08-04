@@ -1122,63 +1122,76 @@
                 console.error("Account not identified, cannot send update.");
                 return { success: false, error: "Account not identified." };
             }
-        
+            
             if (updates.length === 0) {
                 return { success: true, message: "No changes to save." };
             }
-        
+            
             const batch = writeBatch(db);
-        
+            
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
                 const updateData = { Status: change.newStatus };
-        
+            
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
                     updateData.ScheduledDateTime = deleteField();
                 } else if (change.newStatus === 'Completed') {
+                    // This part is for the bookings collection document
                     updateData._originalSource = deleteField();
                     if (change.scheduledTime) {
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
                     } else {
                         updateData.ScheduledDateTime = deleteField();
                     }
-        
-                    // --- CORRECTED LOGIC for creating scheduled_meetings entry ---
+                    
+                    // --- CORRECTED LOGIC for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
                         
-                        // Create a copy to avoid modifying the original data reference
-                        const meetingData = { ...change.fullBookingData };
+                        // Explicitly create the new object with the desired fields and mappings
+                        const meetingData = {
+                            Status: 'Completed',
+                            ScheduledAt: Timestamp.now(),
+                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
+                            BookedBy: currentUserUid,
+                            id: change.id, // Including the document ID in the data itself
+                            
+                            // Map the original booking fields to the new names
+                            Name: change.fullBookingData.Customer_Name || change.fullBookingData.Contact_Name,
+                            Email: change.fullBookingData.Email,
+                            URL: change.fullBookingData.URL || change.fullBookingData.Website, // Assuming URL is an original field
+                            "Company Name": change.fullBookingData.Company_Name, // Handle field name with a space
+                            
+                            // Map the original timestamp to the new name
+                            BookingRequestTimestamp: change.fullBookingData.Timestamp,
+            
+                            // Include other fields if they exist to prevent data loss
+                            Subject: change.fullBookingData.Subject,
+                            Message: change.fullBookingData.Message,
+                            Phone_Number: change.fullBookingData.Phone_Number,
+                            Service: change.fullBookingData.Service,
+                        };
                         
-                        // Set/Override essential fields for the scheduled meeting
-                        meetingData.Status = 'Completed';
-                        meetingData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
-                        meetingData.BookedBy = currentUserUid;
-                        meetingData.ScheduledAt = Timestamp.now();
-        
-                        // Clean up fields that are not relevant for scheduled_meetings
-                        delete meetingData._originalSource;
-                        if (meetingData.Timestamp) {
-                            meetingData.BookingRequestTimestamp = meetingData.Timestamp;
-                            delete meetingData.Timestamp;
+                        // Remove any fields that are undefined or null to keep the document clean
+                        for (const key in meetingData) {
+                            if (meetingData[key] === undefined || meetingData[key] === null) {
+                                delete meetingData[key];
+                            }
                         }
-                        delete meetingData.Status; // This line was the problem
-                        
-                        // REMOVED THE CONFLICTING LINE: `delete meetingData.ScheduledDateTime;`
-        
+            
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
                     }
                     // --- END CORRECTED LOGIC ---
-        
+                
                 } else { // 'New' or 'Pending'
                     updateData._originalSource = deleteField();
                     updateData.ScheduledDateTime = deleteField();
                 }
                 batch.update(bookingDocRef, updateData);
             });
-        
+            
             try {
                 await batch.commit();
                 return { success: true, message: "Booking statuses updated successfully." };
