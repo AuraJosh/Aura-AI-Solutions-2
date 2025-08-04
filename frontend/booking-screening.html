@@ -211,22 +211,18 @@
     <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
         <div class="container mx-auto flex items-center justify-between p-4">
         <div class="container mx-auto flex items-center justify-between p-4 relative">
-                <div class="flex items-center space-x-4">
-                    <div class="relative h-20 w-[150px]">
-                        <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
-                    </div>
-                    <span class="text-white text-base">Aura AI Solutions</span>
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
                 </div>
-                <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Booking Screening</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="calendar.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                        Calendar View
-                    </a>
-                    <a href="analytics.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                        Back to Analytics
-                    </a>
-                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
-                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Booking Screening</h1>
+            <div class="flex items-center space-x-4">
+                <a href="analytics.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                    Back to Analytics
+                </a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
             </div>
         </div>
     </header>
@@ -246,7 +242,7 @@
                     <div id="card-counter" class="text-gray-400 mt-4 text-sm"></div>
                     <div class="flex justify-center space-x-4 mt-4 w-full">
                         <button id="move-to-pending-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
-                            Schedule this booking
+                            Move booking to pending
                         </button>
                         <button id="delete-booking-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200 flex-1">
                             Delete booking
@@ -260,9 +256,9 @@
 
             <div class="flex flex-col w-full ml-8 space-y-8">
                 <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
-                    <h2 class="text-white text-2xl font-semibold mb-4">Scheduled Bookings</h2>
+                    <h2 class="text-white text-2xl font-semibold mb-4">Pending Bookings</h2>
                     <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
-                        <p class="text-white text-center w-full">No scheduled bookings.</p>
+                        <p class="text-white text-center w-full">No pending bookings.</p>
                     </div>
                 </div>
 
@@ -515,7 +511,7 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Phone_Number || data.Email || 'Scheduled',
+                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'completed', // Use same completed style
@@ -535,7 +531,7 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Phone_Number || data.Email || 'Scheduled',
+                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Pending',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'pending',
