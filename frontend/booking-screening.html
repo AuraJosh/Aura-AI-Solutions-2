@@ -515,7 +515,7 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Phone_Number || data.Customer_Name || data.Email || 'Scheduled',
+                            title: data.Customer_Name || data.Phone_Number || data.Email || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'completed', // Use same completed style
