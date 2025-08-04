@@ -491,24 +491,43 @@
                     dateNumDiv.className = 'text-right font-medium mb-1';
                     
                     let cellDate;
+                    let isCurrentMonthDay = false; // Flag to check if the day belongs to the current month
+        
                     if (i === 0 && j < firstDayOfMonth) {
                         const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
                         dateNumDiv.textContent = prevMonthDay;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
+                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on previous month's days
                         cellDate = new Date(year, month - 1, prevMonthDay);
                     } else if (dayCounter > daysInMonth) {
                         dateNumDiv.textContent = nextMonthDayCounter;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
+                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on next month's days
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
                     } else {
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
+                        isCurrentMonthDay = true;
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
                             dayCell.classList.add('border-blue-500', 'border-2');
                         }
                         if (isPastTime(cellDate)) {
                             dayCell.classList.add('day-cell-month-past');
+                            dayCell.style.cursor = 'not-allowed'; // Disable clicking on past days
+                        } else {
+                            dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
+                            
+                            // NEW: Add a click listener for valid days
+                            dayCell.addEventListener('click', () => {
+                                // Prevent clicking on past days
+                                if (!dayCell.classList.contains('day-cell-month-past')) {
+                                    currentDate = cellDate;
+                                    currentView = 'day';
+                                    calendarViewSelect.value = 'day'; // Update the dropdown
+                                    fetchAndRenderCalendar();
+                                }
+                            });
                         }
                         dayCounter++;
                     }
