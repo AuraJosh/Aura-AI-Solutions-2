@@ -515,7 +515,7 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Phone_Number || data.Email || 'Scheduled',
+                            title: 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'completed', // Use same completed style
@@ -535,7 +535,7 @@
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
                         events.push({
-                            title: data.Customer_Name || data.Phone_Number || data.Email || 'Scheduled',
+                            title:  'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
                             end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
                             type: 'pending',
