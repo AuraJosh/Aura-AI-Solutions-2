@@ -85,48 +85,35 @@
         .message-box.error { background-color: #EF4444; }
         .message-box.success { background-color: #22C55E; }
 
-        /* MODIFIED: Remove calendar-grid specific scrollbars */
+        /* MODIFIED: Ensure calendar grid fills space without scrolling */
         #calendar-grid {
-            /* scrollbar-width: thin;
-            scrollbar-color: #4b5563 #1f2937; */
-            height: 100%; /* Ensure it fills the parent container's height */
-            /* Removed overflow-y: auto */
+            flex: 1;
         }
-        /* Removed Webkit scrollbar styles */
-        /* #calendar-grid::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        #calendar-grid::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        #calendar-grid::-webkit-scrollbar-thumb {
-            background-color: #4b5563;
-            border-radius: 4px;
-        } */
-
-        /* MODIFIED: Make month view cells fill container height */
+        
+        /* MODIFIED: Adjusted month view grid to fit container better */
         .month-view-grid {
             display: grid;
-            grid-template-rows: repeat(6, minmax(0, 1fr)); /* Distribute rows equally */
+            grid-template-rows: repeat(6, 1fr);
             height: 100%;
         }
         .month-day-cell {
             display: flex;
             flex-direction: column;
-            border: 1px solid #374151; /* Darker border for a cleaner look */
+            border: 1px solid #374151;
             padding: 4px;
             overflow: hidden;
             position: relative;
+            min-height: 0;
         }
         .month-day-cell .text-right {
-            flex-shrink: 0; /* Prevents the day number from shrinking */
+            flex-shrink: 0;
         }
         .month-day-events-container {
             flex-grow: 1;
-            overflow-y: auto; /* Allow scrolling within the events container if there are too many */
+            overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #4b5563 #1f2937;
+            padding-right: 4px; /* Add some space for the scrollbar */
         }
         .month-day-events-container::-webkit-scrollbar {
             width: 4px;
@@ -138,8 +125,7 @@
             background-color: #4b5563;
             border-radius: 2px;
         }
-
-
+        
         .time-slot.selected {
             background-color: #1D4ED8;
             border: 2px solid #3B82F6;
@@ -233,20 +219,17 @@
                 </div>
                 <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Calendar View</h1>
                 <div class="flex items-center space-x-4">
-                    <a href="booking.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                        Back to Booking
-                    </a>
-                    <a href="booking.schedule.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                        Back to Bookings
-                    </a>
+                    <a href="booking-schedule.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                        Back to Bookings
+                    </a>
                     <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="pt-28 px-4 flex justify-center relative z-10">
-        <div id="calendar-container" class="w-full max-w-[1600px] h-[90vh] bg-white/10 backdrop-blur-md p-4 rounded-xl shadow-lg flex overflow-hidden">
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="calendar-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md p-4 rounded-xl shadow-lg flex overflow-hidden">
             <div class="bg-gray-900/70 p-8 rounded-xl shadow-2xl w-full flex flex-col text-white">
                 <div class="flex flex-col p-4 border-b border-gray-700 flex-shrink-0">
                     <div class="flex justify-between items-center mb-2">
@@ -500,12 +483,11 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-            // MODIFIED: Added a grid container to manage the week rows
             const monthGridContainer = document.createElement('div');
             monthGridContainer.className = 'flex flex-col h-full';
 
             const headerRow = document.createElement('div');
-            headerRow.className = 'grid grid-cols-7 gap-1 mb-1 flex-shrink-0'; // flex-shrink-0 to prevent header from being squashed
+            headerRow.className = 'grid grid-cols-7 gap-1 mb-1 flex-shrink-0';
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
                 const dayHeader = document.createElement('div');
                 dayHeader.className = 'text-center text-gray-400 text-sm font-medium py-2';
@@ -514,15 +496,10 @@
             });
             monthGridContainer.appendChild(headerRow);
             
-            // MODIFIED: Create the main grid for days
             const dayGrid = document.createElement('div');
-            dayGrid.className = 'grid grid-cols-7 gap-1 flex-grow month-view-grid'; // Use flex-grow and new grid style
+            dayGrid.className = 'grid grid-cols-7 gap-1 flex-grow month-view-grid';
 
-            let dayCounter = 1;
-            let nextMonthDayCounter = 1;
-
-            // Generate cells for all days in view
-            const totalCells = 42; // A calendar always needs 42 cells to fit up to 6 weeks
+            const totalCells = 42;
             for (let i = 0; i < totalCells; i++) {
                 const dayCell = document.createElement('div');
                 dayCell.className = 'month-day-cell text-white/80';
