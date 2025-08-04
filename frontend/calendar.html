@@ -84,11 +84,16 @@
         .message-box.info { background-color: #3B82F6; }
         .message-box.error { background-color: #EF4444; }
         .message-box.success { background-color: #22C55E; }
+
+        /* MODIFIED: Remove calendar-grid specific scrollbars */
         #calendar-grid {
-            scrollbar-width: thin;
-            scrollbar-color: #4b5563 #1f2937;
+            /* scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937; */
+            height: 100%; /* Ensure it fills the parent container's height */
+            /* Removed overflow-y: auto */
         }
-        #calendar-grid::-webkit-scrollbar {
+        /* Removed Webkit scrollbar styles */
+        /* #calendar-grid::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
@@ -98,7 +103,43 @@
         #calendar-grid::-webkit-scrollbar-thumb {
             background-color: #4b5563;
             border-radius: 4px;
+        } */
+
+        /* MODIFIED: Make month view cells fill container height */
+        .month-view-grid {
+            display: grid;
+            grid-template-rows: repeat(6, minmax(0, 1fr)); /* Distribute rows equally */
+            height: 100%;
         }
+        .month-day-cell {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #374151; /* Darker border for a cleaner look */
+            padding: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .month-day-cell .text-right {
+            flex-shrink: 0; /* Prevents the day number from shrinking */
+        }
+        .month-day-events-container {
+            flex-grow: 1;
+            overflow-y: auto; /* Allow scrolling within the events container if there are too many */
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937;
+        }
+        .month-day-events-container::-webkit-scrollbar {
+            width: 4px;
+        }
+        .month-day-events-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .month-day-events-container::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 2px;
+        }
+
+
         .time-slot.selected {
             background-color: #1D4ED8;
             border: 2px solid #3B82F6;
@@ -158,13 +199,7 @@
             border: 1px solid #F59E0B;
             color: white;
         }
-        .month-day-events-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
+        
         .month-day-event-item {
             background-color: #8B5CF6;
             color: white;
@@ -185,7 +220,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen overflow-auto">
+<body class="bg-gray-900 text-white min-h-screen overflow-hidden">
 
     <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
         <div class="container mx-auto flex items-center justify-between p-4">
@@ -198,7 +233,10 @@
                 </div>
                 <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Calendar View</h1>
                 <div class="flex items-center space-x-4">
-                    <a href="booking-schedule.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                    <a href="booking.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                        Back to Booking
+                    </a>
+                    <a href="booking.schedule.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
                         Back to Bookings
                     </a>
                     <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
@@ -207,10 +245,10 @@
         </div>
     </header>
 
-    <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="calendar-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex">
+    <main class="pt-28 px-4 flex justify-center relative z-10">
+        <div id="calendar-container" class="w-full max-w-[1600px] h-[90vh] bg-white/10 backdrop-blur-md p-4 rounded-xl shadow-lg flex overflow-hidden">
             <div class="bg-gray-900/70 p-8 rounded-xl shadow-2xl w-full flex flex-col text-white">
-                <div class="flex flex-col p-4 border-b border-gray-700">
+                <div class="flex flex-col p-4 border-b border-gray-700 flex-shrink-0">
                     <div class="flex justify-between items-center mb-2">
                         <div class="flex space-x-2 items-center">
                             <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
@@ -235,9 +273,9 @@
                         </div>
                     </div>
                 </div>
-                <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
+                <div id="calendar-grid" class="flex-1 p-4">
                     </div>
-                </div>
+            </div>
         </div>
     </main>
 
@@ -362,7 +400,6 @@
             }
 
             try {
-                // Fetch events from both collections
                 const events = [];
                 const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
@@ -422,7 +459,7 @@
             hideLoading();
         }
 
-        // RENDER FUNCTIONS (Copied with minor adaptations)
+        // RENDER FUNCTIONS
         function addEventToCell(cellElement, event, viewType) {
             if (viewType === 'month') {
                 const eventDiv = document.createElement('div');
@@ -463,67 +500,82 @@
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
 
+            // MODIFIED: Added a grid container to manage the week rows
+            const monthGridContainer = document.createElement('div');
+            monthGridContainer.className = 'flex flex-col h-full';
+
             const headerRow = document.createElement('div');
-            headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
+            headerRow.className = 'grid grid-cols-7 gap-1 mb-1 flex-shrink-0'; // flex-shrink-0 to prevent header from being squashed
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
                 const dayHeader = document.createElement('div');
                 dayHeader.className = 'text-center text-gray-400 text-sm font-medium py-2';
                 dayHeader.textContent = day;
                 headerRow.appendChild(dayHeader);
             });
-            calendarGrid.appendChild(headerRow);
+            monthGridContainer.appendChild(headerRow);
+            
+            // MODIFIED: Create the main grid for days
+            const dayGrid = document.createElement('div');
+            dayGrid.className = 'grid grid-cols-7 gap-1 flex-grow month-view-grid'; // Use flex-grow and new grid style
 
             let dayCounter = 1;
             let nextMonthDayCounter = 1;
 
-            for (let i = 0; i < 6; i++) {
-                const weekRow = document.createElement('div');
-                weekRow.className = 'grid grid-cols-7 gap-1';
-                for (let j = 0; j < 7; j++) {
-                    const dayCell = document.createElement('div');
-                    dayCell.className = 'h-24 border border-gray-700 rounded p-1 overflow-hidden flex flex-col relative group';
-                    const dateNumDiv = document.createElement('div');
-                    dateNumDiv.className = 'text-right font-medium mb-1';
-                    
-                    let cellDate;
-                    if (i === 0 && j < firstDayOfMonth) {
-                        const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
-                        dateNumDiv.textContent = prevMonthDay;
-                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        cellDate = new Date(year, month - 1, prevMonthDay);
-                    } else if (dayCounter > daysInMonth) {
-                        dateNumDiv.textContent = nextMonthDayCounter;
-                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        cellDate = new Date(year, month + 1, nextMonthDayCounter);
-                        nextMonthDayCounter++;
-                    } else {
-                        dateNumDiv.textContent = dayCounter;
-                        cellDate = new Date(year, month, dayCounter);
-                        if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2');
-                        }
-                        if (isPastTime(cellDate)) {
-                            dayCell.classList.add('day-cell-month-past');
-                        }
-                        dayCounter++;
+            // Generate cells for all days in view
+            const totalCells = 42; // A calendar always needs 42 cells to fit up to 6 weeks
+            for (let i = 0; i < totalCells; i++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'month-day-cell text-white/80';
+                
+                const dateNumDiv = document.createElement('div');
+                dateNumDiv.className = 'text-right font-medium mb-1 text-sm';
+                
+                let cellDate;
+                let dayNumber;
+
+                if (i < firstDayOfMonth) {
+                    dayNumber = daysInPrevMonth - (firstDayOfMonth - i - 1);
+                    dateNumDiv.textContent = dayNumber;
+                    dayCell.classList.add('bg-gray-900/50', 'text-gray-600', 'day-cell-month-past');
+                    cellDate = new Date(year, month - 1, dayNumber);
+                } else if (dayCounter > daysInMonth) {
+                    dayNumber = nextMonthDayCounter;
+                    dateNumDiv.textContent = dayNumber;
+                    dayCell.classList.add('bg-gray-900/50', 'text-gray-600', 'day-cell-month-past');
+                    cellDate = new Date(year, month + 1, dayNumber);
+                    nextMonthDayCounter++;
+                } else {
+                    dayNumber = dayCounter;
+                    dateNumDiv.textContent = dayNumber;
+                    dayCell.classList.add('bg-gray-800');
+                    cellDate = new Date(year, month, dayNumber);
+                    if (cellDate.setHours(0,0,0,0) === currentDayMs) {
+                        dayCell.classList.add('border-blue-500', 'border-2');
                     }
-                    
-                    dayCell.appendChild(dateNumDiv);
-                    const eventsContainer = document.createElement('div');
-                    eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
-                    
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getDate() === cellDate.getDate() &&
-                            event.start.getMonth() === cellDate.getMonth() &&
-                            event.start.getFullYear() === cellDate.getFullYear()) {
-                            addEventToCell(eventsContainer, event, 'month');
-                        }
-                    });
-                    dayCell.appendChild(eventsContainer);
-                    weekRow.appendChild(dayCell);
+                    if (isPastTime(cellDate)) {
+                        dayCell.classList.add('day-cell-month-past');
+                    }
+                    dayCounter++;
                 }
-                calendarGrid.appendChild(weekRow);
+                
+                dayCell.appendChild(dateNumDiv);
+                
+                const eventsContainer = document.createElement('div');
+                eventsContainer.className = 'month-day-events-container';
+                
+                fetchedCalendarEvents.forEach(event => {
+                    if (event.start.getDate() === cellDate.getDate() &&
+                        event.start.getMonth() === cellDate.getMonth() &&
+                        event.start.getFullYear() === cellDate.getFullYear()) {
+                        addEventToCell(eventsContainer, event, 'month');
+                    }
+                });
+                dayCell.appendChild(eventsContainer);
+                dayGrid.appendChild(dayCell);
             }
+            
+            monthGridContainer.appendChild(dayGrid);
+            calendarGrid.appendChild(monthGridContainer);
         }
 
         function renderWeekView(fetchStartDate, fetchEndDate) {
@@ -723,14 +775,12 @@
         function startRealtimeListeners() {
             if (!currentAccountId) return;
             
-            // Clean up old listeners if they exist
             if (scheduledMeetingsListener) scheduledMeetingsListener();
             if (pendingBookingsListener) pendingBookingsListener();
 
             const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
             const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
 
-            // Listen to scheduled_meetings
             scheduledMeetingsListener = onSnapshot(scheduledMeetingsRef, (snapshot) => {
                 console.log("Scheduled meetings data changed. Re-rendering calendar...");
                 fetchAndRenderCalendar();
@@ -738,7 +788,6 @@
                 console.error("Error listening to scheduled meetings:", error);
             });
 
-            // Listen to pending bookings
             pendingBookingsListener = onSnapshot(query(bookingsRef, where('Status', '==', 'Pending')), (snapshot) => {
                 console.log("Pending bookings data changed. Re-rendering calendar...");
                 fetchAndRenderCalendar();
