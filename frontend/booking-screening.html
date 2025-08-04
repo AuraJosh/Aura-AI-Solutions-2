@@ -1163,8 +1163,9 @@
                             meetingData.BookingRequestTimestamp = meetingData.Timestamp;
                             delete meetingData.Timestamp;
                         }
-                        // REMOVED THE CONFLICTING LINE: `delete meetingData.Status;`
-                        delete meetingData.ScheduledDateTime;
+                        delete meetingData.Status; // This line was the problem
+                        
+                        // REMOVED THE CONFLICTING LINE: `delete meetingData.ScheduledDateTime;`
         
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
