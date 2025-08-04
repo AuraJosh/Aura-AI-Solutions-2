@@ -1122,64 +1122,62 @@
                 console.error("Account not identified, cannot send update.");
                 return { success: false, error: "Account not identified." };
             }
-
+        
             if (updates.length === 0) {
                 return { success: true, message: "No changes to save." };
             }
-
+        
             const batch = writeBatch(db);
-
+        
             updates.forEach(change => {
                 const bookingDocRef = doc(db, 'accounts', currentAccountId, 'bookings', change.id);
                 const updateData = { Status: change.newStatus };
-
+        
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
-                    updateData.ScheduledDateTime = deleteField(); 
+                    updateData.ScheduledDateTime = deleteField();
                 } else if (change.newStatus === 'Completed') {
-                    updateData._originalSource = deleteField(); // Clear original source for completed
-                    if (change.scheduledTime) { 
+                    updateData._originalSource = deleteField();
+                    if (change.scheduledTime) {
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
                     } else {
                         updateData.ScheduledDateTime = deleteField();
                     }
-
-                    // --- NEW LOGIC FOR CREATING SCHEDULED_MEETINGS ENTRY (Pattern B) ---
-                    if (change.fullBookingData) { 
-                        const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id); 
+        
+                    // --- CORRECTED LOGIC for creating scheduled_meetings entry ---
+                    if (change.fullBookingData) {
+                        const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
                         
-                        // Create a copy to avoid modifying the original data reference and ensure cleanliness
-                        const meetingData = { ...change.fullBookingData }; 
+                        // Create a copy to avoid modifying the original data reference
+                        const meetingData = { ...change.fullBookingData };
                         
                         // Set/Override essential fields for the scheduled meeting
-                        meetingData.Status = 'Completed'; 
+                        meetingData.Status = 'Completed';
                         meetingData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
-                        meetingData.BookedBy = currentUserUid; 
+                        meetingData.BookedBy = currentUserUid;
                         meetingData.ScheduledAt = Timestamp.now();
-
+        
                         // Clean up fields that are not relevant for scheduled_meetings
-                        delete meetingData._originalSource; 
+                        delete meetingData._originalSource;
                         if (meetingData.Timestamp) {
-                            meetingData.BookingRequestTimestamp = meetingData.Timestamp; 
+                            meetingData.BookingRequestTimestamp = meetingData.Timestamp;
                             delete meetingData.Timestamp;
                         }
-                        // Also remove Status and ScheduledDateTime from the booking data if they were explicitly there
-                        delete meetingData.Status; 
+                        // REMOVED THE CONFLICTING LINE: `delete meetingData.Status;`
                         delete meetingData.ScheduledDateTime;
-
-                        batch.set(scheduledMeetingDocRef, meetingData, { merge: true }); // Use set with merge to create or update
+        
+                        batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
                     }
-                    // --- END NEW LOGIC ---
-
-                }
-                else { // 'New' or 'Pending'
-                    updateData._originalSource = deleteField(); 
-                    updateData.ScheduledDateTime = deleteField(); 
+                    // --- END CORRECTED LOGIC ---
+        
+                } else { // 'New' or 'Pending'
+                    updateData._originalSource = deleteField();
+                    updateData.ScheduledDateTime = deleteField();
                 }
                 batch.update(bookingDocRef, updateData);
             });
-
+        
             try {
                 await batch.commit();
                 return { success: true, message: "Booking statuses updated successfully." };
@@ -1188,7 +1186,6 @@
                 return { success: false, error: `Failed to save changes: ${error.message}` };
             }
         }
-
         /**
          * Converts a field name from `snake_case` or `camelCase` to `Title Case`.
          * @param {string} fieldName 
