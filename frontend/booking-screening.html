@@ -254,13 +254,15 @@
                 </div>
             </div>
 
-            <div class="flex flex-col w-full ml-8 space-y-8">
-                <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
-                    <h2 class="text-white text-2xl font-semibold mb-4">Scheduled Bookings</h2>
-                    <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
-                        <p class="text-white text-center w-full">No scheduled bookings.</p>
-                    </div>
+           <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center relative">
+                <h2 class="text-white text-2xl font-semibold mb-4">Scheduled Bookings</h2>
+                <a href="calendar.html" class="absolute top-8 right-8 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                    Calendar View
+                </a>
+                <div id="pending-bookings-list" class="bg-gradient-to-br from-blue-800 to-cyan-900 p-8 rounded-2xl shadow-xl w-full h-[200px] overflow-y-auto flex flex-col justify-start items-start space-y-2">
+                    <p class="text-white text-center w-full">No scheduled bookings.</p>
                 </div>
+            </div>
 
                 <div class="flex-1 p-8 rounded-xl shadow-2xl bg-gray-900/70 flex flex-col justify-center items-center">
                     <h2 class="text-white text-2xl font-semibold mb-4">Deleted Bookings</h2>
