@@ -1,784 +1,785 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aura Calendar</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-03MPB9XG9B');
-    </script>
-    <link rel="icon" href="media/favicon.png" type="image/png">
-    <style>
-        /* Custom CSS from original page */
-        .chat-logs-container {
-            display: flex;
-            flex-direction: column-reverse;
-            overflow-y: auto;
-            height: 240px;
-            justify-content: flex-start;
-        }
-        .chat-log-message {
-            padding-bottom: 8px;
-        }
-        #loading-overlay {
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-        }
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            color: white;
-            font-size: 1.2rem;
-        }
-        .loader {
-            height: 60px;
-            aspect-ratio: 2;
-            border-bottom: 3px solid #0000;
-            background:
-                linear-gradient(90deg,#524656 50%,#0000 0)
-                -25% 100%/50% 3px repeat-x border-box;
-            position: relative;
-            animation: l3-0 .75s linear infinite;
-        }
-        .loader:before {
-            content: "";
-            position: absolute;
-            inset: auto 42.5% 0;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            background: #8A2BE2;
-            animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
-        }
-        @keyframes l3-0 {
-            to {background-position: -125% 100%}
-        }
-        @keyframes l3-1 {
-            0%,2% {bottom: 0%}
-            98%,to {bottom:.1%}
-        }
-        .message-box {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.5rem;
-            color: white;
-            z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .message-box.info { background-color: #3B82F6; }
-        .message-box.error { background-color: #EF4444; }
-        .message-box.success { background-color: #22C55E; }
-        #calendar-grid {
-            scrollbar-width: thin;
-            scrollbar-color: #4b5563 #1f2937;
-        }
-        #calendar-grid::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        #calendar-grid::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        #calendar-grid::-webkit-scrollbar-thumb {
-            background-color: #4b5563;
-            border-radius: 4px;
-        }
-        .time-slot.selected {
-            background-color: #1D4ED8;
-            border: 2px solid #3B82F6;
-        }
-        .time-slot.occupied-slot {
-            background-color: #8B5CF6;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            cursor: not-allowed !important;
-            border: 1px solid #7C3AED;
-            border-radius: 0.5rem;
-        }
-        .time-slot.occupied-slot:hover {
-            background-color: #7C3AED !important;
-        }
-        .time-slot.past-slot {
-            background-color: #374151;
-            cursor: not-allowed !important;
-            opacity: 0.5;
-            border-radius: 0.5rem;
-        }
-        .day-cell-month-past {
-            background-color: #374151;
-            cursor: not-allowed !important;
-            opacity: 0.5;
-        }
-        .calendar-event {
-            color: white;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            line-height: 1rem;
-            text-align: center;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            background-color: transparent;
-        }
-        .calendar-event.pending {
-            color: #F59E0B;
-        }
-        .time-slot.occupied-slot .calendar-event.pending {
-            background-color: #CC8A00;
-            border: 1px solid #F59E0B;
-            color: white;
-        }
-        .month-day-events-container {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-        .month-day-event-item {
-            background-color: #8B5CF6;
-            color: white;
-            padding: 2px 4px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            line-height: 1rem;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            z-index: 1;
-        }
-        .month-day-event-item.pending {
-            background-color: #F59E0B;
-        }
-        .day-cell-month-selected {
-            border: 2px solid #3B82F6;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Calendar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+        /* Custom CSS from original page */
+        .chat-logs-container {
+            display: flex;
+            flex-direction: column-reverse;
+            overflow-y: auto;
+            height: 240px;
+            justify-content: flex-start;
+        }
+        .chat-log-message {
+            padding-bottom: 8px;
+        }
+        #loading-overlay {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .loader {
+            height: 60px;
+            aspect-ratio: 2;
+            border-bottom: 3px solid #0000;
+            background:
+                linear-gradient(90deg,#524656 50%,#0000 0)
+                -25% 100%/50% 3px repeat-x border-box;
+            position: relative;
+            animation: l3-0 .75s linear infinite;
+            margin-bottom: 20px;
+        }
+        .loader:before {
+            content: "";
+            position: absolute;
+            inset: auto 42.5% 0;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: #8A2BE2;
+            animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
+        }
+        @keyframes l3-0 {
+            to {background-position: -125% 100%}
+        }
+        @keyframes l3-1 {
+            0%,2% {bottom: 0%}
+            98%,to {bottom:.1%}
+        }
+        .message-box {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            color: white;
+            z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .message-box.info { background-color: #3B82F6; }
+        .message-box.error { background-color: #EF4444; }
+        .message-box.success { background-color: #22C55E; }
+        #calendar-grid {
+            scrollbar-width: thin;
+            scrollbar-color: #4b5563 #1f2937;
+        }
+        #calendar-grid::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        #calendar-grid::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        #calendar-grid::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 4px;
+        }
+        .time-slot.selected {
+            background-color: #1D4ED8;
+            border: 2px solid #3B82F6;
+        }
+        .time-slot.occupied-slot {
+            background-color: #8B5CF6;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: not-allowed !important;
+            border: 1px solid #7C3AED;
+            border-radius: 0.5rem;
+        }
+        .time-slot.occupied-slot:hover {
+            background-color: #7C3AED !important;
+        }
+        .time-slot.past-slot {
+            background-color: #374151;
+            cursor: not-allowed !important;
+            opacity: 0.5;
+            border-radius: 0.5rem;
+        }
+        .day-cell-month-past {
+            background-color: #374151;
+            cursor: not-allowed !important;
+            opacity: 0.5;
+        }
+        .calendar-event {
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            line-height: 1rem;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            background-color: transparent;
+        }
+        .calendar-event.pending {
+            color: #F59E0B;
+        }
+        .time-slot.occupied-slot .calendar-event.pending {
+            background-color: #CC8A00;
+            border: 1px solid #F59E0B;
+            color: white;
+        }
+        .month-day-events-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .month-day-event-item {
+            background-color: #8B5CF6;
+            color: white;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            line-height: 1rem;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            z-index: 1;
+        }
+        .month-day-event-item.pending {
+            background-color: #F59E0B;
+        }
+        .day-cell-month-selected {
+            border: 2px solid #3B82F6;
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
 
-    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
-        <div class="container mx-auto flex items-center justify-between p-4">
-            <div class="container mx-auto flex items-center justify-between p-4 relative">
-                <div class="flex items-center space-x-4">
-                    <div class="relative h-20 w-[150px]">
-                        <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
-                    </div>
-                    <span class="text-white text-base">Aura AI Solutions</span>
-                </div>
-                <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Calendar View</h1>
-                <div class="flex items-center space-x-4">
-                    <a href="booking-screening.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
-                        Back to Bookings
-                    </a>
-                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
-                </div>
-            </div>
-        </div>
-    </header>
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4">
+            <div class="container mx-auto flex items-center justify-between p-4 relative">
+                <div class="flex items-center space-x-4">
+                    <div class="relative h-20 w-[150px]">
+                        <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                    </div>
+                    <span class="text-white text-base">Aura AI Solutions</span>
+                </div>
+                <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Calendar View</h1>
+                <div class="flex items-center space-x-4">
+                    <a href="booking-screening.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm transition duration-200">
+                        Back to Bookings
+                    </a>
+                    <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
 
-    <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="calendar-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex">
-            <div class="bg-gray-900/70 p-8 rounded-xl shadow-2xl w-full flex flex-col text-white">
-                <div class="flex flex-col p-4 border-b border-gray-700">
-                    <div class="flex justify-between items-center mb-2">
-                        <div class="flex space-x-2 items-center">
-                            <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                                </svg>
-                            </button>
-                            <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </button>
-                            <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
-                        </div>
-                        <div class="flex space-x-2 items-center">
-                            <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
-                            <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
-                                <option value="day">Day</option>
-                                <option value="week">Week</option>
-                                <option value="month" selected>Month</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
-                    </div>
-                </div>
-        </div>
-    </main>
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="calendar-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg flex">
+            <div class="bg-gray-900/70 p-8 rounded-xl shadow-2xl w-full flex flex-col text-white">
+                <div class="flex flex-col p-4 border-b border-gray-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex space-x-2 items-center">
+                            <button id="calendar-prev" class="p-2 rounded-full hover:bg-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <button id="calendar-next" class="p-2 rounded-full hover:bg-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                            <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
+                        </div>
+                        <div class="flex space-x-2 items-center">
+                            <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
+                            <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
+                                <option value="day">Day</option>
+                                <option value="week">Week</option>
+                                <option value="month" selected>Month</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
+                    </div>
+                </div>
+        </div>
+    </main>
 
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
-        </video>
-        <div class="absolute inset-0 bg-black/60"></div>
-    </div>
+    <div class="fixed inset-0 -z-10 pointer-events-none">
+        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
+            <source src="media/background.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
+        </video>
+        <div class="absolute inset-0 bg-black/60"></div>
+    </div>
 
-    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
-        <div class="flex flex-col items-center">
-            <div id="loading-spinner" class="geometric-loader mb-4"></div>
-            <p id="loading-message" class="text-white text-lg font-semibold"></p>
-        </div>
-    </div>
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-[100] hidden">
+        <div class="flex flex-col items-center">
+            <div id="loading-spinner" class="geometric-loader mb-4"></div>
+            <p id="loading-message" class="text-white text-lg font-semibold"></p>
+        </div>
+    </div>
 
-    <div id="message-container" class="fixed top-4 right-4 z-[101]"></div>
+    <div id="message-container" class="fixed top-4 right-4 z-[101]"></div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
-        // Firebase Configuration
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-            authDomain: "aura-ai-85b65.firebaseapp.com",
-            projectId: "aura-ai-85b65",
-            storageBucket: "aura-ai-85b65.appspot.com",
-            messagingSenderId: "492492484793",
-            appId: "1:492492484793:web:7f9038d50f523241536b68"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Firebase Configuration
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        let currentUserUid = null;
-        let currentAccountId = null;
-        let authInitialized = false;
-        let fetchedCalendarEvents = [];
-        let scheduledMeetingsListener = null;
-        let pendingBookingsListener = null;
+        let currentUserUid = null;
+        let currentAccountId = null;
+        let authInitialized = false;
+        let fetchedCalendarEvents = [];
+        let scheduledMeetingsListener = null;
+        let pendingBookingsListener = null;
 
-        // UI Elements
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingMessage = document.getElementById('loading-message');
-        const calendarGrid = document.getElementById('calendar-grid');
-        const calendarTitle = document.getElementById('calendar-title');
-        const calendarPrev = document.getElementById('calendar-prev');
-        const calendarNext = document.getElementById('calendar-next');
-        const calendarToday = document.getElementById('calendar-today');
-        const calendarViewSelect = document.getElementById('calendar-view');
-        
-        let currentDate = new Date();
-        let currentView = 'month';
+        // UI Elements
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+        const calendarGrid = document.getElementById('calendar-grid');
+        const calendarTitle = document.getElementById('calendar-title');
+        const calendarPrev = document.getElementById('calendar-prev');
+        const calendarNext = document.getElementById('calendar-next');
+        const calendarToday = document.getElementById('calendar-today');
+        const calendarViewSelect = document.getElementById('calendar-view');
+        
+        let currentDate = new Date();
+        let currentView = 'month';
 
-        function showLoading(message) {
-            loadingMessage.textContent = message;
-            loadingOverlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        }
-        function hideLoading() {
-            loadingOverlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        }
+        function showLoading(message) {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
 
-        // Helper function to show messages
-        function showMessage(message, type = 'info') {
-            const messageBox = document.createElement('div');
-            messageBox.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-[101]`;
-            if (type === 'error') { messageBox.classList.add('bg-red-600'); }
-            else if (type === 'success') { messageBox.classList.add('bg-green-600'); }
-            else { messageBox.classList.add('bg-blue-600'); }
-            messageBox.textContent = message;
-            document.body.appendChild(messageBox);
-            setTimeout(() => { messageBox.remove(); }, 3000);
-        }
+        // Helper function to show messages
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-[101]`;
+            if (type === 'error') { messageBox.classList.add('bg-red-600'); }
+            else if (type === 'success') { messageBox.classList.add('bg-green-600'); }
+            else { messageBox.classList.add('bg-blue-600'); }
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => { messageBox.remove(); }, 3000);
+        }
 
-        // Helper to check if a date/time is in the past
-        function isPastTime(date) {
-            const now = new Date();
-            return date < now;
-        }
+        // Helper to check if a date/time is in the past
+        function isPastTime(date) {
+            const now = new Date();
+            return date < now;
+        }
 
-        async function fetchAndRenderCalendar() {
-            if (!currentAccountId) {
-                console.warn("Account ID not available for fetching calendar events.");
-                return;
-            }
+        async function fetchAndRenderCalendar() {
+            if (!currentAccountId) {
+                console.warn("Account ID not available for fetching calendar events.");
+                return;
+            }
 
-            calendarGrid.innerHTML = '';
-            showLoading("Loading calendar events...");
-            
-            let fetchStartDate, fetchEndDate;
-            if (currentView === 'month') {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth();
-                fetchStartDate = new Date(year, month, 1);
-                fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59);
-                calendarTitle.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
-            } else if (currentView === 'week') {
-                const startOfWeek = new Date(currentDate);
-                startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-                startOfWeek.setHours(0, 0, 0, 0);
-                const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 6);
-                endOfWeek.setHours(23, 59, 59, 999);
-                fetchStartDate = startOfWeek;
-                fetchEndDate = endOfWeek;
-                calendarTitle.textContent = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
-            } else { // Day View
-                const startOfDay = new Date(currentDate);
-                startOfDay.setHours(0, 0, 0, 0);
-                const endOfDay = new Date(currentDate);
-                endOfDay.setHours(23, 59, 59, 999);
-                fetchStartDate = startOfDay;
-                fetchEndDate = endOfDay;
-                calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-            }
+            calendarGrid.innerHTML = '';
+            showLoading("Loading calendar events...");
+            
+            let fetchStartDate, fetchEndDate;
+            if (currentView === 'month') {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                fetchStartDate = new Date(year, month, 1);
+                fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59);
+                calendarTitle.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
+            } else if (currentView === 'week') {
+                const startOfWeek = new Date(currentDate);
+                startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                endOfWeek.setHours(23, 59, 59, 999);
+                fetchStartDate = startOfWeek;
+                fetchEndDate = endOfWeek;
+                calendarTitle.textContent = `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+            } else { // Day View
+                const startOfDay = new Date(currentDate);
+                startOfDay.setHours(0, 0, 0, 0);
+                const endOfDay = new Date(currentDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                fetchStartDate = startOfDay;
+                fetchEndDate = endOfDay;
+                calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            }
 
-            try {
-                // Fetch events from both collections
-                const events = [];
-                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
-                const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
+            try {
+                // Fetch events from both collections
+                const events = [];
+                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
+                const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
 
-                const qScheduledMeetings = query(scheduledMeetingsRef,
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
-                    where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchEndDate))
-                );
-                const querySnapshotScheduledMeetings = await getDocs(qScheduledMeetings);
-                querySnapshotScheduledMeetings.forEach(doc => {
-                    const data = doc.data();
-                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
-                        events.push({
-                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
-                            type: 'completed',
-                            originalData: data
-                        });
-                    }
-                });
+                const qScheduledMeetings = query(scheduledMeetingsRef,
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
+                    where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchEndDate))
+                );
+                const querySnapshotScheduledMeetings = await getDocs(qScheduledMeetings);
+                querySnapshotScheduledMeetings.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        events.push({
+                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
+                            start: data.ScheduledDateTime.toDate(),
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
+                            type: 'completed',
+                            originalData: data
+                        });
+                    }
+                });
 
-                const qPending = query(bookingsRef,
-                    where('Status', '==', 'Pending'),
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
-                    where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchEndDate))
-                );
-                const querySnapshotPending = await getDocs(qPending);
-                querySnapshotPending.forEach(doc => {
-                    const data = doc.data();
-                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
-                        events.push({
-                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
-                            type: 'pending',
-                            originalData: data
-                        });
-                    }
-                });
-                
-                fetchedCalendarEvents = events;
-            } catch (error) {
-                console.error("Error fetching calendar events:", error);
-                showMessage("Error loading calendar events. Check console for index requirement.", 'error');
-            }
-            
-            // Now render the view
-            if (currentView === 'month') {
-                renderMonthView(fetchStartDate, fetchEndDate);
-            } else if (currentView === 'week') {
-                renderWeekView(fetchStartDate, fetchEndDate);
-            } else { // Day View
-                renderDayView(fetchStartDate, fetchEndDate);
-            }
+                const qPending = query(bookingsRef,
+                    where('Status', '==', 'Pending'),
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
+                    where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchEndDate))
+                );
+                const querySnapshotPending = await getDocs(qPending);
+                querySnapshotPending.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        events.push({
+                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
+                            start: data.ScheduledDateTime.toDate(),
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
+                            type: 'pending',
+                            originalData: data
+                        });
+                    }
+                });
+                
+                fetchedCalendarEvents = events;
+            } catch (error) {
+                console.error("Error fetching calendar events:", error);
+                showMessage("Error loading calendar events. Check console for index requirement.", 'error');
+            }
+            
+            // Now render the view
+            if (currentView === 'month') {
+                renderMonthView(fetchStartDate, fetchEndDate);
+            } else if (currentView === 'week') {
+                renderWeekView(fetchStartDate, fetchEndDate);
+            } else { // Day View
+                renderDayView(fetchStartDate, fetchEndDate);
+            }
 
-            hideLoading();
-        }
+            hideLoading();
+        }
 
-        // RENDER FUNCTIONS (Copied with minor adaptations)
-        function addEventToCell(cellElement, event, viewType) {
-            if (viewType === 'month') {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
-                eventDiv.textContent = event.title;
-                eventDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
-                cellElement.appendChild(eventDiv);
-            } else {
-                const eventTextDiv = document.createElement('div');
-                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
-                eventTextDiv.textContent = event.title;
-                eventTextDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
-                cellElement.appendChild(eventTextDiv);
-            }
-        }
-        
-        function renderMonthView(fetchStartDate, fetchEndDate) {
-            // Clear the calendar grid before rendering
-            calendarGrid.innerHTML = '';
-        
-            const currentDayMs = new Date().setHours(0,0,0,0);
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            const firstDayOfMonth = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const daysInPrevMonth = new Date(year, month, 0).getDate();
-        
-            // Create the header row for days of the week
-            const headerRow = document.createElement('div');
-            headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
-            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
-                const dayHeader = document.createElement('div');
-                dayHeader.className = 'text-center text-gray-400 text-sm font-medium py-2';
-                dayHeader.textContent = day;
-                headerRow.appendChild(dayHeader);
-            });
-            calendarGrid.appendChild(headerRow);
-        
-            let dayCounter = 1;
-            let nextMonthDayCounter = 1;
-        
-            // Loop to build the month grid (up to 6 weeks)
-            for (let i = 0; i < 6; i++) {
-                const weekRow = document.createElement('div');
-                weekRow.className = 'grid grid-cols-7 gap-1';
-                for (let j = 0; j < 7; j++) {
-                    const dayCell = document.createElement('div');
-                    dayCell.className = 'h-24 border border-gray-700 rounded p-1 overflow-hidden flex flex-col relative group';
-                    const dateNumDiv = document.createElement('div');
-                    dateNumDiv.className = 'text-right font-medium mb-1';
-                    
-                    let cellDate;
-                    let isCurrentMonthDay = false; // Flag to check if the day belongs to the current month
-        
-                    if (i === 0 && j < firstDayOfMonth) {
-                        const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
-                        dateNumDiv.textContent = prevMonthDay;
-                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on previous month's days
-                        cellDate = new Date(year, month - 1, prevMonthDay);
-                    } else if (dayCounter > daysInMonth) {
-                        dateNumDiv.textContent = nextMonthDayCounter;
-                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on next month's days
-                        cellDate = new Date(year, month + 1, nextMonthDayCounter);
-                        nextMonthDayCounter++;
-                    } else {
-                        dateNumDiv.textContent = dayCounter;
-                        cellDate = new Date(year, month, dayCounter);
-                        isCurrentMonthDay = true;
-                        if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2');
-                        }
-                        if (isPastTime(cellDate)) {
-                            dayCell.classList.add('day-cell-month-past');
-                            dayCell.style.cursor = 'not-allowed'; // Disable clicking on past days
-                        } else {
-                            dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
-                            
-                            // NEW: Add a click listener for valid days
-                            dayCell.addEventListener('click', () => {
-                                // Prevent clicking on past days
-                                if (!dayCell.classList.contains('day-cell-month-past')) {
-                                    currentDate = cellDate;
-                                    currentView = 'day';
-                                    calendarViewSelect.value = 'day'; // Update the dropdown
-                                    fetchAndRenderCalendar();
-                                }
-                            });
-                        }
-                        dayCounter++;
-                    }
-                    
-                    dayCell.appendChild(dateNumDiv);
-                    const eventsContainer = document.createElement('div');
-                    eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
-                    
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getDate() === cellDate.getDate() &&
-                            event.start.getMonth() === cellDate.getMonth() &&
-                            event.start.getFullYear() === cellDate.getFullYear()) {
-                            addEventToCell(eventsContainer, event, 'month');
-                        }
-                    });
-                    dayCell.appendChild(eventsContainer);
-                    weekRow.appendChild(dayCell);
-                }
-                calendarGrid.appendChild(weekRow);
-            }
-        }
+        // RENDER FUNCTIONS (Copied with minor adaptations)
+        function addEventToCell(cellElement, event, viewType) {
+            if (viewType === 'month') {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
+                eventDiv.textContent = event.title;
+                eventDiv.title = `
+                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
+                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
+                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
+                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
+                `.trim();
+                cellElement.appendChild(eventDiv);
+            } else {
+                const eventTextDiv = document.createElement('div');
+                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
+                eventTextDiv.textContent = event.title;
+                eventTextDiv.title = `
+                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
+                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
+                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
+                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
+                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
+                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
+                `.trim();
+                cellElement.appendChild(eventTextDiv);
+            }
+        }
+        
+        function renderMonthView(fetchStartDate, fetchEndDate) {
+            // Clear the calendar grid before rendering
+            calendarGrid.innerHTML = '';
+        
+            const currentDayMs = new Date().setHours(0,0,0,0);
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+            // Create the header row for days of the week
+            const headerRow = document.createElement('div');
+            headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'text-center text-gray-400 text-sm font-medium py-2';
+                dayHeader.textContent = day;
+                headerRow.appendChild(dayHeader);
+            });
+            calendarGrid.appendChild(headerRow);
+        
+            let dayCounter = 1;
+            let nextMonthDayCounter = 1;
+        
+            // Loop to build the month grid (up to 6 weeks)
+            for (let i = 0; i < 6; i++) {
+                const weekRow = document.createElement('div');
+                weekRow.className = 'grid grid-cols-7 gap-1';
+                for (let j = 0; j < 7; j++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'h-24 border border-gray-700 rounded p-1 overflow-hidden flex flex-col relative group';
+                    const dateNumDiv = document.createElement('div');
+                    dateNumDiv.className = 'text-right font-medium mb-1';
+                    
+                    let cellDate;
+                    let isCurrentMonthDay = false; // Flag to check if the day belongs to the current month
+        
+                    if (i === 0 && j < firstDayOfMonth) {
+                        const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
+                        dateNumDiv.textContent = prevMonthDay;
+                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
+                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on previous month's days
+                        cellDate = new Date(year, month - 1, prevMonthDay);
+                    } else if (dayCounter > daysInMonth) {
+                        dateNumDiv.textContent = nextMonthDayCounter;
+                        dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
+                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on next month's days
+                        cellDate = new Date(year, month + 1, nextMonthDayCounter);
+                        nextMonthDayCounter++;
+                    } else {
+                        dateNumDiv.textContent = dayCounter;
+                        cellDate = new Date(year, month, dayCounter);
+                        isCurrentMonthDay = true;
+                        if (cellDate.setHours(0,0,0,0) === currentDayMs) {
+                            dayCell.classList.add('border-blue-500', 'border-2');
+                        }
+                        if (isPastTime(cellDate)) {
+                            dayCell.classList.add('day-cell-month-past');
+                            dayCell.style.cursor = 'not-allowed'; // Disable clicking on past days
+                        } else {
+                            dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
+                            
+                            // NEW: Add a click listener for valid days
+                            dayCell.addEventListener('click', () => {
+                                // Prevent clicking on past days
+                                if (!dayCell.classList.contains('day-cell-month-past')) {
+                                    currentDate = cellDate;
+                                    currentView = 'day';
+                                    calendarViewSelect.value = 'day'; // Update the dropdown
+                                    fetchAndRenderCalendar();
+                                }
+                            });
+                        }
+                        dayCounter++;
+                    }
+                    
+                    dayCell.appendChild(dateNumDiv);
+                    const eventsContainer = document.createElement('div');
+                    eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
+                    
+                    fetchedCalendarEvents.forEach(event => {
+                        if (event.start.getDate() === cellDate.getDate() &&
+                            event.start.getMonth() === cellDate.getMonth() &&
+                            event.start.getFullYear() === cellDate.getFullYear()) {
+                            addEventToCell(eventsContainer, event, 'month');
+                        }
+                    });
+                    dayCell.appendChild(eventsContainer);
+                    weekRow.appendChild(dayCell);
+                }
+                calendarGrid.appendChild(weekRow);
+            }
+        }
 
-        function renderWeekView(fetchStartDate, fetchEndDate) {
-            const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
-            startOfWeek.setHours(0,0,0,0);
+        function renderWeekView(fetchStartDate, fetchEndDate) {
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+            startOfWeek.setHours(0,0,0,0);
 
-            const headerRow = document.createElement('div');
-            headerRow.className = 'grid grid-cols-8 gap-1';
-            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
-            for (let i = 0; i < 7; i++) {
-                const day = new Date(startOfWeek);
-                day.setDate(startOfWeek.getDate() + i);
-                const isToday = day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() && day.getFullYear() === new Date().getFullYear();
-                headerRow.innerHTML += `
-                    <div class="text-center p-2 border-b border-gray-700">
-                        <div class="text-gray-400 text-sm">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
-                        <div class="${isToday ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">
-                            ${day.getDate()}
-                        </div>
-                    </div>
-                `;
-            }
-            calendarGrid.appendChild(headerRow);
+            const headerRow = document.createElement('div');
+            headerRow.className = 'grid grid-cols-8 gap-1';
+            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+                const isToday = day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() && day.getFullYear() === new Date().getFullYear();
+                headerRow.innerHTML += `
+                    <div class="text-center p-2 border-b border-gray-700">
+                        <div class="text-gray-400 text-sm">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                        <div class="${isToday ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : ''}">
+                            ${day.getDate()}
+                        </div>
+                    </div>
+                `;
+            }
+            calendarGrid.appendChild(headerRow);
 
-            for (let hour = 8; hour < 20; hour++) {
-                const timeRow = document.createElement('div');
-                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
-                const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
-                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
-                timeRow.appendChild(timeLabel);
+            for (let hour = 8; hour < 20; hour++) {
+                const timeRow = document.createElement('div');
+                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
+                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
+                timeRow.appendChild(timeLabel);
 
-                for (let i = 0; i < 7; i++) {
-                    const day = new Date(startOfWeek);
-                    day.setDate(startOfWeek.getDate() + i);
-                    const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative';
-                    const cellDateTime = new Date(day);
-                    cellDateTime.setHours(hour, 0, 0, 0);
-                    const isSlotInPast = isPastTime(cellDateTime);
-                    const isSlotOccupied = fetchedCalendarEvents.some(event => {
-                        return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                               event.start.getMonth() === cellDateTime.getMonth() &&
-                               event.start.getDate() === cellDateTime.getDate() &&
-                               event.start.getHours() === cellDateTime.getHours();
-                    });
-                    
-                    if (isSlotOccupied) {
-                        timeCell.classList.add('occupied-slot');
-                    } else if (isSlotInPast) {
-                        timeCell.classList.add('past-slot');
-                    }
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                            event.start.getMonth() === cellDateTime.getMonth() &&
-                            event.start.getDate() === cellDateTime.getDate() &&
-                            event.start.getHours() === cellDateTime.getHours()) {
-                            addEventToCell(timeCell, event, 'week');
-                        }
-                    });
-                    timeRow.appendChild(timeCell);
-                }
-                calendarGrid.appendChild(timeRow);
-            }
-        }
+                for (let i = 0; i < 7; i++) {
+                    const day = new Date(startOfWeek);
+                    day.setDate(startOfWeek.getDate() + i);
+                    const timeCell = document.createElement('div');
+                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative';
+                    const cellDateTime = new Date(day);
+                    cellDateTime.setHours(hour, 0, 0, 0);
+                    const isSlotInPast = isPastTime(cellDateTime);
+                    const isSlotOccupied = fetchedCalendarEvents.some(event => {
+                        return event.start.getFullYear() === cellDateTime.getFullYear() &&
+                               event.start.getMonth() === cellDateTime.getMonth() &&
+                               event.start.getDate() === cellDateTime.getDate() &&
+                               event.start.getHours() === cellDateTime.getHours();
+                    });
+                    
+                    if (isSlotOccupied) {
+                        timeCell.classList.add('occupied-slot');
+                    } else if (isSlotInPast) {
+                        timeCell.classList.add('past-slot');
+                    }
+                    fetchedCalendarEvents.forEach(event => {
+                        if (event.start.getFullYear() === cellDateTime.getFullYear() &&
+                            event.start.getMonth() === cellDateTime.getMonth() &&
+                            event.start.getDate() === cellDateTime.getDate() &&
+                            event.start.getHours() === cellDateTime.getHours()) {
+                            addEventToCell(timeCell, event, 'week');
+                        }
+                    });
+                    timeRow.appendChild(timeCell);
+                }
+                calendarGrid.appendChild(timeRow);
+            }
+        }
 
-        function renderDayView(fetchStartDate, fetchEndDate) {
-            const day = currentDate;
-            const timeSlotsContainer = document.createElement('div');
-            timeSlotsContainer.className = 'space-y-1';
+        function renderDayView(fetchStartDate, fetchEndDate) {
+            const day = currentDate;
+            const timeSlotsContainer = document.createElement('div');
+            timeSlotsContainer.className = 'space-y-1';
 
-            for (let hour = 8; hour < 20; hour++) {
-                const timeSlot = document.createElement('div');
-                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
-                const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
-                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
-                timeSlot.appendChild(timeLabel);
-                const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative';
-                const cellDateTime = new Date(day);
-                cellDateTime.setHours(hour, 0, 0, 0);
-                const isSlotInPast = isPastTime(cellDateTime);
-                const isSlotOccupied = fetchedCalendarEvents.some(event => {
-                    return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                           event.start.getMonth() === cellDateTime.getMonth() &&
-                           event.start.getDate() === cellDateTime.getDate() &&
-                           event.start.getHours() === cellDateTime.getHours();
-                });
+            for (let hour = 8; hour < 20; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
+                timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
+                timeSlot.appendChild(timeLabel);
+                const contentArea = document.createElement('div');
+                contentArea.className = 'time-slot flex-1 h-full relative';
+                const cellDateTime = new Date(day);
+                cellDateTime.setHours(hour, 0, 0, 0);
+                const isSlotInPast = isPastTime(cellDateTime);
+                const isSlotOccupied = fetchedCalendarEvents.some(event => {
+                    return event.start.getFullYear() === cellDateTime.getFullYear() &&
+                           event.start.getMonth() === cellDateTime.getMonth() &&
+                           event.start.getDate() === cellDateTime.getDate() &&
+                           event.start.getHours() === cellDateTime.getHours();
+                });
 
-                if (isSlotOccupied) {
-                    contentArea.classList.add('occupied-slot');
-                } else if (isSlotInPast) {
-                    contentArea.classList.add('past-slot');
-                }
-                fetchedCalendarEvents.forEach(event => {
-                    if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                        event.start.getMonth() === cellDateTime.getMonth() &&
-                        event.start.getDate() === cellDateTime.getDate() &&
-                        event.start.getHours() === cellDateTime.getHours()) {
-                        addEventToCell(contentArea, event, 'day');
-                    }
-                });
-                timeSlot.appendChild(contentArea);
-                timeSlotsContainer.appendChild(timeSlot);
-            }
-            calendarGrid.appendChild(timeSlotsContainer);
-        }
+                if (isSlotOccupied) {
+                    contentArea.classList.add('occupied-slot');
+                } else if (isSlotInPast) {
+                    contentArea.classList.add('past-slot');
+                }
+                fetchedCalendarEvents.forEach(event => {
+                    if (event.start.getFullYear() === cellDateTime.getFullYear() &&
+                        event.start.getMonth() === cellDateTime.getMonth() &&
+                        event.start.getDate() === cellDateTime.getDate() &&
+                        event.start.getHours() === cellDateTime.getHours()) {
+                        addEventToCell(contentArea, event, 'day');
+                    }
+                });
+                timeSlot.appendChild(contentArea);
+                timeSlotsContainer.appendChild(timeSlot);
+            }
+            calendarGrid.appendChild(timeSlotsContainer);
+        }
 
-        // Calendar event listeners (for navigation and view change)
-        calendarPrev.addEventListener('click', () => {
-            if (currentView === 'month') { currentDate.setMonth(currentDate.getMonth() - 1); }
-            else if (currentView === 'week') { currentDate.setDate(currentDate.getDate() - 7); }
-            else { currentDate.setDate(currentDate.getDate() - 1); }
-            fetchAndRenderCalendar();
-        });
-        calendarNext.addEventListener('click', () => {
-            if (currentView === 'month') { currentDate.setMonth(currentDate.getMonth() + 1); }
-            else if (currentView === 'week') { currentDate.setDate(currentDate.getDate() + 7); }
-            else { currentDate.setDate(currentDate.getDate() + 1); }
-            fetchAndRenderCalendar();
-        });
-        calendarToday.addEventListener('click', () => {
-            currentDate = new Date();
-            fetchAndRenderCalendar();
-        });
-        calendarViewSelect.addEventListener('change', (e) => {
-            currentView = e.target.value;
-            fetchAndRenderCalendar();
-        });
+        // Calendar event listeners (for navigation and view change)
+        calendarPrev.addEventListener('click', () => {
+            if (currentView === 'month') { currentDate.setMonth(currentDate.getMonth() - 1); }
+            else if (currentView === 'week') { currentDate.setDate(currentDate.getDate() - 7); }
+            else { currentDate.setDate(currentDate.getDate() - 1); }
+            fetchAndRenderCalendar();
+        });
+        calendarNext.addEventListener('click', () => {
+            if (currentView === 'month') { currentDate.setMonth(currentDate.getMonth() + 1); }
+            else if (currentView === 'week') { currentDate.setDate(currentDate.getDate() + 7); }
+            else { currentDate.setDate(currentDate.getDate() + 1); }
+            fetchAndRenderCalendar();
+        });
+        calendarToday.addEventListener('click', () => {
+            currentDate = new Date();
+            fetchAndRenderCalendar();
+        });
+        calendarViewSelect.addEventListener('change', (e) => {
+            currentView = e.target.value;
+            fetchAndRenderCalendar();
+        });
 
-        // AUTHENTICATION AND INITIALIZATION
-        onAuthStateChanged(auth, async (user) => {
-            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
-                try {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token from Canvas.");
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                    showMessage("Authentication failed. Please try logging in again.", 'error');
-                    window.location.href = "login.html";
-                }
-                return;
-            }
+        // AUTHENTICATION AND INITIALIZATION
+        onAuthStateChanged(auth, async (user) => {
+            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
+                try {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Signed in with custom token from Canvas.");
+                } catch (error) {
+                    console.error("Error signing in with custom token:", error);
+                    showMessage("Authentication failed. Please try logging in again.", 'error');
+                    window.location.href = "login.html";
+                }
+                return;
+            }
 
-            if (!user) {
-                if (authInitialized) {
-                    window.location.href = "login.html";
-                }
-                return;
-            }
+            if (!user) {
+                if (authInitialized) {
+                    window.location.href = "login.html";
+                }
+                return;
+            }
 
-            if (!authInitialized) {
-                authInitialized = true;
-                currentUserUid = user.uid;
-                console.log("Logged-in user ID:", currentUserUid);
-                initializeCalendarPage();
-            }
-        });
+            if (!authInitialized) {
+                authInitialized = true;
+                currentUserUid = user.uid;
+                console.log("Logged-in user ID:", currentUserUid);
+                initializeCalendarPage();
+            }
+        });
 
-        async function initializeCalendarPage() {
-            showLoading("Finding your account...");
-            try {
-                const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
-                const userMappingSnap = await getDoc(userMappingDocRef);
+        async function initializeCalendarPage() {
+            showLoading("Finding your account...");
+            try {
+                const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
+                const userMappingSnap = await getDoc(userMappingDocRef);
 
-                if (!userMappingSnap.exists()) {
-                    const errorMessage = `No account mapping found.`;
-                    calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    hideLoading();
-                    return;
-                }
-                currentAccountId = userMappingSnap.data().accountId;
-                console.log("Mapped Account ID:", currentAccountId);
+                if (!userMappingSnap.exists()) {
+                    const errorMessage = `No account mapping found.`;
+                    calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                    hideLoading();
+                    return;
+                }
+                currentAccountId = userMappingSnap.data().accountId;
+                console.log("Mapped Account ID:", currentAccountId);
 
-                if (!currentAccountId) {
-                    const errorMessage = `Account ID not found.`;
-                    calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
-                    hideLoading();
-                    return;
-                }
+                if (!currentAccountId) {
+                    const errorMessage = `Account ID not found.`;
+                    calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
+                    hideLoading();
+                    return;
+                }
 
-                // Initial fetch and render
-                await fetchAndRenderCalendar();
+                // Initial fetch and render
+                await fetchAndRenderCalendar();
 
-                // Listen for changes to automatically update the calendar
-                startRealtimeListeners();
+                // Listen for changes to automatically update the calendar
+                startRealtimeListeners();
 
-            } catch (error) {
-                console.error('Error during initial setup:', error);
-                calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">Failed to load calendar: ${error.message}.</p>`;
-                hideLoading();
-            }
-        }
-        
-        function startRealtimeListeners() {
-            if (!currentAccountId) return;
-            
-            // Clean up old listeners if they exist
-            if (scheduledMeetingsListener) scheduledMeetingsListener();
-            if (pendingBookingsListener) pendingBookingsListener();
+            } catch (error) {
+                console.error('Error during initial setup:', error);
+                calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">Failed to load calendar: ${error.message}.</p>`;
+                hideLoading();
+            }
+        }
+        
+        function startRealtimeListeners() {
+            if (!currentAccountId) return;
+            
+            // Clean up old listeners if they exist
+            if (scheduledMeetingsListener) scheduledMeetingsListener();
+            if (pendingBookingsListener) pendingBookingsListener();
 
-            const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
-            const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
+            const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
+            const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
 
-            // Listen to scheduled_meetings
-            scheduledMeetingsListener = onSnapshot(scheduledMeetingsRef, (snapshot) => {
-                console.log("Scheduled meetings data changed. Re-rendering calendar...");
-                fetchAndRenderCalendar();
-            }, (error) => {
-                console.error("Error listening to scheduled meetings:", error);
-            });
+            // Listen to scheduled_meetings
+            scheduledMeetingsListener = onSnapshot(scheduledMeetingsRef, (snapshot) => {
+                console.log("Scheduled meetings data changed. Re-rendering calendar...");
+                fetchAndRenderCalendar();
+            }, (error) => {
+                console.error("Error listening to scheduled meetings:", error);
+            });
 
-            // Listen to pending bookings
-            pendingBookingsListener = onSnapshot(query(bookingsRef, where('Status', '==', 'Pending')), (snapshot) => {
-                console.log("Pending bookings data changed. Re-rendering calendar...");
-                fetchAndRenderCalendar();
-            }, (error) => {
-                console.error("Error listening to pending bookings:", error);
-            });
-        }
+            // Listen to pending bookings
+            pendingBookingsListener = onSnapshot(query(bookingsRef, where('Status', '==', 'Pending')), (snapshot) => {
+                console.log("Pending bookings data changed. Re-rendering calendar...");
+                fetchAndRenderCalendar();
+            }, (error) => {
+                console.error("Error listening to pending bookings:", error);
+            });
+        }
 
-        // Logout button
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                window.location.href = "login.html";
-            } catch (err) {
-                showMessage("Logout failed: " + err.message, 'error');
-            }
-        });
-    </script>
+        // Logout button
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (err) {
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
+    </script>
 </body>
 </html>
