@@ -262,7 +262,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -730,6 +730,21 @@
                     hideLoading();
                     return;
                 }
+
+                // --- NEW CODE STARTS HERE ---
+                let calendarToken = userMappingSnap.data()?.calendarToken;
+                if (!calendarToken) {
+                    calendarToken = self.crypto.randomUUID();
+                    await setDoc(userMappingDocRef, { calendarToken: calendarToken }, { merge: true });
+                    console.log("Generated and saved new calendar token.");
+                }
+                
+                const firebaseRegion = 'us-central1';
+                const projectId = firebaseConfig.projectId;
+                const calendarLink = `https://${firebaseRegion}-${projectId}.cloudfunctions.net/icalendarFeed?token=${calendarToken}`;
+                
+                console.log("Your calendar subscription URL is:", calendarLink);
+                // --- NEW CODE ENDS HERE ---
 
                 // Initial fetch and render
                 await fetchAndRenderCalendar();
