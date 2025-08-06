@@ -677,7 +677,7 @@
             const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 for Sunday, 1 for Monday, etc.
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
-
+        
             // Create header with day names
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
@@ -688,14 +688,14 @@
                 headerRow.appendChild(dayHeader);
             });
             calendarGrid.appendChild(headerRow);
-
+        
             let dayCounter = 1;
             let nextMonthDayCounter = 1;
-
+        
             for (let i = 0; i < 6; i++) { // Max 6 weeks in a month view
                 const weekRow = document.createElement('div');
                 weekRow.className = 'grid grid-cols-7 gap-1';
-
+        
                 for (let j = 0; j < 7; j++) {
                     const dayCell = document.createElement('div');
                     dayCell.className = 'h-24 border border-gray-700 rounded p-1 overflow-hidden flex flex-col relative group';
@@ -703,7 +703,7 @@
                     dateNumDiv.className = 'text-right font-medium mb-1';
                     
                     let cellDate; // Date object for this specific cell
-
+        
                     if (i === 0 && j < firstDayOfMonth) {
                         // Days from previous month
                         const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
@@ -716,33 +716,32 @@
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
-                    else {
+                    } else {
+                        // Current month days
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
-                        
-                        // Check if the cell is today
+        
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2');
+                            dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
                         }
                         
-                        // Check if the cell is in the past
+                        // NEW: Disable past days in month view
                         if (isPastTime(cellDate)) {
                             dayCell.classList.add('day-cell-month-past');
-                            dayCell.style.cursor = 'not-allowed';
                         } else {
-                            // This is the code you need to copy
-                            dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
-                            
+                            // Add click listener for selection in month view (selecting a whole day)
+                            dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
+                            dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                             dayCell.addEventListener('click', () => {
-                                // Prevent clicking on past days
                                 if (!dayCell.classList.contains('day-cell-month-past')) {
                                     currentDate = cellDate;
                                     currentView = 'day';
                                     calendarViewSelect.value = 'day'; // Update the dropdown
-                                    fetchAndRenderCalendar(); // Trigger the view change
+                                    renderCalendar(); // Rerender the calendar to show the day view
                                 }
                             });
                         }
+                        
                         dayCounter++;
                     }
                     
