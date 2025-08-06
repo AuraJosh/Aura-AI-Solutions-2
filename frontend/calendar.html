@@ -509,6 +509,8 @@
                 // Add all fields from the 'Extra' map
                 if (event.originalData.Extra) {
                     for (const key in event.originalData.Extra) {
+                        // EXCLUDED: Skip the 'Timestamp' field
+                        if (key === 'Timestamp') continue; 
                         const label = formatFieldNameAsLabel(key);
                         const value = event.originalData.Extra[key];
                         tooltipContent += `${label}: ${value}\n`;
@@ -531,6 +533,8 @@
                 // Add all fields from the 'Extra' map
                 if (event.originalData.Extra) {
                     for (const key in event.originalData.Extra) {
+                        // EXCLUDED: Skip the 'Timestamp' field
+                        if (key === 'Timestamp') continue; 
                         const label = formatFieldNameAsLabel(key);
                         const value = event.originalData.Extra[key];
                         tooltipContent += `${label}: ${value}\n`;
