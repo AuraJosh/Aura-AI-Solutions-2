@@ -170,7 +170,7 @@ function initCounters() {
                 if (target === 98) {
                     numberElement.textContent = Math.floor(current) + '%';
                 } else if (target >= 100) {
-                    numberElement.textContent = Math.floor(current) + '+';
+                    numberElement.textContent = Math.floor(current) + '%';
                 }
             }, stepTime);
         });
