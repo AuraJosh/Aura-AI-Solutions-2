@@ -621,10 +621,9 @@
             if (viewType === 'month') {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
-                // Prioritize a clear title, like Customer_Name or Email
                 eventDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
         
-                // Build the tooltip content
+                // Build the tooltip content for month view
                 let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
                 // Add core fields if they exist
                 if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
@@ -644,7 +643,7 @@
                 }
                 eventDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventDiv);
-            } else { // 'week' or 'day' view - single block event
+            } else { // 'week' or 'day' view
                 const eventTextDiv = document.createElement('div');
                 eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
                 eventTextDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
