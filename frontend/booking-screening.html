@@ -716,39 +716,33 @@
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
-                    } else {
-                        // Current month days
+                    else {
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
-
+                        
+                        // Check if the cell is today
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
+                            dayCell.classList.add('border-blue-500', 'border-2');
                         }
                         
-                        // NEW: Disable past days in month view
+                        // Check if the cell is in the past
                         if (isPastTime(cellDate)) {
                             dayCell.classList.add('day-cell-month-past');
+                            dayCell.style.cursor = 'not-allowed';
                         } else {
-                            // Add click listener for selection in month view (selecting a whole day)
-                            dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
-                            dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
-                            dayCell.addEventListener('click', (e) => {
-                                // Clear previous selection
-                                document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                                document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-                                
-                                // Select this day
-                                selectedEventDate = new Date(e.currentTarget.dataset.date);
-                                // Default to a sensible time, perhaps start of day, or current time
-                                selectedEventDate.setHours(new Date().getHours(), new Date().getMinutes(), 0, 0); 
-                                confirmScheduleBtn.disabled = false;
-                                // --- MODIFIED LINE: Added .selected class ---
-                                e.currentTarget.classList.add('day-cell-month-selected', 'selected'); // Add a class for month selection
-                                showMessage(`Selected: ${selectedEventDate.toLocaleDateString()} (click time slot for specific hour)`, 'info');
-                                console.log("Selected month view date:", selectedEventDate);
+                            // This is the code you need to copy
+                            dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
+                            
+                            dayCell.addEventListener('click', () => {
+                                // Prevent clicking on past days
+                                if (!dayCell.classList.contains('day-cell-month-past')) {
+                                    currentDate = cellDate;
+                                    currentView = 'day';
+                                    calendarViewSelect.value = 'day'; // Update the dropdown
+                                    fetchAndRenderCalendar(); // Trigger the view change
+                                }
                             });
                         }
-                        
                         dayCounter++;
                     }
                     
