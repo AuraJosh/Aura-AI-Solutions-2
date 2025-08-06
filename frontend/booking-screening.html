@@ -511,18 +511,19 @@
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
                 const querySnapshotScheduledMeetings = await getDocs(qScheduledMeetings);
-                querySnapshotScheduledMeetings.docs.forEach(doc => {
-                    const data = doc.data();
-                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
-                        events.push({
-                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed', // Use same completed style
-                            originalData: data // Pass the full data object for detailed tooltip
-                        });
-                    }
-                });
+                // Inside fetchCalendarEvents function, when creating the event object
+                querySnapshotScheduledMeetings.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        events.push({
+                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
+                            start: data.ScheduledDateTime.toDate(),
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), 
+                            type: 'completed',
+                            originalData: data // This 'data' object needs to contain the 'Extra' field
+                        });
+                    }
+                });
 
                 // Query for 'Pending' bookings from bookings collection (only pending status, as completed are now in scheduled_meetings)
                 const qPending = query(bookingsRef,
@@ -531,18 +532,19 @@
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
                 const querySnapshotPending = await getDocs(qPending);
-                querySnapshotPending.docs.forEach(doc => {
-                    const data = doc.data();
-                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
-                        events.push({
-                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'pending',
-                            originalData: data // Pass the full data object for detailed tooltip
-                        });
-                    }
-                });
+                // Inside fetchCalendarEvents function, when creating the event object
+                querySnapshotScheduledMeetings.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        events.push({
+                            title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
+                            start: data.ScheduledDateTime.toDate(),
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), 
+                            type: 'completed',
+                            originalData: data // This 'data' object needs to contain the 'Extra' field
+                        });
+                    }
+                });
                 
                 return events;
             } catch (error) {
@@ -618,44 +620,44 @@
 
         // MODIFIED: addEventToCell now dynamically builds a detailed tooltip
         function addEventToCell(cellElement, event, viewType) {
-            // Start building the tooltip string
-            let tooltipText = `
-                ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            `.trim();
-
-            // Loop through all data in the 'originalData' object
-            if (event.originalData) {
-                for (const key in event.originalData) {
-                    const value = event.originalData[key];
-                    if (key === 'Extra' && typeof value === 'object' && value !== null) {
-                        // If the key is 'Extra', loop through its sub-fields
-                        for (const extraKey in value) {
-                            if (value.hasOwnProperty(extraKey)) {
-                                tooltipText += `\n${formatFieldNameAsLabel(extraKey)}: ${value[extraKey]}`;
-                            }
-                        }
-                    } else if (!['id', 'Status', 'ScheduledAt', 'ScheduledDateTime', 'BookedBy'].includes(key)) {
-                        // Add all other core fields (excluding internal ones)
-                        tooltipText += `\n${formatFieldNameAsLabel(key)}: ${value}`;
-                    }
-                }
-            }
-
-            if (viewType === 'month') {
-                const eventDiv = document.createElement('div');
-                eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
-                eventDiv.textContent = event.title;
-                eventDiv.title = tooltipText; // Assign the new, detailed tooltip text
-                cellElement.appendChild(eventDiv);
-            } else { // 'week' or 'day' view
-                const eventTextDiv = document.createElement('div');
-                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
-                eventTextDiv.textContent = event.title;
-                eventTextDiv.title = tooltipText; // Assign the new, detailed tooltip text
-                cellElement.appendChild(eventTextDiv);
-            }
-        }
+            // Start building the tooltip string
+            let tooltipText = `
+                ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            `.trim();
+        
+            // Loop through all data in the 'originalData' object
+            if (event.originalData) {
+                for (const key in event.originalData) {
+                    const value = event.originalData[key];
+                    if (key === 'Extra' && typeof value === 'object' && value !== null) {
+                        // If the key is 'Extra', loop through its sub-fields
+                        for (const extraKey in value) {
+                            if (value.hasOwnProperty(extraKey)) {
+                                tooltipText += `\n${formatFieldNameAsLabel(extraKey)}: ${value[extraKey]}`;
+                            }
+                        }
+                    } else if (!['id', 'Status', 'ScheduledAt', 'ScheduledDateTime', 'BookedBy'].includes(key)) {
+                        // Add all other core fields (excluding internal ones)
+                        tooltipText += `\n${formatFieldNameAsLabel(key)}: ${value}`;
+                    }
+                }
+            }
+        
+            if (viewType === 'month') {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
+                eventDiv.textContent = event.title;
+                eventDiv.title = tooltipText; // Assign the new, detailed tooltip text
+                cellElement.appendChild(eventDiv);
+            } else { // 'week' or 'day' view
+                const eventTextDiv = document.createElement('div');
+                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
+                eventTextDiv.textContent = event.title;
+                eventTextDiv.title = tooltipText; // Assign the new, detailed tooltip text
+                cellElement.appendChild(eventTextDiv);
+            }
+        }
 
         function renderMonthView(fetchStartDate, fetchEndDate) {
             const currentDayMs = new Date().setHours(0,0,0,0);
