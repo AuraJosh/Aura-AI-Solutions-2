@@ -88,9 +88,9 @@ p {
     text-decoration: none;
     color: inherit;
     transition: var(--transition);
-    display: flex; /* Added for logo + text alignment */
-    align-items: center; /* Added for logo + text alignment */
-    gap: 10px; /* Added for logo + text spacing */
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .logo-link:hover {
@@ -180,13 +180,13 @@ p {
 
 .btn-secondary {
     background: transparent;
-    color: var(--dark-gray); /* Adjusted for light background */
-    border: 2px solid var(--dark-gray); /* Adjusted for light background */
+    color: var(--dark-gray); /* Corrected for light background */
+    border: 2px solid var(--dark-gray); /* Corrected for light background */
 }
 
 .btn-secondary:hover {
     background: var(--dark-gray);
-    color: var(--white); /* Adjusted for light background */
+    color: var(--white); /* Corrected for light background */
     transform: translateY(-2px);
 }
 
@@ -202,7 +202,7 @@ p {
     transform: translateY(-2px);
 }
 
-/* Hero Section (Consolidated for Video Background) */
+/* Hero Section */
 .hero {
     position: relative;
     min-height: 100vh;
@@ -210,7 +210,7 @@ p {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    color: var(--white);
+    color: var(--dark-gray); /* Changed to dark gray for light background */
 }
 
 .hero video {
@@ -221,16 +221,9 @@ p {
     height: 100%;
     object-fit: cover;
     z-index: 0; /* Background layer */
-    filter: invert(100%);
-    transform: scaleX(-1); /* Added to flip the video horizontally */
-    /* Add a slowed down video speed effect */
-    animation: slow-motion 10s linear infinite; /* You might need to add a custom animation for this */
-}
-
-/* CSS animation to slow down the video. This is more reliable than transform */
-@keyframes slow-motion {
-  0% { transform: scale(1); }
-  100% { transform: scale(1); } /* You can use this to control speed, though playbackRate is better */
+    /* Add a slowed down video speed effect with transform */
+    transform: scale(0.5); /* This is an attempt at a slow motion effect, but may not be reliable */
+    animation: slow-motion 10s linear infinite; /* You can use this to control speed, though playbackRate is better */
 }
 
 .hero img { /* Fallback image */
@@ -243,14 +236,8 @@ p {
     z-index: 0;
 }
 
-.hero .bg-black\/60 { /* Dark overlay */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.2);
-    z-index: 10;
+.hero .bg-black\/60 { /* This is the overlay, which should be removed for a light background */
+    display: none;
 }
 
 .hero-container { /* Content container */
@@ -281,11 +268,8 @@ p {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: center; /* Centered buttons for the new layout */
+    justify-content: center;
 }
-
-/* The hero-visual and hero-img styles from before are no longer needed for this layout. */
-
 
 /* Stats Section */
 .stats {
@@ -649,11 +633,11 @@ p {
 .footer-section { min-width: 0; }
 .footer-section h3, .footer-section h4 { margin-bottom: 1rem; color: var(--white); }
 @media (max-width: 768px) {
-    .footer-content { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .footer-content { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 }
 @media (max-width: 480px) {
-    .footer-content { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; }
-    .social-links { justify-content: center; }
+    .footer-content { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; }
+    .social-links { justify-content: center; }
 }
 .footer-section h3, .footer-section h4 { color: var(--white); margin-bottom: 1rem; }
 .footer-section ul { list-style: none; }
@@ -674,7 +658,6 @@ p {
 .map-container iframe { display: block; width: 100%; height: 100%; border: none; border-radius: var(--border-radius); }
 .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--medium-gray); }
 
-
 /* Animation Classes */
 .fade-in { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s ease forwards; }
 .fade-in-delay { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s ease 0.3s forwards; }
@@ -683,52 +666,52 @@ p {
 .hover-lift { transition: var(--transition); }
 .hover-lift:hover { transform: translateY(-10px); box-shadow: var(--shadow-hover); }
 @keyframes fadeInUp {
-    to { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
 }
 @keyframes countUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .hamburger { display: flex; }
-    .nav-menu { position: fixed; left: -100%; top: 70px; flex-direction: column; background-color: var(--white); width: 100%; text-align: center; transition: 0.3s; box-shadow: var(--shadow); padding: 2rem 0; }
-    .nav-menu.active { left: 0; }
-    .nav-menu li { margin: 1rem 0; }
-    .hamburger.active .bar:nth-child(2) { opacity: 0; }
-    .hamburger.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
-    .hamburger.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
-    .hero-container { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
-    .hero-title { font-size: 2.5rem; }
-    .hero-buttons { justify-content: center; }
-    .stats-container { grid-template-columns: repeat(2, 1fr); }
-    .features-grid { grid-template-columns: 1fr; }
-    .tutors-grid { grid-template-columns: 1fr; }
-    .subjects-grid { grid-template-columns: 1fr; }
-    .contact-content { grid-template-columns: 1fr; gap: 2rem; }
-    .form-row { grid-template-columns: 1fr; }
-    h1 { font-size: 2rem; }
-    h2 { font-size: 1.75rem; }
-    .page-header { padding: 100px 0 40px; }
-    .hero, .features, .tutors-section, .subjects-section, .contact-section, .cta { padding: 60px 0; }
+    .hamburger { display: flex; }
+    .nav-menu { position: fixed; left: -100%; top: 70px; flex-direction: column; background-color: var(--white); width: 100%; text-align: center; transition: 0.3s; box-shadow: var(--shadow); padding: 2rem 0; }
+    .nav-menu.active { left: 0; }
+    .nav-menu li { margin: 1rem 0; }
+    .hamburger.active .bar:nth-child(2) { opacity: 0; }
+    .hamburger.active .bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .hamburger.active .bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .hero-container { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+    .hero-title { font-size: 2.5rem; }
+    .hero-buttons { justify-content: center; }
+    .stats-container { grid-template-columns: repeat(2, 1fr); }
+    .features-grid { grid-template-columns: 1fr; }
+    .tutors-grid { grid-template-columns: 1fr; }
+    .subjects-grid { grid-template-columns: 1fr; }
+    .contact-content { grid-template-columns: 1fr; gap: 2rem; }
+    .form-row { grid-template-columns: 1fr; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    .page-header { padding: 100px 0 40px; }
+    .hero, .features, .tutors-section, .subjects-section, .contact-section, .cta { padding: 60px 0; }
 }
 
 @media (max-width: 480px) {
-    .nav-container { padding: 0 1rem; }
-    .hero-container, .features-container, .tutors-container, .subjects-container, .contact-container, .cta-container, .footer-container { padding: 0 1rem; }
-    .hero-title { font-size: 2rem; }
-    .stats-container { grid-template-columns: 1fr; }
-    .hero-buttons { flex-direction: column; align-items: center; }
-    .btn { width: 100%; max-width: 300px; }
+    .nav-container { padding: 0 1rem; }
+    .hero-container, .features-container, .tutors-container, .subjects-container, .contact-container, .cta-container, .footer-container { padding: 0 1rem; }
+    .hero-title { font-size: 2rem; }
+    .stats-container { grid-template-columns: 1fr; }
+    .hero-buttons { flex-direction: column; align-items: center; }
+    .btn { width: 100%; max-width: 300px; }
 }
 
 @media (max-width: 768px) {
-    .logo-img { height: 30px; }
+    .logo-img { height: 30px; }
 }
 @media (max-width: 640px) {
-    .hero video { display: none; }
+    .hero video { display: none; }
 }
 @media (min-width: 641px) {
-    .hero img { display: none; }
+    .hero img { display: none; }
 }
