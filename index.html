@@ -1,188 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>No.1 Tutors | Learn. Blossom. Succeed.</title>
-    <meta name="description" content="Trusted family-run tutoring company with over 20 years of experience. Personalized learning support across the West Midlands.">
-    <link rel="stylesheet" href="css/styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" href="assets/no1tutorlogo.png" type="image/png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Aura AI Solutions</title>
+    <link rel="icon" href="data:,">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#6366F1',
+              accent: '#8B5CF6',
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="frontend/style.css">
+    <link rel="stylesheet" href="frontend/widget.css">
+
+    <style>
+        html, body { margin: 0; padding: 0; }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-out forwards;
+        }
+
+        /* Custom styles for mobile menu slide-in/out */
+        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
+            transition: transform 0.3s ease-out;
+        }
+        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
+            transform: translateY(-100%);
+        }
+        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
+            transform: translateY(0);
+        }
+
+    </style>
+    <link rel="icon" href="frontend/media/favicon.png" type="image/png">
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-03MPB9XG9B');
+    </script>
+
 </head>
-<body>
-    <video autoplay muted loop playsinline class="video-background">
-        <source src="assets/boxbg.mp4" type="video/mp4">
+<body class="bg-gray-900 text-gray-200">
+
+<header class="fixed w-full bg-[#060d1f] shadow z-50">
+    <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1"> <a href="index.html" class="flex items-center space-x-2 sm:space-x-4"> <div class="relative h-16 w-[120px] sm:h-20 sm:w-[150px]"> <img src="frontend/media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
+                    <img src="frontend/media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
+                </div>
+                <span class="typing-text text-sm sm:text-base text-white whitespace-nowrap">Aura AI Solutions</span> </a>
+        </div>
+
+        <nav class="hidden md:flex justify-center space-x-6 flex-1">
+            <a href="index.html" class="hover:text-primary">Home</a>
+            <a href="frontend/services.html" class="hover:text-primary">Services</a>
+            <a href="frontend/pricing.html" class="hover:text-primary">Pricing</a>
+            <a href="frontend/contact.html" class="hover:text-primary">Contact</a>
+        </nav>
+
+        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1"> <button id="menu-btn" class="md:hidden text-3xl text-white">&#9776;</button> </div>
+    </div>
+</header>
+
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg mobile-menu-slide-leave-to"> <nav class="flex flex-col space-y-2 text-center"> <a href="index.html" class="hover:text-primary py-2 block">Home</a> <a href="frontend/services.html" class="hover:text-primary py-2 block">Services</a>
+        <a href="frontend/pricing.html" class="hover:text-primary py-2 block">Pricing</a>
+        <a href="frontend/contact.html" class="hover:text-primary py-2 block">Contact</a>
+    </nav>
+</div>
+
+<section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden text-white">
+    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover z-0 hidden sm:block">
+        <source src="frontend/media/background.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <a href="index.html" class="logo-link">
-                    <img src="assets/no1tutorlogo.png" alt="No.1 Tutors Logo" class="logo-img">
-                    <h2>No.1 Tutors</h2>
-                </a>
-            </div>
-            <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item">
-                    <a href="index.html" class="nav-link active">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="tutors.html" class="nav-link">Tutors</a>
-                </li>
-                <li class="nav-item">
-                    <a href="subjects.html" class="nav-link">Subjects</a>
-                </li>
-                <li class="nav-item">
-                    <a href="contact.html" class="nav-link">Contact</a>
-                </li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+    <img src="frontend/media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover sm:hidden" />
+    <div class="absolute inset-0 bg-black/60 z-10"></div>
 
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content fade-in">
-                <h1 class="hero-title">Learn. Blossom. Succeed.</h1>
-                <p class="hero-subtitle">We are a trusted, family-run tutoring company with over 20 years of experience and a high success rate. We believe every student can achieve their full potential, and our mission is to simply raise your confidence.</p>
-                <div class="hero-buttons">
-                    <a href="tutors.html" class="btn btn-primary">Meet Our Tutors</a>
-                    <a href="contact.html" class="btn btn-secondary">Get Started</a>
-                </div>
-            </div>
-            <div class="hero-image fade-in-delay">
-                <div class="hero-visual">
-                    <img src="assets/photo2.png" alt="Students and a tutor working together" class="hero-img">
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="container relative z-20 text-center px-4 sm:px-6 max-w-4xl pt-24 pb-12 sm:py-0"> <h1 class="text-3xl md:text-6xl font-bold mb-3 sm:mb-4 leading-tight sm:leading-normal"> Bring Your Website to Life with Smarter AI Chatbots
+        </h1>
+        <p class="text-base sm:text-xl mb-6 sm:mb-8"> Custom-integrated conversational AI for websites that engage, convert, and support in real time.
+        </p>
 
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item" data-target="20">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Years Experience</div>
-            </div>
-            <div class="stat-item" data-target="1000">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Students Helped</div>
-            </div>
-            <div class="stat-item" data-target="95">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Success Rate %</div>
-            </div>
-            <div class="stat-item" data-target="5">
-                <div class="stat-number">0</div>
-                <div class="stat-label">Centres</div>
-            </div>
+        <div class="mt-12 sm:mt-16"> <svg class="w-6 h-6 mx-auto animate-bounce opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="features">
-        <div class="features-container">
-            <div class="section-header">
-                <h2>Your Partner in Learning</h2>
-                <p>Established in the UK in 2012, No.1 Tutors is a family-oriented business with a proven track record of success. With our main centre in Wolverhampton, we offer in-person tuition across the West Midlands, including Dudley, Birmingham, Wednesbury, Nottingham, and West Bromwich.</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card slide-up">
-                    <div class="feature-icon">
-                        <i class="fas fa-certificate"></i>
-                    </div>
-                    <h3>Ofsted Registered</h3>
-                    <p>We are an Ofsted-registered childcare provider, maintaining high standards and enabling tax credit claims</p>
-                </div>
-                <div class="feature-card slide-up">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Experienced Team</h3>
-                    <p>Our tutors are passionate, dedicated, and carefully selected with substantial experience</p>
-                </div>
-                <div class="feature-card slide-up">
-                    <div class="feature-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
-                    <h3>Personalized Learning</h3>
-                    <p>We adapt our teaching techniques to be more personal, ensuring every student gets the support they need</p>
-                </div>
-                <div class="feature-card slide-up">
-                    <div class="feature-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <h3>Focus on Confidence</h3>
-                    <p>We don't just teach for exams; we inspire students to become well-rounded individuals with confidence</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<footer class="bg-gray-900 text-gray-400 py-8 text-center">
+    <div class="mb-4 text-sm sm:text-base"> <a href="frontend/privacy.html" class="mx-1 sm:mx-2 hover:text-white">Privacy Policy</a> <a href="frontend/terms.html" class="mx-1 sm:mx-2 hover:text-white">Terms of Service</a> </div>
+    <div class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</div> </footer>
 
-    <section class="cta">
-        <div class="cta-container">
-            <div class="cta-content">
-                <h2>Affordable Tutoring for Every Family</h2>
-                <p>Our general hourly rate ranges between £10 and £25, depending on the student's needs. We offer a 20% discount for each additional sibling after one full-paying child.</p>
-                <a href="contact.html" class="btn btn-primary">Get Started Today</a>
-            </div>
-        </div>
-    </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
 
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>No.1 Tutors</h3>
-                    <p>Trusted family-run tutoring company with over 20 years of experience. Learn. Blossom. Succeed.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="tutors.html">Tutors</a></li>
-                        <li><a href="subjects.html">Subjects</a></li>
-                        <li><a href="contact.html">Contact</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Contact Info</h4>
-                    <p><i class="fas fa-phone"></i> 01902 810040</p>
-                    <p><i class="fas fa-mobile-alt"></i> 07477 917251</p>
-                    <p><i class="fas fa-envelope"></i> femiadams@no1tutors.org</p>
-                    <p><i class="fas fa-map-marker-alt"></i> Regent House, Bath Avenue, Wolverhampton, WV1 4EG</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link facebook"><img src="assets/5296499_fb_facebook_facebook logo_icon.png" alt="Facebook"></a>
-                        <a href="#" class="social-link twitter"><img src="assets/5296516_tweet_twitter_twitter logo_icon.png" alt="Twitter"></a>
-                        <a href="#" class="social-link instagram"><img src="assets/5296765_camera_instagram_instagram logo_icon.png" alt="Instagram"></a>
-                        <a href="#" class="social-link linkedin"><img src="assets/5296501_linkedin_network_linkedin logo_icon.png" alt="LinkedIn"></a>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h4>Location</h4>
-                    <div class="map-container">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2428.409790357851!2d-2.1297!3d52.5864!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4870b8c8c8c8c8c8%3A0x8c8c8c8c8c8c8c8c!2sRegent+House%2C+Bath+Avenue%2C+Wolverhampton%2C+West+Midlands+WV1+4EG!5e0!3m2!1sen!2suk!4v1640995200000!5m2!1sen!2suk" 
-                            width="100%" 
-                            height="150" 
-                            style="border:0;" 
-                            allowfullscreen="" 
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2024 Excellence Tutoring. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+        menuBtn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            if (!menu.classList.contains('hidden')) {
+                // Show menu: slide in
+                menu.classList.remove('mobile-menu-slide-leave-to');
+                menu.classList.add('mobile-menu-slide-enter-active');
+                setTimeout(() => {
+                    menu.classList.remove('mobile-menu-slide-enter-active');
+                }, 300); // Should match transition duration
+            } else {
+                // Hide menu: slide out
+                menu.classList.add('mobile-menu-slide-leave-active');
+                setTimeout(() => {
+                    menu.classList.remove('mobile-menu-slide-leave-active');
+                    menu.classList.add('mobile-menu-slide-leave-to');
+                }, 300); // Should match transition duration
+            }
+        });
+    });
+</script>
 
-    <script src="js/script.js"></script>
+<script>
+    const defaultTitle = document.title;
+    const awayTitle = "👋 Come back soon!";
+    const blinkTitle = "⚡ Chat with Aura AI...";
+
+    let blinkInterval;
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            document.title = awayTitle;
+            blinkInterval = setInterval(() => {
+                document.title = document.title === awayTitle ? blinkTitle : awayTitle;
+            }, 1000);
+        } else {
+            document.title = defaultTitle;
+            clearInterval(blinkInterval);
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const typingEl = document.querySelector('.typing-text');
+        if (typingEl) {
+            // Only apply typing effect for desktop to prevent overflow on mobile, or adjust more carefully.
+            // For now, I'll keep it as is, assuming 'finished' class prevents overflow.
+            setTimeout(() => {
+                typingEl.classList.add('finished');
+            }, 4500);
+        }
+    });
+</script>
+<iframe
+  id="aura-chatbot-iframe"
+  frameborder="0"
+  scrolling="no"
+  title="Aura AI Chatbot"
+  style="
+    border:none;
+    position:fixed;
+    bottom:2px;
+    right:2px;  
+    z-index:9999;
+    width:90px;
+    height:90px;
+    overflow:hidden;
+    pointer-events:auto;
+    transition: width 0.3s ease-out, height 0.3s ease-out;
+  "
+></iframe>
+
+<script>
+    // Configuration for the chatbot
+    const chatbotConfig = {
+        accountId: 'AUR000',
+        apiKey: 'r3m2dP9EwH8PoXANYgNZV6JCOcRiOOTGaIdKVR63',
+        apiEndpoint: 'https://uxa8aixawk.execute-api.eu-west-2.amazonaws.com/default/chat'
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatbotIframe = document.getElementById('aura-chatbot-iframe');
+
+        if (chatbotIframe) {
+            // Set the iframe src based on accountId
+            const widgetUrl = chatbotConfig.accountId 
+                ? `https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/${chatbotConfig.accountId}-chatbot-widget.html`
+                : 'https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/chatbot-widget.html';
+            
+            chatbotIframe.src = widgetUrl;
+
+            // Define the full and toggle button sizes.
+            const fullWidth = 420;
+            const fullHeight = 540;
+            const toggleButtonWidth = 90;
+            const toggleButtonHeight = 90;
+
+            // Send configuration to the iframe once it's loaded
+            chatbotIframe.addEventListener('load', function() {
+                chatbotIframe.contentWindow.postMessage({
+                    type: 'init',
+                    config: chatbotConfig
+                }, '*');
+            });
+
+            // Listen for messages from the iframe
+            window.addEventListener('message', function(event) {
+                // IMPORTANT: Verify the origin in a production environment for security
+                // if (event.origin !== "https://d2yqj3k2c4m8s1.cloudfront.net") {
+                //     return; // Reject messages from unknown origins
+                // }
+
+                // Check if the message is from your chatbot widget and is a state change
+                if (event.data && event.data.type === 'chatbotState') {
+                    if (event.data.isOpen) {
+                        // Chat is OPEN: expand iframe to full size
+                        chatbotIframe.style.width = `${fullWidth}px`;
+                        chatbotIframe.style.height = `${fullHeight}px`;
+                        chatbotIframe.style.transition = 'width 0.3s ease-out, height 0.3s ease-out';
+                    } else {
+                        // Chat is CLOSED: shrink iframe to button size
+                        chatbotIframe.style.width = `${toggleButtonWidth}px`;
+                        chatbotIframe.style.height = `${toggleButtonHeight}px`;
+                        chatbotIframe.style.transition = 'width 0.3s ease-in, height 0.3s ease-in';
+                    }
+                }
+            });
+        }
+    });
+</script>
 </body>
 </html>
