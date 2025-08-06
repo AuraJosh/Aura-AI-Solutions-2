@@ -46,19 +46,22 @@
         </div>
     </nav>
 
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content fade-in">
-                <h1 class="hero-title">Learn. Blossom. Succeed.</h1>
-                <p class="hero-subtitle">We are a trusted, family-run tutoring company with over 20 years of experience and a high success rate. We believe every student can achieve their full potential, and our mission is to simply raise your confidence.</p>
-                <div class="hero-buttons">
+    <section class="hero relative min-h-screen flex items-center justify-center overflow-hidden text-white">
+        <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover z-0 hidden sm:block">
+            <source src="assets/boxbg.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    
+        <img src="assets/no1tutorsfallback.jpg" alt="No.1 Tutors background" class="absolute inset-0 w-full h-full object-cover sm:hidden" />
+        <div class="absolute inset-0 bg-black/60 z-10"></div>
+    
+        <div class="hero-container relative z-20">
+            <div class="hero-content fade-in text-center px-4 sm:px-6 max-w-4xl pt-24 pb-12 sm:py-0">
+                <h1 class="hero-title text-3xl md:text-6xl font-bold mb-3 sm:mb-4 leading-tight sm:leading-normal">Learn. Blossom. Succeed.</h1>
+                <p class="hero-subtitle text-base sm:text-xl mb-6 sm:mb-8">We are a trusted, family-run tutoring company with over 20 years of experience and a high success rate. We believe every student can achieve their full potential, and our mission is to simply raise your confidence.</p>
+                <div class="hero-buttons mt-12 sm:mt-16">
                     <a href="tutors.html" class="btn btn-primary">Meet Our Tutors</a>
                     <a href="contact.html" class="btn btn-secondary">Get Started</a>
-                </div>
-            </div>
-            <div class="hero-image fade-in-delay">
-                <div class="hero-visual">
-                    <img src="assets/photo2.png" alt="Students and a tutor working together" class="hero-img">
                 </div>
             </div>
         </div>
