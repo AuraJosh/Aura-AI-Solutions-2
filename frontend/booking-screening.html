@@ -635,7 +635,7 @@
                                 tooltipText += `\n${formatFieldNameAsLabel(extraKey)}: ${value[extraKey]}`;
                             }
                         }
-                    } else if (!['id', 'Status', 'ScheduledAt', 'ScheduledDateTime'].includes(key)) {
+                    } else if (!['id', 'Status', 'ScheduledAt', 'ScheduledDateTime', 'BookedBy'].includes(key)) {
                         // Add all other core fields (excluding internal ones)
                         tooltipText += `\n${formatFieldNameAsLabel(key)}: ${value}`;
                     }
@@ -1263,7 +1263,12 @@
             ];
 
             // Get all keys from the current booking data
-            let allBookingKeys = Object.keys(currentBooking);
+            let allBookingKeys = Object.keys(booking).filter(key => key !== 'Extra');
+
+            // Also retrieve keys from the 'Extra' object if it exists
+            if (booking.Extra && typeof booking.Extra === 'object') {
+                allBookingKeys = [...allBookingKeys, ...Object.keys(booking.Extra)];
+            }
 
             // Filter out excluded fields
             let displayKeys = allBookingKeys.filter(key => !excludedFields.includes(key));
