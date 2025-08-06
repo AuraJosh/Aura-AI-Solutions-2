@@ -621,30 +621,52 @@
             if (viewType === 'month') {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
-                eventDiv.textContent = event.title; 
-                eventDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
+                // Prioritize a clear title, like Customer_Name or Email
+                eventDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
+        
+                // Build the tooltip content
+                let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
+                // Add core fields if they exist
+                if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
+                if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
+                if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
+        
+                // Add all fields from the 'Extra' map
+                if (event.originalData.Extra) {
+                    for (const key in event.originalData.Extra) {
+                        // Exclude internal fields or fields not meant for display
+                        if (key !== 'Timestamp' && key !== 'Status') {
+                            const label = formatFieldNameAsLabel(key);
+                            const value = event.originalData.Extra[key];
+                            tooltipContent += `${label}: ${value}\n`;
+                        }
+                    }
+                }
+                eventDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventDiv);
             } else { // 'week' or 'day' view - single block event
                 const eventTextDiv = document.createElement('div');
-                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`; // Apply pending class to text
-                eventTextDiv.textContent = event.title; 
-                eventTextDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
+                eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
+                eventTextDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
+                
+                // Build the tooltip content for day/week view
+                let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
+                // Add core fields
+                if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
+                if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
+                if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
+                
+                // Add all fields from the 'Extra' map
+                if (event.originalData.Extra) {
+                    for (const key in event.originalData.Extra) {
+                        if (key !== 'Timestamp' && key !== 'Status') {
+                            const label = formatFieldNameAsLabel(key);
+                            const value = event.originalData.Extra[key];
+                            tooltipContent += `${label}: ${value}\n`;
+                        }
+                    }
+                }
+                eventTextDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventTextDiv);
             }
         }
