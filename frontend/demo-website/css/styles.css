@@ -180,13 +180,13 @@ p {
 
 .btn-secondary {
     background: transparent;
-    color: var(--white); /* Adjusted for dark background */
-    border: 2px solid var(--white); /* Adjusted for dark background */
+    color: var(--dark-gray);
+    border: 2px solid var(--dark-gray);
 }
 
 .btn-secondary:hover {
-    background: var(--white);
-    color: var(--primary-color); /* Adjusted for dark background */
+    background: var(--dark-gray);
+    color: var(--white);
     transform: translateY(-2px);
 }
 
@@ -221,7 +221,8 @@ p {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    filter: invert(100%); /* This inverts the colors of the video */
+    /* This line controls the playback speed, which is a JS property */
+    /* CSS alone cannot change the video's playback rate. */
 }
 
 .hero img { /* Fallback image */
@@ -256,14 +257,14 @@ p {
 
 .hero-title {
     font-size: 3.5rem;
-    color: var(--white); /* Changed to white for dark background */
+    color: var(--dark-gray);
     margin-bottom: 1.5rem;
     line-height: 1.1;
 }
 
 .hero-subtitle {
     font-size: 1.25rem;
-    color: var(--light-gray); /* Changed to light gray for dark background */
+    color: var(--dark-gray);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -722,4 +723,13 @@ p {
 }
 @media (min-width: 641px) {
     .hero img { display: none; }
+}
+
+@keyframes slow-motion-video {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1);
+  }
 }
