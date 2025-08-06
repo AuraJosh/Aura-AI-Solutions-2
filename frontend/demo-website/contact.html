@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | No.1 Tutors</title>
+    <meta name="description" content="Get in touch with No.1 Tutors. We're here to answer any questions you may have about our tutoring services.">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html" class="logo-link">
+                    <h2>No.1 Tutors</h2>
+                </a>
+            </div>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="tutors.html" class="nav-link">Tutors</a>
+                </li>
+                <li class="nav-item">
+                    <a href="subjects.html" class="nav-link">Subjects</a>
+                </li>
+                <li class="nav-item">
+                    <a href="contact.html" class="nav-link active">Contact</a>
+                </li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="page-header-container">
+            <h1 class="page-title fade-in">Get in Touch</h1>
+            <p class="page-subtitle fade-in-delay">We're here to answer any questions you may have. Feel free to contact us by phone or email, or visit one of our centres.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="contact-container">
+            <div class="contact-content">
+                <!-- Contact Form -->
+                <div class="contact-form-wrapper slide-up">
+                    <h2>Schedule Your Consultation</h2>
+                    <p>Fill out the form below and we'll get back to you within 24 hours to discuss your tutoring needs and find the perfect solution for you.</p>
+                    
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="studentAge">Student Age/Grade Level *</label>
+                            <select id="studentAge" name="studentAge" required>
+                                <option value="">Select Age/Grade</option>
+                                <option value="ks1">Key Stage 1</option>
+                                <option value="ks2">Key Stage 2</option>
+                                <option value="ks3">Key Stage 3</option>
+                                <option value="ks4">Key Stage 4</option>
+                                <option value="11plus">11+ Preparation</option>
+                                <option value="undergraduate">Undergraduate</option>
+                                <option value="postgraduate">Postgraduate</option>
+                                <option value="adult">Adult Learner</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subjects">Subjects of Interest *</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="english">
+                                    <span class="checkmark"></span>
+                                    English
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="mathematics">
+                                    <span class="checkmark"></span>
+                                    Mathematics
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="science">
+                                    <span class="checkmark"></span>
+                                    Science
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="11plus">
+                                    <span class="checkmark"></span>
+                                    11+ and 11+ Mock Exams
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="adult">
+                                    <span class="checkmark"></span>
+                                    Adult Learner Support
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="subjects" value="other">
+                                    <span class="checkmark"></span>
+                                    Other (Please specify)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sessionType">Preferred Session Type *</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="sessionType" value="online" required>
+                                    <span class="radio-mark"></span>
+                                    Online Sessions
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sessionType" value="in-person" required>
+                                    <span class="radio-mark"></span>
+                                    In-Person Sessions
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="sessionType" value="both" required>
+                                    <span class="radio-mark"></span>
+                                    Both Options
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="goals">Learning Goals & Challenges</label>
+                            <textarea id="goals" name="goals" rows="4" placeholder="Tell us about your specific learning goals, challenges, or areas where you need support..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="availability">Preferred Schedule</label>
+                            <textarea id="availability" name="availability" rows="3" placeholder="Let us know your preferred days and times for tutoring sessions..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary form-submit-btn">
+                            <span class="btn-text">Schedule Consultation</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Sending...
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Success Message -->
+                    <div class="form-success" id="formSuccess" style="display: none;">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>Thank You!</h3>
+                        <p>Your consultation request has been submitted successfully. We'll contact you within 24 hours to discuss your tutoring needs and schedule your first session.</p>
+                    </div>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="contact-info-wrapper slide-up" data-delay="200">
+                    <h2>Contact Information</h2>
+                    
+                    <div class="contact-info-grid">
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Wolverhampton Centre</h4>
+                                <p>Regent House, Bath Avenue<br>Wolverhampton, West Midlands, WV1 4EG</p>
+                                <small>Main centre - In-person sessions available</small>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Phone</h4>
+                                <p>01902 810040</p>
+                                <small>Mon-Fri: 9AM-6PM<br>Sat: 10AM-4PM</small>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Mobile</h4>
+                                <p>07477 917251</p>
+                                <small>Available for urgent enquiries</small>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Email</h4>
+                                <p>femiadams@no1tutors.org</p>
+                                <small>We respond within 24 hours</small>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Nottingham Branch</h4>
+                                <p>Mobile: 07840 797241<br>Email: mariamadams@no1tutors.org</p>
+                                <small>Branch location - Contact for details</small>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h4>Business Hours</h4>
+                                <p>Monday - Friday: 9AM - 6PM<br>Saturday: 10AM - 4PM</p>
+                                <small>Flexible scheduling available</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Section -->
+                    <div class="faq-section">
+                        <h3>Frequently Asked Questions</h3>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>How quickly can I start tutoring sessions?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Most students can begin within 1-2 weeks of their initial consultation. We'll match you with the perfect tutor and schedule your first session at your convenience.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>What are your tutoring rates?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Our general hourly rate ranges between £10 and £25, depending on the student's needs. We offer a 20% discount for each additional sibling after one full-paying child. We recommend 2-hour sessions for maximum efficiency.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>Do you offer online tutoring sessions?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>We primarily offer in-person tuition across the West Midlands, including Dudley, Birmingham, Wednesbury, Nottingham, and West Bromwich. We also offer in-home tuition subject to availability.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <h4>How do you match students with tutors?</h4>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Our tutors are carefully selected and must pass an exam at their interview to ensure the highest quality of teaching. We identify individual learning styles and tailor lessons to fit your specific needs, whether in small groups, one-on-one sessions, or in-home tuition.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>No.1 Tutors</h3>
+                    <p>Trusted family-run tutoring company with over 20 years of experience. Learn. Blossom. Succeed.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="tutors.html">Tutors</a></li>
+                        <li><a href="subjects.html">Subjects</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <p><i class="fas fa-phone"></i> 01902 810040</p>
+                    <p><i class="fas fa-mobile-alt"></i> 07477 917251</p>
+                    <p><i class="fas fa-envelope"></i> femiadams@no1tutors.org</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Regent House, Bath Avenue, Wolverhampton, WV1 4EG</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook"><img src="assets/5296499_fb_facebook_facebook logo_icon.png" alt="Facebook"></a>
+                        <a href="#" class="social-link twitter"><img src="assets/5296516_tweet_twitter_twitter logo_icon.png" alt="Twitter"></a>
+                        <a href="#" class="social-link instagram"><img src="assets/5296765_camera_instagram_instagram logo_icon.png" alt="Instagram"></a>
+                        <a href="#" class="social-link linkedin"><img src="assets/5296501_linkedin_network_linkedin logo_icon.png" alt="LinkedIn"></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Location</h4>
+                    <div class="map-container">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2428.409790357851!2d-2.1297!3d52.5864!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4870b8c8c8c8c8c8%3A0x8c8c8c8c8c8c8c8c!2sRegent+House%2C+Bath+Avenue%2C+Wolverhampton%2C+West+Midlands+WV1+4EG!5e0!3m2!1sen!2suk!4v1640995200000!5m2!1sen!2suk" 
+                            width="100%" 
+                            height="150" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Excellence Tutoring. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
