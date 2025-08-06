@@ -1148,34 +1148,44 @@
                     // --- CORRECTED LOGIC for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
-                                            
-                            // Explicitly create the new object with the desired fields and mappings
-                            const meetingData = {
-                                Status: 'Completed',
-                                ScheduledAt: Timestamp.now(),
-                                ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
-                                BookedBy: currentUserUid,
-                                id: change.id,
-                                // Keep the original field name consistent
-                                Customer_Name: change.fullBookingData.Customer_Name || change.fullBookingData.Contact_Name,
-                                Email: change.fullBookingData.Email,
-                                URL: change.fullBookingData.URL || change.fullBookingData.Website,
-                                "Company Name": change.fullBookingData.Company_Name,
-                                BookingRequestTimestamp: change.fullBookingData.Timestamp,
-                                // Include other fields if they exist to prevent data loss
-                                Subject: change.fullBookingData.Subject,
-                                Message: change.fullBookingData.Message,
-                                Phone_Number: change.fullBookingData.Phone_Number,
-                                Service: change.fullBookingData.Service,
-                            };
-                        
-                        // Remove any fields that are undefined or null to keep the document clean
-                        for (const key in meetingData) {
-                            if (meetingData[key] === undefined || meetingData[key] === null) {
-                                delete meetingData[key];
+                    
+                        // 1. Define the core fields you want in the main document.
+                        const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
+                        const extraData = {};
+                        const meetingData = {
+                            // Start with the standard, non-optional fields
+                            id: change.id,
+                            Status: 'Completed',
+                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
+                            BookedBy: currentUserUid,
+                            ScheduledAt: Timestamp.now(), // New field to track when it was booked
+                        };
+                    
+                        // 2. Iterate over the original booking data.
+                        for (const fieldName in change.fullBookingData) {
+                            // Skip internal/redundant fields from the original booking
+                            if (['id', 'Status', '_originalSource'].includes(fieldName)) {
+                                continue;
+                            }
+                    
+                            const fieldValue = change.fullBookingData[fieldName];
+                    
+                            // 3. Categorize the fields.
+                            if (coreFields.includes(fieldName)) {
+                                // Map core fields directly.
+                                meetingData[fieldName] = fieldValue;
+                            } else {
+                                // All other fields go into the 'extra' map.
+                                extraData[fieldName] = fieldValue;
                             }
                         }
-            
+                    
+                        // 4. Add the 'extra' map to the main object if it has data.
+                        if (Object.keys(extraData).length > 0) {
+                            meetingData.Extra = extraData;
+                        }
+                        
+                        // 5. Commit the standardized meetingData object.
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                         console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
                     }
