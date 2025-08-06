@@ -322,7 +322,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, Timestamp, getDocs, setDoc } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
-
+    
         // Firebase Configuration
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
@@ -335,14 +335,14 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
+    
         let currentUserUid = null;
         let currentAccountId = null;
         let authInitialized = false;
         let fetchedCalendarEvents = [];
         let scheduledMeetingsListener = null;
         let pendingBookingsListener = null;
-
+    
         // UI Elements
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingMessage = document.getElementById('loading-message');
@@ -355,7 +355,7 @@
         
         let currentDate = new Date();
         let currentView = 'month';
-
+    
         function showLoading(message) {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
@@ -365,7 +365,7 @@
             loadingOverlay.classList.add('hidden');
             document.body.style.overflow = '';
         }
-
+    
         // Helper function to show messages
         function showMessage(message, type = 'info') {
             const messageBox = document.createElement('div');
@@ -377,19 +377,32 @@
             document.body.appendChild(messageBox);
             setTimeout(() => { messageBox.remove(); }, 3000);
         }
-
+    
         // Helper to check if a date/time is in the past
         function isPastTime(date) {
             const now = new Date();
             return date < now;
         }
-
+    
+        /**
+         * Converts a field name from `snake_case` or `camelCase` to `Title Case`.
+         * @param {string} fieldName 
+         * @returns {string} Formatted label.
+         */
+        function formatFieldNameAsLabel(fieldName) {
+            return fieldName
+                .replace(/_/g, ' ') // Replace underscores with spaces
+                .replace(/([A-Z])/g, ' $1') // Add space before capital letters (for camelCase)
+                .trim() // Remove leading/trailing spaces
+                .replace(/\b\w/g, l => l.toUpperCase()); // Capitalize first letter of each word
+        }
+        
         async function fetchAndRenderCalendar() {
             if (!currentAccountId) {
                 console.warn("Account ID not available for fetching calendar events.");
                 return;
             }
-
+    
             calendarGrid.innerHTML = '';
             showLoading("Loading calendar events...");
             
@@ -419,13 +432,12 @@
                 fetchEndDate = endOfDay;
                 calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
             }
-
+    
             try {
-                // Fetch events from both collections
                 const events = [];
                 const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
-
+    
                 const qScheduledMeetings = query(scheduledMeetingsRef,
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(fetchEndDate))
@@ -443,7 +455,7 @@
                         });
                     }
                 });
-
+    
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'),
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(fetchStartDate)),
@@ -469,7 +481,6 @@
                 showMessage("Error loading calendar events. Check console for index requirement.", 'error');
             }
             
-            // Now render the view
             if (currentView === 'month') {
                 renderMonthView(fetchStartDate, fetchEndDate);
             } else if (currentView === 'week') {
@@ -477,55 +488,69 @@
             } else { // Day View
                 renderDayView(fetchStartDate, fetchEndDate);
             }
-
+    
             hideLoading();
         }
-
-        // RENDER FUNCTIONS (Copied with minor adaptations)
+    
+        // NEW: addEventToCell with full tooltip functionality
         function addEventToCell(cellElement, event, viewType) {
             if (viewType === 'month') {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
-                eventDiv.textContent = event.title;
-                eventDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
+                eventDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
+        
+                // Build the tooltip content for month view
+                let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
+                // Add core fields if they exist
+                if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
+                if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
+                if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
+        
+                // Add all fields from the 'Extra' map
+                if (event.originalData.Extra) {
+                    for (const key in event.originalData.Extra) {
+                        const label = formatFieldNameAsLabel(key);
+                        const value = event.originalData.Extra[key];
+                        tooltipContent += `${label}: ${value}\n`;
+                    }
+                }
+                eventDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventDiv);
-            } else {
+            } else { // 'week' or 'day' view
                 const eventTextDiv = document.createElement('div');
                 eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
-                eventTextDiv.textContent = event.title;
-                eventTextDiv.title = `
-                    ${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -
-                    ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    ${event.originalData?.Customer_Name ? `\nName: ${event.originalData.Customer_Name}` : ''}
-                    ${event.originalData?.Contact_Name ? `\nContact Name: ${event.originalData.Contact_Name}` : ''}
-                    ${event.originalData?.Phone_Number ? `\nPhone: ${event.originalData.Phone_Number}` : ''}
-                    ${event.originalData?.Subject ? `\nSubject: ${event.originalData.Subject}` : ''}
-                    ${event.originalData?.Status ? `\nStatus: ${event.originalData.Status}` : ''}
-                `.trim();
+                eventTextDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
+                
+                // Build the tooltip content for day/week view
+                let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
+                // Add core fields
+                if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
+                if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
+                if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
+                
+                // Add all fields from the 'Extra' map
+                if (event.originalData.Extra) {
+                    for (const key in event.originalData.Extra) {
+                        const label = formatFieldNameAsLabel(key);
+                        const value = event.originalData.Extra[key];
+                        tooltipContent += `${label}: ${value}\n`;
+                    }
+                }
+                eventTextDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventTextDiv);
             }
         }
-        
+            
         function renderMonthView(fetchStartDate, fetchEndDate) {
-            // Clear the calendar grid before rendering
             calendarGrid.innerHTML = '';
-        
+            
             const currentDayMs = new Date().setHours(0,0,0,0);
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
-        
-            // Create the header row for days of the week
+            
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
@@ -535,11 +560,10 @@
                 headerRow.appendChild(dayHeader);
             });
             calendarGrid.appendChild(headerRow);
-        
+            
             let dayCounter = 1;
             let nextMonthDayCounter = 1;
-        
-            // Loop to build the month grid (up to 6 weeks)
+            
             for (let i = 0; i < 6; i++) {
                 const weekRow = document.createElement('div');
                 weekRow.className = 'grid grid-cols-7 gap-1';
@@ -550,40 +574,36 @@
                     dateNumDiv.className = 'text-right font-medium mb-1';
                     
                     let cellDate;
-                    let isCurrentMonthDay = false; // Flag to check if the day belongs to the current month
-        
+                    
                     if (i === 0 && j < firstDayOfMonth) {
                         const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
                         dateNumDiv.textContent = prevMonthDay;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on previous month's days
+                        dayCell.style.cursor = 'not-allowed';
                         cellDate = new Date(year, month - 1, prevMonthDay);
                     } else if (dayCounter > daysInMonth) {
                         dateNumDiv.textContent = nextMonthDayCounter;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
-                        dayCell.style.cursor = 'not-allowed'; // Disable clicking on next month's days
+                        dayCell.style.cursor = 'not-allowed';
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
                     } else {
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
-                        isCurrentMonthDay = true;
+                        
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
                             dayCell.classList.add('border-blue-500', 'border-2');
                         }
                         if (isPastTime(cellDate)) {
                             dayCell.classList.add('day-cell-month-past');
-                            dayCell.style.cursor = 'not-allowed'; // Disable clicking on past days
+                            dayCell.style.cursor = 'not-allowed';
                         } else {
                             dayCell.classList.add('hover:bg-gray-700', 'transition-colors', 'duration-200', 'cursor-pointer');
-                            
-                            // NEW: Add a click listener for valid days
                             dayCell.addEventListener('click', () => {
-                                // Prevent clicking on past days
                                 if (!dayCell.classList.contains('day-cell-month-past')) {
                                     currentDate = cellDate;
                                     currentView = 'day';
-                                    calendarViewSelect.value = 'day'; // Update the dropdown
+                                    calendarViewSelect.value = 'day';
                                     fetchAndRenderCalendar();
                                 }
                             });
@@ -608,12 +628,13 @@
                 calendarGrid.appendChild(weekRow);
             }
         }
-
+    
         function renderWeekView(fetchStartDate, fetchEndDate) {
+            calendarGrid.innerHTML = '';
             const startOfWeek = new Date(currentDate);
             startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
             startOfWeek.setHours(0,0,0,0);
-
+    
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-8 gap-1';
             headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
@@ -631,7 +652,7 @@
                 `;
             }
             calendarGrid.appendChild(headerRow);
-
+    
             for (let hour = 8; hour < 20; hour++) {
                 const timeRow = document.createElement('div');
                 timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
@@ -639,7 +660,7 @@
                 timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeRow.appendChild(timeLabel);
-
+    
                 for (let i = 0; i < 7; i++) {
                     const day = new Date(startOfWeek);
                     day.setDate(startOfWeek.getDate() + i);
@@ -673,12 +694,13 @@
                 calendarGrid.appendChild(timeRow);
             }
         }
-
+    
         function renderDayView(fetchStartDate, fetchEndDate) {
+            calendarGrid.innerHTML = '';
             const day = currentDate;
             const timeSlotsContainer = document.createElement('div');
             timeSlotsContainer.className = 'space-y-1';
-
+    
             for (let hour = 8; hour < 20; hour++) {
                 const timeSlot = document.createElement('div');
                 timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
@@ -697,7 +719,7 @@
                            event.start.getDate() === cellDateTime.getDate() &&
                            event.start.getHours() === cellDateTime.getHours();
                 });
-
+    
                 if (isSlotOccupied) {
                     contentArea.classList.add('occupied-slot');
                 } else if (isSlotInPast) {
@@ -716,7 +738,7 @@
             }
             calendarGrid.appendChild(timeSlotsContainer);
         }
-
+    
         // Calendar event listeners (for navigation and view change)
         calendarPrev.addEventListener('click', () => {
             if (currentView === 'month') { currentDate.setMonth(currentDate.getMonth() - 1); }
@@ -738,7 +760,7 @@
             currentView = e.target.value;
             fetchAndRenderCalendar();
         });
-
+    
         // AUTHENTICATION AND INITIALIZATION
         onAuthStateChanged(auth, async (user) => {
             if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
@@ -752,14 +774,14 @@
                 }
                 return;
             }
-
+    
             if (!user) {
                 if (authInitialized) {
                     window.location.href = "login.html";
                 }
                 return;
             }
-
+    
             if (!authInitialized) {
                 authInitialized = true;
                 currentUserUid = user.uid;
@@ -767,13 +789,13 @@
                 initializeCalendarPage();
             }
         });
-
+    
         async function initializeCalendarPage() {
             showLoading("Finding your account...");
             try {
                 const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
                 const userMappingSnap = await getDoc(userMappingDocRef);
-
+    
                 if (!userMappingSnap.exists()) {
                     const errorMessage = `No account mapping found.`;
                     calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
@@ -782,15 +804,14 @@
                 }
                 currentAccountId = userMappingSnap.data().accountId;
                 console.log("Mapped Account ID:", currentAccountId);
-
+    
                 if (!currentAccountId) {
                     const errorMessage = `Account ID not found.`;
                     calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
                     hideLoading();
                     return;
                 }
-
-                // --- NEW CODE STARTS HERE ---
+    
                 let calendarToken = userMappingSnap.data()?.calendarToken;
                 if (!calendarToken) {
                     calendarToken = self.crypto.randomUUID();
@@ -803,17 +824,13 @@
                 const calendarLink = `https://${firebaseRegion}-${projectId}.cloudfunctions.net/icalendarFeed?token=${calendarToken}`;
                 
                 console.log("Your calendar subscription URL is:", calendarLink);
-
+    
                 const subscriptionUrlText = document.getElementById('subscription-url-text');
                 subscriptionUrlText.textContent = calendarLink;
-                // --- NEW CODE ENDS HERE ---
-
-                // Initial fetch and render
+    
                 await fetchAndRenderCalendar();
-
-                // Listen for changes to automatically update the calendar
                 startRealtimeListeners();
-
+    
             } catch (error) {
                 console.error('Error during initial setup:', error);
                 calendarGrid.innerHTML = `<p class="text-red-400 text-center w-full">Failed to load calendar: ${error.message}.</p>`;
@@ -824,22 +841,19 @@
         function startRealtimeListeners() {
             if (!currentAccountId) return;
             
-            // Clean up old listeners if they exist
             if (scheduledMeetingsListener) scheduledMeetingsListener();
             if (pendingBookingsListener) pendingBookingsListener();
-
+    
             const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
             const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
-
-            // Listen to scheduled_meetings
+    
             scheduledMeetingsListener = onSnapshot(scheduledMeetingsRef, (snapshot) => {
                 console.log("Scheduled meetings data changed. Re-rendering calendar...");
                 fetchAndRenderCalendar();
             }, (error) => {
                 console.error("Error listening to scheduled meetings:", error);
             });
-
-            // Listen to pending bookings
+    
             pendingBookingsListener = onSnapshot(query(bookingsRef, where('Status', '==', 'Pending')), (snapshot) => {
                 console.log("Pending bookings data changed. Re-rendering calendar...");
                 fetchAndRenderCalendar();
@@ -847,7 +861,7 @@
                 console.error("Error listening to pending bookings:", error);
             });
         }
-
+    
         // Logout button
         document.getElementById("logout-btn").addEventListener("click", async () => {
             try {
@@ -857,28 +871,23 @@
                 showMessage("Logout failed: " + err.message, 'error');
             }
         });
-
-        // --- NEW CODE STARTS HERE ---
+    
         document.addEventListener('DOMContentLoaded', () => {
             const copyUrlBtn = document.getElementById('copy-url-btn');
             const subscriptionUrlText = document.getElementById('subscription-url-text');
             const buttonWrapper = copyUrlBtn.parentElement;
-
+    
             if (copyUrlBtn && buttonWrapper) {
                 copyUrlBtn.addEventListener('click', async (event) => {
                     event.stopPropagation();
                     try {
                         await navigator.clipboard.writeText(subscriptionUrlText.textContent);
-
-                        // Trigger dissolve animation on the button itself
+    
                         copyUrlBtn.classList.add('animate-dissolve');
-                        
-                        // Temporarily disable the border animation while dissolving
                         buttonWrapper.classList.add('pointer-events-none');
                         
                         showMessage("Subscription URL copied!", 'success');
-
-                        // Reset after animation
+    
                         setTimeout(() => {
                             copyUrlBtn.classList.remove('animate-dissolve');
                             buttonWrapper.classList.remove('pointer-events-none');
@@ -890,7 +899,6 @@
                 });
             }
         });
-        // --- NEW CODE ENDS HERE ---
     </script>
 </body>
 </html>
