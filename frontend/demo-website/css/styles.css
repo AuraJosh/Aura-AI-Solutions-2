@@ -1266,3 +1266,27 @@ p {
         max-width: 300px;
     }
 }
+
+.logo-link {
+    display: flex;
+    align-items: center; /* This vertically aligns the logo and text */
+    gap: 10px; /* Adds space between the logo and the text */
+    text-decoration: none; /* Removes the underline from the link */
+}
+
+.logo-img {
+    height: 40px; /* Adjust the height of the logo as needed */
+    width: auto;
+}
+
+.nav-logo h2 {
+    margin: 0; /* Removes default margin from the heading */
+    font-size: 1.5rem; /* Adjust font size as needed */
+    color: #333; /* Change to your desired color */
+}
+
+@media (max-width: 768px) {
+    .logo-img {
+        height: 30px; /* Smaller logo on mobile devices */
+    }
+}
