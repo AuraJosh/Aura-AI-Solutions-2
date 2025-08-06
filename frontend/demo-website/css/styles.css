@@ -88,9 +88,9 @@ p {
     text-decoration: none;
     color: inherit;
     transition: var(--transition);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    display: flex; /* Added for logo + text alignment */
+    align-items: center; /* Added for logo + text alignment */
+    gap: 10px; /* Added for logo + text spacing */
 }
 
 .logo-link:hover {
@@ -180,13 +180,13 @@ p {
 
 .btn-secondary {
     background: transparent;
-    color: var(--dark-gray); /* Corrected for light background */
-    border: 2px solid var(--dark-gray); /* Corrected for light background */
+    color: var(--dark-gray); /* Adjusted for light background */
+    border: 2px solid var(--dark-gray); /* Adjusted for light background */
 }
 
 .btn-secondary:hover {
     background: var(--dark-gray);
-    color: var(--white); /* Corrected for light background */
+    color: var(--white); /* Adjusted for light background */
     transform: translateY(-2px);
 }
 
@@ -202,7 +202,7 @@ p {
     transform: translateY(-2px);
 }
 
-/* Hero Section */
+/* Hero Section (Consolidated for Video Background) */
 .hero {
     position: relative;
     min-height: 100vh;
@@ -210,7 +210,7 @@ p {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    color: var(--dark-gray); /* Changed to dark gray for light background */
+    color: var(--dark-gray); /* Set the default text color to dark gray */
 }
 
 .hero video {
@@ -221,9 +221,14 @@ p {
     height: 100%;
     object-fit: cover;
     z-index: 0; /* Background layer */
-    /* Add a slowed down video speed effect with transform */
-    transform: scale(0.5); /* This is an attempt at a slow motion effect, but may not be reliable */
-    animation: slow-motion 10s linear infinite; /* You can use this to control speed, though playbackRate is better */
+    filter: invert(100%);
+    animation: slow-motion 10s linear infinite; /* You might need to add a custom animation for this */
+}
+
+/* CSS animation to slow down the video. This is more reliable than transform */
+@keyframes slow-motion {
+  0% { transform: scale(0.5); }
+  100% { transform: scale(0.5); } /* This is not the right way to slow down a video in CSS. The playbackRate in JS is the best way. For now, this is a placeholder. */
 }
 
 .hero img { /* Fallback image */
@@ -236,8 +241,14 @@ p {
     z-index: 0;
 }
 
-.hero .bg-black\/60 { /* This is the overlay, which should be removed for a light background */
-    display: none;
+.hero .bg-black\/60 { /* Dark overlay */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    z-index: 10;
 }
 
 .hero-container { /* Content container */
@@ -268,8 +279,11 @@ p {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: center; /* Centered buttons for the new layout */
 }
+
+/* The hero-visual and hero-img styles from before are no longer needed for this layout. */
+
 
 /* Stats Section */
 .stats {
@@ -657,6 +671,7 @@ p {
 .map-container { margin-top: 1rem; border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); height: 150px; width: 100%; }
 .map-container iframe { display: block; width: 100%; height: 100%; border: none; border-radius: var(--border-radius); }
 .footer-bottom { text-align: center; padding-top: 2rem; border-top: 1px solid var(--medium-gray); }
+
 
 /* Animation Classes */
 .fade-in { opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s ease forwards; }
