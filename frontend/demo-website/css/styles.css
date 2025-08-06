@@ -1298,27 +1298,69 @@ p {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
 }
 
-.video-background {
-    position: fixed; /* Positions the video relative to the viewport */
-    right: 0;
-    bottom: 0;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: -100; /* Puts the video behind all other content */
-    object-fit: cover; /* Ensures the video covers the entire container without distortion */
+/* Hero Section Container */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    color: white; /* Ensures text is readable on the dark background */
 }
 
-/* Optional: Adding an overlay for better readability of text */
-body::after {
-    content: '';
-    position: fixed;
+/* Video Background Styling */
+.hero video {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-    z-index: -99; /* Place it between the video and the content */
+    object-fit: cover;
+    z-index: 0; /* Ensures the video is at the very bottom layer */
+}
+
+/* Fallback Image for Mobile */
+.hero img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0; /* Same low z-index as the video */
+}
+
+/* Semi-Transparent Overlay */
+.hero .bg-black\/60 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 10; /* Sits on top of the video but under the text */
+}
+
+/* Main Content Container */
+.hero-container {
+    position: relative;
+    z-index: 20; /* The highest z-index, ensuring your content is on top */
+    text-align: center;
+    padding-top: 6rem;
+    padding-bottom: 3rem;
+}
+
+/* Responsive visibility for video and image */
+@media (max-width: 640px) {
+    .hero video {
+        display: none;
+    }
+}
+
+@media (min-width: 641px) {
+    .hero img {
+        display: none;
+    }
 }
 
