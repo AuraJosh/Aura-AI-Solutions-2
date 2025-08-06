@@ -183,6 +183,22 @@
         .day-cell-month-selected {
             border: 2px solid #3B82F6;
         }
+        @keyframes dissolve-out {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+            filter: blur(0px);
+          }
+          100% {
+            transform: scale(0.5);
+            opacity: 0;
+            filter: blur(8px);
+          }
+        }
+        .animate-dissolve {
+          animation: dissolve-out 0.5s forwards;
+          pointer-events: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
@@ -225,7 +241,18 @@
                             </button>
                             <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
                         </div>
-                        <div class="flex space-x-2 items-center">
+                        <div class="flex space-x-2 items-center relative group">
+                            <span id="subscription-url-text" class="sr-only"></span>
+                        
+                            <button id="copy-url-btn" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300
+                                       bg-transparent text-gray-400 hover:text-white
+                                       border border-gray-600 hover:border-white rounded-full
+                                       p-2 focus:outline-none focus:ring-2 focus:ring-white">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h5a2 2 0 012 2v10a2 2 0 01-2 2h-2M16 11v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2" />
+                                </svg>
+                            </button>
+                            
                             <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
                             <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
                                 <option value="day">Day</option>
@@ -744,6 +771,9 @@
                 const calendarLink = `https://${firebaseRegion}-${projectId}.cloudfunctions.net/icalendarFeed?token=${calendarToken}`;
                 
                 console.log("Your calendar subscription URL is:", calendarLink);
+
+                const subscriptionUrlText = document.getElementById('subscription-url-text');
+                subscriptionUrlText.textContent = calendarLink;
                 // --- NEW CODE ENDS HERE ---
 
                 // Initial fetch and render
@@ -795,6 +825,34 @@
                 showMessage("Logout failed: " + err.message, 'error');
             }
         });
+
+        // --- NEW CODE STARTS HERE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyUrlBtn = document.getElementById('copy-url-btn');
+            const subscriptionUrlText = document.getElementById('subscription-url-text');
+
+            if (copyUrlBtn) {
+                copyUrlBtn.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    try {
+                        await navigator.clipboard.writeText(subscriptionUrlText.textContent);
+
+                        copyUrlBtn.classList.remove('transition-opacity', 'duration-300', 'group-hover:opacity-100');
+                        copyUrlBtn.classList.add('animate-dissolve');
+                        showMessage("Subscription URL copied!", 'success');
+
+                        setTimeout(() => {
+                            copyUrlBtn.classList.remove('animate-dissolve');
+                            copyUrlBtn.classList.add('transition-opacity', 'duration-300', 'group-hover:opacity-100');
+                        }, 500);
+                    } catch (err) {
+                        console.error('Failed to copy subscription URL:', err);
+                        showMessage("Failed to copy URL.", 'error');
+                    }
+                });
+            }
+        });
+        // --- NEW CODE ENDS HERE ---
     </script>
 </body>
 </html>
