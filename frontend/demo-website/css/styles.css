@@ -221,8 +221,11 @@ p {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    /* This line controls the playback speed, which is a JS property */
-    /* CSS alone cannot change the video's playback rate. */
+    filter: invert(100%); /* Add this line back */
+    animation-name: slow-motion-video;
+    animation-duration: 20s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 
 .hero img { /* Fallback image */
