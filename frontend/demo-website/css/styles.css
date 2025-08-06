@@ -465,12 +465,16 @@ p {
     gap: 2rem;
 }
 
+/* Change this section */
 .tutor-card {
     background: var(--white);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
     overflow: hidden;
     transition: var(--transition);
+    height: 100%; /* Important for the child elements */
+    display: flex; /* Makes the card a flex container */
+    flex-direction: column; /* Stacks the image and info sections */
 }
 
 .tutor-card:hover {
@@ -557,7 +561,19 @@ p {
 .social-link.linkedin:hover { background: #e8f4fd; }
 
 
-.tutor-info { padding: 2rem; }
+/* Change this section */
+.tutor-info {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Makes sure the container fills the card's height */
+}
+
+/* Add this new section */
+.tutor-info .tutor-description {
+    flex-grow: 1; /* This pushes the button to the bottom by taking up all available space */
+}
+
 .tutor-name { color: var(--primary-color); margin-bottom: 0.5rem; }
 .tutor-title { color: var(--secondary-color); font-weight: 600; margin-bottom: 1rem; }
 .tutor-rating { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
