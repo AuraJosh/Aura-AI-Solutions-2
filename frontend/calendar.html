@@ -183,6 +183,7 @@
         .day-cell-month-selected {
             border: 2px solid #3B82F6;
         }
+        /* New custom CSS for the animated button */
         @keyframes dissolve-out {
           0% {
             transform: scale(1);
@@ -198,6 +199,31 @@
         .animate-dissolve {
           animation: dissolve-out 0.5s forwards;
           pointer-events: none;
+        }
+        @keyframes border-spin {
+            100% {
+                transform: rotate(-360deg);
+            }
+        }
+        .animated-border-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding: 1px;
+            border-radius: 9999px; /* rounded-full */
+        }
+        .animated-border-wrapper::before {
+            content: "";
+            position: absolute;
+            left: -25%;
+            top: -25%;
+            height: 150%;
+            width: 150%;
+            background: conic-gradient(
+                rgba(238, 92, 33, 0) 0deg,
+                rgba(238, 92, 33, 1) 0deg,
+                transparent 40deg
+            );
+            animation: border-spin 7s linear infinite;
         }
     </style>
 </head>
@@ -241,17 +267,18 @@
                             </button>
                             <h2 id="calendar-title" class="text-xl font-semibold px-2">Month View</h2>
                         </div>
-                        <div class="flex space-x-2 items-center relative group">
-                            <span id="subscription-url-text" class="sr-only"></span>
-                        
-                            <button id="copy-url-btn" class="opacity-0 group-hover:opacity-100 transition-opacity duration-300
-                                       bg-transparent text-gray-400 hover:text-white
-                                       border border-gray-600 hover:border-white rounded-full
-                                       p-2 focus:outline-none focus:ring-2 focus:ring-white">
-                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h5a2 2 0 012 2v10a2 2 0 01-2 2h-2M16 11v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2" />
-                                </svg>
-                            </button>
+                        <div class="flex space-x-2 items-center">
+                            <div class="animated-border-wrapper group">
+                                <button id="copy-url-btn" class="relative z-10
+                                           bg-gray-800/50 hover:bg-gray-700 text-gray-400 hover:text-white
+                                           transition-colors duration-300
+                                           rounded-full p-2 focus:outline-none focus:ring-2 focus:ring-white">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h5a2 2 0 012 2v10a2 2 0 01-2 2h-2M16 11v2a2 2 0 01-2 2H8a2 2 0 01-2-2v-2" />
+                                    </svg>
+                                </button>
+                                <span id="subscription-url-text" class="sr-only"></span>
+                            </div>
                             
                             <button id="calendar-today" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg">Today</button>
                             <select id="calendar-view" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white">
@@ -830,20 +857,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             const copyUrlBtn = document.getElementById('copy-url-btn');
             const subscriptionUrlText = document.getElementById('subscription-url-text');
+            const buttonWrapper = copyUrlBtn.parentElement;
 
-            if (copyUrlBtn) {
+            if (copyUrlBtn && buttonWrapper) {
                 copyUrlBtn.addEventListener('click', async (event) => {
                     event.stopPropagation();
                     try {
                         await navigator.clipboard.writeText(subscriptionUrlText.textContent);
 
-                        copyUrlBtn.classList.remove('transition-opacity', 'duration-300', 'group-hover:opacity-100');
+                        // Trigger dissolve animation on the button itself
                         copyUrlBtn.classList.add('animate-dissolve');
+                        
+                        // Temporarily disable the border animation while dissolving
+                        buttonWrapper.classList.add('pointer-events-none');
+                        
                         showMessage("Subscription URL copied!", 'success');
 
+                        // Reset after animation
                         setTimeout(() => {
                             copyUrlBtn.classList.remove('animate-dissolve');
-                            copyUrlBtn.classList.add('transition-opacity', 'duration-300', 'group-hover:opacity-100');
+                            buttonWrapper.classList.remove('pointer-events-none');
                         }, 500);
                     } catch (err) {
                         console.error('Failed to copy subscription URL:', err);
