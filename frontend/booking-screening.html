@@ -1148,30 +1148,26 @@
                     // --- CORRECTED LOGIC for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
-                        
-                        // Explicitly create the new object with the desired fields and mappings
-                        const meetingData = {
-                            Status: 'Completed',
-                            ScheduledAt: Timestamp.now(),
-                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
-                            BookedBy: currentUserUid,
-                            id: change.id, // Including the document ID in the data itself
-                            
-                            // Map the original booking fields to the new names
-                            Name: change.fullBookingData.Customer_Name || change.fullBookingData.Contact_Name,
-                            Email: change.fullBookingData.Email,
-                            URL: change.fullBookingData.URL || change.fullBookingData.Website, // Assuming URL is an original field
-                            "Company Name": change.fullBookingData.Company_Name, // Handle field name with a space
-                            
-                            // Map the original timestamp to the new name
-                            BookingRequestTimestamp: change.fullBookingData.Timestamp,
-            
-                            // Include other fields if they exist to prevent data loss
-                            Subject: change.fullBookingData.Subject,
-                            Message: change.fullBookingData.Message,
-                            Phone_Number: change.fullBookingData.Phone_Number,
-                            Service: change.fullBookingData.Service,
-                        };
+                                            
+                            // Explicitly create the new object with the desired fields and mappings
+                            const meetingData = {
+                                Status: 'Completed',
+                                ScheduledAt: Timestamp.now(),
+                                ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
+                                BookedBy: currentUserUid,
+                                id: change.id,
+                                // Keep the original field name consistent
+                                Customer_Name: change.fullBookingData.Customer_Name || change.fullBookingData.Contact_Name,
+                                Email: change.fullBookingData.Email,
+                                URL: change.fullBookingData.URL || change.fullBookingData.Website,
+                                "Company Name": change.fullBookingData.Company_Name,
+                                BookingRequestTimestamp: change.fullBookingData.Timestamp,
+                                // Include other fields if they exist to prevent data loss
+                                Subject: change.fullBookingData.Subject,
+                                Message: change.fullBookingData.Message,
+                                Phone_Number: change.fullBookingData.Phone_Number,
+                                Service: change.fullBookingData.Service,
+                            };
                         
                         // Remove any fields that are undefined or null to keep the document clean
                         for (const key in meetingData) {
