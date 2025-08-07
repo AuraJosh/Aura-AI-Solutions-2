@@ -363,7 +363,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, writeBatch, deleteField, Timestamp, getDocs } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js";
-
+    
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8", // Replace with your actual API Key from Firebase Console
@@ -373,11 +373,11 @@
             messagingSenderId: "492492484793",
             appId: "1:492492484793:web:7f9038d50f523241536b68"
         };
-
+    
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
+    
         let bookingsData = []; // 'New' bookings
         let pendingBookings = [];
         let deletedBookings = [];
@@ -386,7 +386,7 @@
         let currentUserUid = null;
         let currentAccountId = null;
         let authInitialized = false; // Flag to track if auth state is resolved
-
+    
         const bookingCardElement = document.getElementById('booking-card');
         const prevButton = document.getElementById('prev-booking-btn');
         const nextButton = document.getElementById('next-booking-btn');
@@ -394,14 +394,14 @@
         const moveToPendingBtn = document.getElementById('move-to-pending-btn');
         const deleteBookingBtn = document.getElementById('delete-booking-btn');
         const saveChangesBtn = document.getElementById('save-changes-btn');
-
+    
         const pendingBookingsListElement = document.getElementById('pending-bookings-list');
         const deletedBookingsListElement = document.getElementById('deleted-bookings-list');
-
+    
         const loadingOverlay = document.getElementById('loading-overlay');
         const loadingSpinner = document.getElementById('loading-spinner');
         const loadingMessage = document.getElementById('loading-message');
-
+    
         // Custom Calendar Elements
         const calendarOverlay = document.getElementById('calendar-overlay');
         const calendarGrid = document.getElementById('calendar-grid');
@@ -409,30 +409,28 @@
         const calendarPrev = document.getElementById('calendar-prev');
         const calendarNext = document.getElementById('calendar-next');
         const calendarToday = document.getElementById('calendar-today');
-        const calendarViewSelect = document.getElementById('calendar-view'); // Renamed to avoid conflict
+        const calendarViewSelect = document.getElementById('calendar-view');
         const calendarClose = document.getElementById('calendar-close');
         const confirmScheduleBtn = document.getElementById('confirm-schedule-btn');
-        const clientAvailableTimesElement = document.getElementById('client-available-times'); // NEW: Client availability element
-
-
+        const clientAvailableTimesElement = document.getElementById('client-available-times');
+    
         let currentDate = new Date();
-        let currentView = 'month'; // Default view
-        let selectedEventDate = null; // To store the date/time chosen by the user
-        let currentBookingBeingScheduled = null; // To store the booking object when the modal is opened
-        let fetchedCalendarEvents = []; // Cache for events fetched from Firebase
-
-
+        let currentView = 'month';
+        let selectedEventDate = null;
+        let currentBookingBeingScheduled = null;
+        let fetchedCalendarEvents = [];
+    
         function showLoading(message) {
             loadingMessage.textContent = message;
             loadingOverlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
-
+    
         function hideLoading() {
             loadingOverlay.classList.add('hidden');
             document.body.style.overflow = '';
         }
-
+    
         function updateSaveButtonState() {
             saveChangesBtn.disabled = stagedChanges.length === 0;
             if (stagedChanges.length > 0) {
@@ -440,9 +438,8 @@
             } else {
                 saveChangesBtn.textContent = 'Save Changes to Database';
             }
-            console.log("updateSaveButtonState called. stagedChanges length:", stagedChanges.length);
         }
-
+    
         function showMessage(message, type = 'info') {
             const messageBox = document.createElement('div');
             messageBox.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-[101]`;
@@ -459,7 +456,7 @@
                 messageBox.remove();
             }, 3000);
         }
-
+    
         function showConfirm(message, onConfirm, onCancel) {
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-[102]';
@@ -473,7 +470,7 @@
                 </div>
             `;
             document.body.appendChild(modal);
-
+    
             document.getElementById('confirm-yes').onclick = () => {
                 modal.remove();
                 onConfirm();
@@ -483,17 +480,14 @@
                 onCancel();
             };
         }
-
-        // NEW: Helper function to check if a date/time is in the past
+    
         function isPastTime(date) {
             const now = new Date();
-            // Compare the date/time objects directly
             return date < now;
         }
-
+    
         // --- CUSTOM CALENDAR LOGIC ---
-
-        // Function to fetch calendar events from Firebase
+    
         async function fetchCalendarEvents(startDate, endDate) {
             if (!currentAccountId) {
                 console.warn("Account ID not available for fetching calendar events.");
@@ -502,11 +496,10 @@
             try {
                 const events = [];
                 const bookingsRef = collection(db, 'accounts', currentAccountId, 'bookings');
-                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings'); // New collection for scheduled meetings
-
-                // Query for 'Completed' meetings from scheduled_meetings collection (Primary source for completed)
+                const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings');
+    
                 const qScheduledMeetings = query(scheduledMeetingsRef,
-                    where('Status', '==', 'Completed'), // Assuming scheduled_meetings also have a 'Status' field
+                    where('Status', '==', 'Completed'),
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
@@ -517,17 +510,16 @@
                         events.push({
                             title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed', // Use same completed style
-                            originalData: data // Pass the full data object for detailed tooltip
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
+                            type: 'completed',
+                            originalData: data
                         });
                     }
                 });
-
-                // Query for 'Pending' bookings from bookings collection (only pending status, as completed are now in scheduled_meetings)
+    
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'),
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)), // Include if Pending bookings can have a scheduled time in calendar
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
                 const querySnapshotPending = await getDocs(qPending);
@@ -537,9 +529,9 @@
                         events.push({
                             title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
                             start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
+                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000),
                             type: 'pending',
-                            originalData: data // Pass the full data object for detailed tooltip
+                            originalData: data
                         });
                     }
                 });
@@ -551,89 +543,79 @@
                 return [];
             }
         }
-
-
-        // MODIFIED: This function now correctly sets the client's available times in the header
+    
         function openBookingCalendarModal(bookingData) {
             currentBookingBeingScheduled = bookingData;
-            selectedEventDate = null; // Reset selection
-            confirmScheduleBtn.disabled = true; // Disable until a time is selected
+            selectedEventDate = null;
+            confirmScheduleBtn.disabled = true;
             calendarOverlay.classList.remove('hidden');
-            document.body.style.overflow = 'hidden'; // Prevent scrolling background
-            
-            // CORRECTED: Use 'Preferred_Time' field, and fall back to a default message
+            document.body.style.overflow = 'hidden';
+    
             const availableTimes = bookingData.Preferred_Time || 'Not specified';
             clientAvailableTimesElement.textContent = `Client's available times: ${availableTimes}`;
-
-            renderCalendar(); // Render the calendar when opening
+            renderCalendar();
         }
-        
-        // This function will fetch events and render the calendar view
+    
         async function renderCalendar() {
-            calendarGrid.innerHTML = ''; // Clear previous content
-            confirmScheduleBtn.disabled = true; // Disable confirm button on re-render
-
+            calendarGrid.innerHTML = '';
+            confirmScheduleBtn.disabled = true;
+    
             let fetchStartDate, fetchEndDate;
-
+    
             if (currentView === 'month') {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
                 fetchStartDate = new Date(year, month, 1);
-                fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59); // End of month
+                fetchEndDate = new Date(year, month + 1, 0, 23, 59, 59);
                 calendarTitle.textContent = `${new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate)} ${year}`;
-                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole month
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
                 renderMonthView(fetchStartDate, fetchEndDate);
             } else if (currentView === 'week') {
                 const startOfWeek = new Date(currentDate);
-                startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Sunday
+                startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
                 startOfWeek.setHours(0, 0, 0, 0);
                 
                 const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 6); // Saturday
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
                 endOfWeek.setHours(23, 59, 59, 999);
-
+    
                 fetchStartDate = startOfWeek;
                 fetchEndDate = endOfWeek;
-
+    
                 calendarTitle.textContent = `
                     ${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - 
                     ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 `;
-                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole week
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
                 renderWeekView(fetchStartDate, fetchEndDate);
-            } else { // Day View
+            } else {
                 const startOfDay = new Date(currentDate);
                 startOfDay.setHours(0, 0, 0, 0);
                 const endOfDay = new Date(currentDate);
                 endOfDay.setHours(23, 59, 59, 999);
-
+    
                 fetchStartDate = startOfDay;
                 fetchEndDate = endOfDay;
-
+    
                 calendarTitle.textContent = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate); // Fetch events for the whole day
+                fetchedCalendarEvents = await fetchCalendarEvents(fetchStartDate, fetchEndDate);
                 renderDayView(fetchStartDate, fetchEndDate);
             }
         }
-
-        // MODIFIED: addEventToCell now differentiates rendering based on view type
+    
         function addEventToCell(cellElement, event, viewType) {
             if (viewType === 'month') {
                 const eventDiv = document.createElement('div');
                 eventDiv.className = `month-day-event-item ${event.type === 'pending' ? 'pending' : ''}`;
                 eventDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
-        
-                // Build the tooltip content for month view
+                
                 let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
-                // Add core fields if they exist
                 if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
                 if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
                 if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
-        
-                // Add all fields from the 'Extra' map
+                
                 if (event.originalData.Extra) {
                     for (const key in event.originalData.Extra) {
-                        // Exclude internal fields or fields not meant for display
                         if (key !== 'Timestamp' && key !== 'Status') {
                             const label = formatFieldNameAsLabel(key);
                             const value = event.originalData.Extra[key];
@@ -643,19 +625,16 @@
                 }
                 eventDiv.title = tooltipContent.trim();
                 cellElement.appendChild(eventDiv);
-            } else { // 'week' or 'day' view
+            } else {
                 const eventTextDiv = document.createElement('div');
                 eventTextDiv.className = `calendar-event ${event.type === 'pending' ? 'pending' : ''}`;
                 eventTextDiv.textContent = event.originalData.Customer_Name || event.originalData.Email || 'Scheduled Booking';
                 
-                // Build the tooltip content for day/week view
                 let tooltipContent = `Scheduled Time: ${event.start.toLocaleString()}\n`;
-                // Add core fields
                 if (event.originalData.Customer_Name) tooltipContent += `Name: ${event.originalData.Customer_Name}\n`;
                 if (event.originalData.Email) tooltipContent += `Email: ${event.originalData.Email}\n`;
                 if (event.originalData.Phone_Number) tooltipContent += `Phone: ${event.originalData.Phone_Number}\n`;
                 
-                // Add all fields from the 'Extra' map
                 if (event.originalData.Extra) {
                     for (const key in event.originalData.Extra) {
                         if (key !== 'Timestamp' && key !== 'Status') {
@@ -669,16 +648,15 @@
                 cellElement.appendChild(eventTextDiv);
             }
         }
-
+    
         function renderMonthView(fetchStartDate, fetchEndDate) {
             const currentDayMs = new Date().setHours(0,0,0,0);
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
-            const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 for Sunday, 1 for Monday, etc.
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const daysInPrevMonth = new Date(year, month, 0).getDate();
-        
-            // Create header with day names
+            
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-7 gap-1 mb-1';
             ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
@@ -688,56 +666,51 @@
                 headerRow.appendChild(dayHeader);
             });
             calendarGrid.appendChild(headerRow);
-        
+            
             let dayCounter = 1;
             let nextMonthDayCounter = 1;
-        
-            for (let i = 0; i < 6; i++) { // Max 6 weeks in a month view
+            
+            for (let i = 0; i < 6; i++) {
                 const weekRow = document.createElement('div');
                 weekRow.className = 'grid grid-cols-7 gap-1';
-        
+                
                 for (let j = 0; j < 7; j++) {
                     const dayCell = document.createElement('div');
                     dayCell.className = 'h-24 border border-gray-700 rounded p-1 overflow-hidden flex flex-col relative group';
                     const dateNumDiv = document.createElement('div');
                     dateNumDiv.className = 'text-right font-medium mb-1';
                     
-                    let cellDate; // Date object for this specific cell
-        
+                    let cellDate;
+                    
                     if (i === 0 && j < firstDayOfMonth) {
-                        // Days from previous month
                         const prevMonthDay = daysInPrevMonth - (firstDayOfMonth - j - 1);
                         dateNumDiv.textContent = prevMonthDay;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month - 1, prevMonthDay);
                     } else if (dayCounter > daysInMonth) {
-                        // Days from next month
                         dateNumDiv.textContent = nextMonthDayCounter;
                         dayCell.classList.add('bg-gray-900/50', 'text-gray-600');
                         cellDate = new Date(year, month + 1, nextMonthDayCounter);
                         nextMonthDayCounter++;
                     } else {
-                        // Current month days
                         dateNumDiv.textContent = dayCounter;
                         cellDate = new Date(year, month, dayCounter);
-        
+                        
                         if (cellDate.setHours(0,0,0,0) === currentDayMs) {
-                            dayCell.classList.add('border-blue-500', 'border-2'); // Highlight today
+                            dayCell.classList.add('border-blue-500', 'border-2');
                         }
                         
-                        // NEW: Disable past days in month view
                         if (isPastTime(cellDate)) {
                             dayCell.classList.add('day-cell-month-past');
                         } else {
-                            // Add click listener for selection in month view (selecting a whole day)
-                            dayCell.dataset.date = cellDate.toISOString(); // Store full date for selection
+                            dayCell.dataset.date = cellDate.toISOString();
                             dayCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                             dayCell.addEventListener('click', () => {
                                 if (!dayCell.classList.contains('day-cell-month-past')) {
                                     currentDate = cellDate;
                                     currentView = 'day';
-                                    calendarViewSelect.value = 'day'; // Update the dropdown
-                                    renderCalendar(); // Rerender the calendar to show the day view
+                                    calendarViewSelect.value = 'day';
+                                    renderCalendar();
                                 }
                             });
                         }
@@ -748,15 +721,13 @@
                     dayCell.appendChild(dateNumDiv);
                     
                     const eventsContainer = document.createElement('div');
-                    // MODIFIED: Added month-day-events-container class for gap styling
                     eventsContainer.className = 'text-xs overflow-y-auto h-16 month-day-events-container';
                     
-                    // Add events for this cell's date
                     fetchedCalendarEvents.forEach(event => {
                         if (event.start.getDate() === cellDate.getDate() &&
                             event.start.getMonth() === cellDate.getMonth() &&
                             event.start.getFullYear() === cellDate.getFullYear()) {
-                            addEventToCell(eventsContainer, event, 'month'); // Pass 'month' view type
+                            addEventToCell(eventsContainer, event, 'month');
                         }
                     });
                     dayCell.appendChild(eventsContainer);
@@ -765,16 +736,15 @@
                 calendarGrid.appendChild(weekRow);
             }
         }
-
+    
         function renderWeekView(fetchStartDate, fetchEndDate) {
             const startOfWeek = new Date(currentDate);
-            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Start on Sunday
+            startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
             startOfWeek.setHours(0,0,0,0);
-
-            // Create header row with blank corner and days of week
+    
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-8 gap-1';
-            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`; // Corner for time column
+            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
             for (let i = 0; i < 7; i++) {
                 const day = new Date(startOfWeek);
                 day.setDate(startOfWeek.getDate() + i);
@@ -790,34 +760,27 @@
                 `;
             }
             calendarGrid.appendChild(headerRow);
-
-            // Time slots and event areas
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
+    
+            for (let hour = 8; hour < 20; hour++) {
                 const timeRow = document.createElement('div');
-                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16'; // Fixed height for time slot
+                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16';
                 
-                // Time label column
                 const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10'; // Sticky for scrolling
+                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeRow.appendChild(timeLabel);
-
-                // Day cells for each hour
+    
                 for (let i = 0; i < 7; i++) {
                     const day = new Date(startOfWeek);
                     day.setDate(startOfWeek.getDate() + i);
                     
                     const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative'; 
-
-                    // Calculate the full date and time for this specific cell/slot
+                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative';
+    
                     const cellDateTime = new Date(day);
                     cellDateTime.setHours(hour, 0, 0, 0);
                     
-                    // NEW: Check if the time slot is in the past
                     const isSlotInPast = isPastTime(cellDateTime);
-
-                    // Check if this time slot is already occupied by a fetched event
                     const isSlotOccupied = fetchedCalendarEvents.some(event => {
                         return event.start.getFullYear() === cellDateTime.getFullYear() &&
                                event.start.getMonth() === cellDateTime.getMonth() &&
@@ -825,43 +788,35 @@
                                event.start.getHours() === cellDateTime.getHours();
                     });
                     
-                    // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
                     if (isSlotOccupied) {
-                        timeCell.classList.add('occupied-slot'); // Mark as occupied
-                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                        timeCell.classList.add('occupied-slot');
+                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                     } else if (isSlotInPast) {
-                        timeCell.classList.add('past-slot'); // Mark as past and unavailable
-                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                        timeCell.classList.add('past-slot');
+                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                     } else {
-                        timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
-                        timeCell.dataset.date = day.toISOString(); // Full date for the day
-                        timeCell.dataset.hour = hour; // Hour for selection
-
-                        // Add click listener for time slot selection ONLY if not occupied or in the past
+                        timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
+                        timeCell.dataset.date = day.toISOString();
+                        timeCell.dataset.hour = hour;
+    
                         timeCell.addEventListener('click', (e) => {
-                            // Clear previous selection
                             document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                             document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                            // Set the selected date/time
                             const selectedDate = new Date(e.currentTarget.dataset.date);
-                            selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                            selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                             selectedEventDate = selectedDate;
                             confirmScheduleBtn.disabled = false;
-                            // --- MODIFIED LINE: Added .selected class ---
-                            e.currentTarget.classList.add('selected'); // Add the 'selected' class here
+                            e.currentTarget.classList.add('selected');
                             showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
-                            console.log("Selected week/day view date/time:", selectedEventDate);
                         });
                     }
-
-                    // Add events that fall within this hour slot
+    
                     fetchedCalendarEvents.forEach(event => {
                         if (event.start.getFullYear() === cellDateTime.getFullYear() &&
                             event.start.getMonth() === cellDateTime.getMonth() &&
                             event.start.getDate() === cellDateTime.getDate() &&
                             event.start.getHours() === cellDateTime.getHours()) {
-                            addEventToCell(timeCell, event, 'week'); // Pass 'week' view type
+                            addEventToCell(timeCell, event, 'week');
                         }
                     });
                     
@@ -870,130 +825,114 @@
                 calendarGrid.appendChild(timeRow);
             }
         }
-
+    
         function renderDayView(fetchStartDate, fetchEndDate) {
             const day = currentDate;
             const currentDayMs = day.setHours(0,0,0,0);
-
+    
             const timeSlotsContainer = document.createElement('div');
             timeSlotsContainer.className = 'space-y-1';
-
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
+    
+            for (let hour = 8; hour < 20; hour++) {
                 const timeSlot = document.createElement('div');
-                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16'; // Fixed height for time slot
+                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16';
                 
-                // Time label
                 const timeLabel = document.createElement('div');
                 timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeSlot.appendChild(timeLabel);
-
-                // Main content area for the hour
+    
                 const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative'; 
+                contentArea.className = 'time-slot flex-1 h-full relative';
                 
-                // Calculate the full date and time for this specific cell/slot
                 const cellDateTime = new Date(day);
                 cellDateTime.setHours(hour, 0, 0, 0);
-
-                // NEW: Check if the time slot is in the past
+    
                 const isSlotInPast = isPastTime(cellDateTime);
-
-                // Check if this time slot is already occupied by a fetched event
                 const isSlotOccupied = fetchedCalendarEvents.some(event => {
                     return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                               event.start.getMonth() === cellDateTime.getMonth() &&
-                               event.start.getDate() === cellDateTime.getDate() &&
-                               event.start.getHours() === cellDateTime.getHours();
+                           event.start.getMonth() === cellDateTime.getMonth() &&
+                           event.start.getDate() === cellDateTime.getDate() &&
+                           event.start.getHours() === cellDateTime.getHours();
                 });
-
-                // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
+    
                 if (isSlotOccupied) {
-                    contentArea.classList.add('occupied-slot'); // Mark as occupied
-                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    contentArea.classList.add('occupied-slot');
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                 } else if (isSlotInPast) {
-                    contentArea.classList.add('past-slot'); // Mark as past and unavailable
-                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    contentArea.classList.add('past-slot');
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                 } else {
-                    contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
+                    contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                     contentArea.dataset.date = day.toISOString();
                     contentArea.dataset.hour = hour;
-
-                    // Add click listener for time slot selection ONLY if not occupied or in the past
+    
                     contentArea.addEventListener('click', (e) => {
-                        // Clear previous selection
                         document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
                         document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                        // Set the selected date/time
                         const selectedDate = new Date(e.currentTarget.dataset.date);
-                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                         selectedEventDate = selectedDate;
                         confirmScheduleBtn.disabled = false;
-                        // --- MODIFIED LINE: Added .selected class ---
-                        e.currentTarget.classList.add('selected'); // Add the 'selected' class here
+                        e.currentTarget.classList.add('selected');
                         showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
-                        console.log("Selected day view date/time:", selectedEventDate);
                     });
                 }
                 
-                // Add events that fall within this hour slot
                 fetchedCalendarEvents.forEach(event => {
                     if (event.start.getFullYear() === cellDateTime.getFullYear() &&
                         event.start.getMonth() === cellDateTime.getMonth() &&
                         event.start.getDate() === cellDateTime.getDate() &&
                         event.start.getHours() === cellDateTime.getHours()) {
-                        addEventToCell(contentArea, event, 'day'); // Pass 'day' view type
+                        addEventToCell(contentArea, event, 'day');
                     }
                 });
-
+    
                 timeSlot.appendChild(contentArea);
                 timeSlotsContainer.appendChild(timeSlot);
             }
             calendarGrid.appendChild(timeSlotsContainer);
         }
-
+    
         // Calendar event listeners (for navigation and view change)
         calendarClose.addEventListener('click', () => {
             calendarOverlay.classList.add('hidden');
             document.body.style.overflow = '';
         });
-
+    
         calendarPrev.addEventListener('click', () => {
             if (currentView === 'month') {
                 currentDate.setMonth(currentDate.getMonth() - 1);
             } else if (currentView === 'week') {
                 currentDate.setDate(currentDate.getDate() - 7);
-            } else { // day
+            } else {
                 currentDate.setDate(currentDate.getDate() - 1);
             }
             renderCalendar();
         });
-
+    
         calendarNext.addEventListener('click', () => {
             if (currentView === 'month') {
                 currentDate.setMonth(currentDate.getMonth() + 1);
             } else if (currentView === 'week') {
                 currentDate.setDate(currentDate.getDate() + 7);
-            } else { // day
+            } else {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
             renderCalendar();
         });
-
+    
         calendarToday.addEventListener('click', () => {
             currentDate = new Date();
             renderCalendar();
         });
-
+    
         calendarViewSelect.addEventListener('change', (e) => {
             currentView = e.target.value;
             renderCalendar();
         });
-
+    
         // --- Core Booking App Logic ---
-
-        // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
             if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
                 try {
@@ -1006,7 +945,7 @@
                 }
                 return;
             }
-
+    
             if (!user) {
                 if (authInitialized) {
                     window.location.href = "login.html";
@@ -1015,7 +954,7 @@
                 }
                 return;
             }
-
+    
             if (!authInitialized) {
                 authInitialized = true;
                 currentUserUid = user.uid;
@@ -1023,14 +962,13 @@
                 initializeBookingData();
             }
         });
-
+    
         async function initializeBookingData() {
             showLoading("Finding your account...");
-
             try {
                 const userMappingDocRef = doc(db, 'user_mappings', currentUserUid);
                 const userMappingSnap = await getDoc(userMappingDocRef);
-
+    
                 if (!userMappingSnap.exists()) {
                     const errorMessage = `No account mapping found for your user ID: ${currentUserUid}. Please contact support.`;
                     bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
@@ -1039,10 +977,10 @@
                     hideLoading();
                     return;
                 }
-
+    
                 currentAccountId = userMappingSnap.data().accountId;
                 console.log("Mapped Account ID:", currentAccountId);
-
+    
                 if (!currentAccountId) {
                     const errorMessage = `Account ID not found in mapping for user ID: ${currentUserUid}. Please contact support.`;
                     bookingCardElement.innerHTML = `<p class="text-red-400 text-center w-full">${errorMessage}</p>`;
@@ -1051,29 +989,29 @@
                     hideLoading();
                     return;
                 }
-
+    
                 showLoading("Loading your booking data...");
-
+    
                 const bookingsCollectionRef = collection(db, 'accounts', currentAccountId, 'bookings');
                 onSnapshot(bookingsCollectionRef, (snapshot) => {
                     bookingsData = [];
                     pendingBookings = [];
                     deletedBookings = [];
-                                                            
+                                                    
                     snapshot.forEach(doc => {
                         const booking = { id: doc.id, ...doc.data() };
                         const status = booking.Status ? booking.Status.toString().trim() : '';
-
+    
                         if (status === 'New' || status === '') {
                             bookingsData.push(booking);
                         } else if (status === 'Pending') {
                             pendingBookings.push(booking);
                         } else if (status === 'Deleted') {
-                            booking._originalSource = booking._originalSource || 'UNKNOWN'; // Ensure original source is preserved
+                            booking._originalSource = booking._originalSource || 'UNKNOWN';
                             deletedBookings.push(booking);
                         }
                     });
-
+    
                     bookingsData.sort((a, b) => {
                         const dateA = a.Timestamp && a.Timestamp.toDate ? a.Timestamp.toDate() : (a.Timestamp instanceof Date ? a.Timestamp : new Date(0));
                         const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
@@ -1089,19 +1027,18 @@
                         const dateB = b.Timestamp && b.Timestamp.toDate ? b.Timestamp.toDate() : (b.Timestamp instanceof Date ? b.Timestamp : new Date(0));
                         return dateA - dateB;
                     });
-
+    
                     if (bookingsData.length > 0) {
                         currentBookingIndex = Math.min(currentBookingIndex, bookingsData.length - 1);
                     } else {
                         currentBookingIndex = 0;
                     }
-
+    
                     renderBookingCard();
                     renderPendingBookings();
                     renderDeletedBookings();
                     updateSaveButtonState();
                     hideLoading();
-                    console.log("Booking data updated from Firestore.");
                 }, (error) => {
                     console.error("Error listening to bookings:", error);
                     const errorMessage = `<p class="text-red-400 text-center w-full">Failed to load booking data: ${error.message}. Please check security rules or contact support.</p>`;
@@ -1110,7 +1047,7 @@
                     deletedBookingsListElement.innerHTML = errorMessage;
                     hideLoading();
                 });
-
+    
             } catch (error) {
                 console.error('Error during initial setup or data fetch:', error);
                 const fetchErrorMessage = `<p class="text-red-400 text-center w-full">Failed to initialize booking data: ${error.message}.</p>`;
@@ -1120,7 +1057,7 @@
                 hideLoading();
             }
         }
-
+    
         // Logout button
         document.getElementById("logout-btn").addEventListener("click", async () => {
             try {
@@ -1130,7 +1067,7 @@
                 showMessage("Logout failed: " + err.message, 'error');
             }
         });
-
+    
         async function sendBatchBookingUpdates(updates) {
             if (!currentAccountId) {
                 console.error("Account not identified, cannot send update.");
@@ -1150,8 +1087,14 @@
                 if (change.newStatus === 'Deleted') {
                     updateData._originalSource = change.originalSource || 'UNKNOWN';
                     updateData.ScheduledDateTime = deleteField();
+                } else if (change.newStatus === 'Pending') {
+                    updateData._originalSource = deleteField();
+                    if (change.scheduledTime) {
+                        updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
+                    } else {
+                        updateData.ScheduledDateTime = deleteField();
+                    }
                 } else if (change.newStatus === 'Completed') {
-                    // This part is for the bookings collection document
                     updateData._originalSource = deleteField();
                     if (change.scheduledTime) {
                         updateData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
@@ -1159,53 +1102,40 @@
                         updateData.ScheduledDateTime = deleteField();
                     }
                     
-                    // --- CORRECTED LOGIC for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
                     
-                        // 1. Define the core fields you want in the main document.
                         const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
                         const extraData = {};
                         const meetingData = {
-                            // Start with the standard, non-optional fields
                             id: change.id,
                             Status: 'Completed',
                             ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
                             BookedBy: currentUserUid,
-                            ScheduledAt: Timestamp.now(), // New field to track when it was booked
+                            ScheduledAt: Timestamp.now(),
                         };
                     
-                        // 2. Iterate over the original booking data.
                         for (const fieldName in change.fullBookingData) {
-                            // Skip internal/redundant fields from the original booking
                             if (['id', 'Status', '_originalSource'].includes(fieldName)) {
                                 continue;
                             }
-                    
+                        
                             const fieldValue = change.fullBookingData[fieldName];
-                    
-                            // 3. Categorize the fields.
+                        
                             if (coreFields.includes(fieldName)) {
-                                // Map core fields directly.
                                 meetingData[fieldName] = fieldValue;
                             } else {
-                                // All other fields go into the 'extra' map.
                                 extraData[fieldName] = fieldValue;
                             }
                         }
                     
-                        // 4. Add the 'extra' map to the main object if it has data.
                         if (Object.keys(extraData).length > 0) {
                             meetingData.Extra = extraData;
                         }
                         
-                        // 5. Commit the standardized meetingData object.
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
-                        console.log("Staging new scheduled meeting entry for ID:", change.id, meetingData);
                     }
-                    // --- END CORRECTED LOGIC ---
-                
-                } else { // 'New' or 'Pending'
+                } else {
                     updateData._originalSource = deleteField();
                     updateData.ScheduledDateTime = deleteField();
                 }
@@ -1220,19 +1150,15 @@
                 return { success: false, error: `Failed to save changes: ${error.message}` };
             }
         }
-        /**
-         * Converts a field name from `snake_case` or `camelCase` to `Title Case`.
-         * @param {string} fieldName 
-         * @returns {string} Formatted label.
-         */
+    
         function formatFieldNameAsLabel(fieldName) {
             return fieldName
-                .replace(/_/g, ' ') // Replace underscores with spaces
-                .replace(/([A-Z])/g, ' $1') // Add space before capital letters (for camelCase)
-                .trim() // Remove leading/trailing spaces
-                .replace(/\b\w/g, l => l.toUpperCase()); // Capitalize first letter of each word
+                .replace(/_/g, ' ')
+                .replace(/([A-Z])/g, ' $1')
+                .trim()
+                .replace(/\b\w/g, l => l.toUpperCase());
         }
-
+    
         function renderBookingCard() {
             if (bookingsData.length === 0) {
                 bookingCardElement.innerHTML = '<p class="text-gray-400 text-center w-full">No new booking requests found for this account.</p>';
@@ -1243,22 +1169,20 @@
                 cardCounterElement.textContent = '';
                 return;
             }
-
+    
             const currentBooking = bookingsData[currentBookingIndex];
             let cardContentArray = [];
-
-            // Define fields to explicitly exclude from the display
+    
             const excludedFields = [
-                'id', // Firebase document ID
-                'Status', // Status is managed internally, not for card display
-                '_originalSource', // Internal tracking field
-                'ScheduledDateTime' // Excluded as per request
+                'id',
+                'Status',
+                '_originalSource',
+                'ScheduledDateTime'
             ];
-
-            // Prioritize certain fields for display order if they exist
+    
             const preferredDisplayOrder = [
                 'Customer_Name',
-                'Contact_Name', // Explicitly include Contact_Name and prioritize it
+                'Contact_Name',
                 'Email',
                 'Phone_Number',
                 'Service',
@@ -1267,95 +1191,83 @@
                 'Preferred_Time',
                 'Timestamp'
             ];
-
-            // Get all keys from the current booking data
+    
             let allBookingKeys = Object.keys(currentBooking);
-
-            // Filter out excluded fields
             let displayKeys = allBookingKeys.filter(key => !excludedFields.includes(key));
-
-            // Sort keys: prioritize specified order, then alphabetical for the rest
+    
             displayKeys.sort((a, b) => {
                 const indexA = preferredDisplayOrder.indexOf(a);
                 const indexB = preferredDisplayOrder.indexOf(b);
-
+    
                 if (indexA === -1 && indexB === -1) {
-                    return a.localeCompare(b); // Alphabetical for non-prioritized
+                    return a.localeCompare(b);
                 }
-                if (indexA === -1) return 1; // b comes before a if a is not in priority list
-                if (indexB === -1) return -1; // a comes before b if b is not in priority list
-                return indexA - indexB; // Order by priority index
+                if (indexA === -1) return 1;
+                if (indexB === -1) return -1;
+                return indexA - indexB;
             });
-
-
+    
             displayKeys.forEach(fieldName => {
                 let fieldValue = (currentBooking[fieldName] || 'N/A');
-
-                // Special formatting for Timestamp fields
+    
                 if (fieldName === 'Timestamp' && fieldValue) {
-                    if (fieldValue.toDate) { // Check if it's a Firestore Timestamp object
+                    if (fieldValue.toDate) {
                         fieldValue = fieldValue.toDate().toLocaleString();
-                    } else if (fieldValue instanceof Date) { // Check if it's a native Date object
+                    } else if (fieldValue instanceof Date) {
                         fieldValue = fieldValue.toLocaleString();
                     } else {
                         fieldValue = fieldValue.toString().trim();
                     }
                 } else {
-                    // For all other fields, just convert to string and trim
                     fieldValue = fieldValue.toString().trim();
                 }
                 
-                // Only add to display if the value is not 'N/A' or empty after processing
                 if (fieldValue !== 'N/A' && fieldValue !== '') {
                     const label = formatFieldNameAsLabel(fieldName);
-                    // --- MODIFIED LINE: Changed font-size from 1.1em to 1em ---
                     cardContentArray.push(`<strong style="font-size: 1em;">${label}</strong>: ${fieldValue}`);
                 }
             });
-
+    
             const combinedContent = cardContentArray.join('<br><br>');
-
+    
             bookingCardElement.innerHTML = `
                 <p class="text-white text-base leading-snug my-0 w-full">${combinedContent}</p>
             `;
-
+    
             updateNavigationButtons();
             cardCounterElement.textContent = `Booking ${currentBookingIndex + 1} of ${bookingsData.length}`;
             moveToPendingBtn.disabled = false;
             deleteBookingBtn.disabled = false;
         }
-
+    
         function renderShortenedBookingItem(booking, type, indexInList) {
             let displayValues = [];
-            // Define fields to explicitly exclude from the shortened display
             const excludedFieldsShort = [
-                'id', 
-                'Status', 
+                'id',
+                'Status',
                 '_originalSource',
-                'Message', // Message can be long, often excluded from short view
-                'Preferred_Time' // Also often long
+                'Message',
+                'Preferred_Time'
             ];
-
-            // Prioritize certain fields for display order in shortened view (up to 3 shown)
+    
             const preferredShortDisplayOrder = [
                 'Timestamp',
                 'Customer_Name',
-                'Contact_Name', // Ensure Contact_Name is considered for short display
+                'Contact_Name',
                 'Email',
                 'Phone_Number',
                 'Subject',
                 'Service',
                 'ScheduledDateTime'
             ];
-
+    
             let allBookingKeys = Object.keys(booking);
             let displayKeysShort = allBookingKeys.filter(key => !excludedFieldsShort.includes(key));
-
-            // Sort keys for shortened display
+    
             displayKeysShort.sort((a, b) => {
                 const indexA = preferredShortDisplayOrder.indexOf(a);
                 const indexB = preferredShortDisplayOrder.indexOf(b);
-
+    
                 if (indexA === -1 && indexB === -1) {
                     return a.localeCompare(b);
                 }
@@ -1366,11 +1278,10 @@
             
             let displayedCount = 0;
             for (const fieldName of displayKeysShort) {
-                if (displayedCount >= 3) break; // Limit to 3 fields
-
+                if (displayedCount >= 3) break;
+    
                 let fieldValue = (booking[fieldName] || 'N/A');
-
-                // Special formatting for Timestamp fields
+    
                 if (fieldName === 'Timestamp' && fieldValue) {
                     if (fieldValue.toDate) {
                         fieldValue = fieldValue.toDate().toLocaleDateString();
@@ -1378,7 +1289,6 @@
                         fieldValue = fieldValue.toLocaleDateString();
                     }
                 } else if (fieldName === 'ScheduledDateTime' && fieldValue) {
-                    // For ScheduledDateTime, display date and time
                     if (fieldValue.toDate) {
                         fieldValue = fieldValue.toDate().toLocaleString();
                     } else if (fieldValue instanceof Date) {
@@ -1387,15 +1297,15 @@
                 } else {
                     fieldValue = fieldValue.toString().trim();
                 }
-
+    
                 if (fieldValue !== 'N/A' && fieldValue !== '') {
                     displayValues.push(fieldValue);
                     displayedCount++;
                 }
             }
-
+    
             const displayString = displayValues.join(' | ');
-
+    
             let buttonsHtml = '';
             if (type === 'pending') {
                 buttonsHtml = `
@@ -1408,7 +1318,7 @@
                     <button class="ml-4 px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded-md text-white text-xs" data-id="${booking.id}" data-list-type="deleted" data-action="undo">Undo</button>
                 `;
             }
-
+    
             return `
                 <div class="bg-white/10 p-3 rounded-lg flex justify-between items-center text-sm">
                     <span class="font-medium">${displayString}</span>
@@ -1417,89 +1327,63 @@
                 </div>
             `;
         }
-
+    
         function renderPendingBookings() {
             if (pendingBookings.length === 0) {
                 pendingBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No pending bookings.</p>';
             } else {
                 pendingBookingsListElement.innerHTML = pendingBookings.map((booking, index) => renderShortenedBookingItem(booking, 'pending', index)).join('');
-                // Event listeners are now handled by delegation on the parent
             }
         }
-
+    
         function renderDeletedBookings() {
             if (deletedBookings.length === 0) {
                 deletedBookingsListElement.innerHTML = '<p class="text-white text-center w-full">No deleted bookings.</p>';
             } else {
                 deletedBookingsListElement.innerHTML = deletedBookings.map((booking, index) => renderShortenedBookingItem(booking, 'deleted', index)).join('');
-                // Event listeners are now handled by delegation on the parent
             }
         }
-
+    
         function updateNavigationButtons() {
             prevButton.disabled = currentBookingIndex === 0;
             nextButton.disabled = bookingsData.length === 0 || currentBookingIndex === bookingsData.length - 1;
         }
-
+    
         function showNextCard() {
-            if (bookingsData.length === 0) return; // Prevent errors if no bookings
+            if (bookingsData.length === 0) return;
             if (currentBookingIndex < bookingsData.length - 1) {
                 currentBookingIndex++;
                 renderBookingCard();
             }
         }
-
+    
         function showPrevCard() {
-            if (bookingsData.length === 0) return; // Prevent errors if no bookings
+            if (bookingsData.length === 0) return;
             if (currentBookingIndex > 0) {
                 currentBookingIndex--;
                 renderBookingCard();
             }
         }
-
+    
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
-
-        function moveBookingToPending() {
+    
+        // This is the new, correct event listener for the "Schedule this booking" button
+        moveToPendingBtn.addEventListener('click', () => {
             if (bookingsData.length === 0) return;
-
-            const bookingToMove = bookingsData[currentBookingIndex];
-            
-            const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToMove.id);
-            if (existingStagedIndex !== -1) {
-                stagedChanges[existingStagedIndex].newStatus = 'Pending';
-                stagedChanges[existingStagedIndex].originalSource = 'requests';
-                delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
-            } else {
-                stagedChanges.push({
-                    id: bookingToMove.id,
-                    newStatus: 'Pending',
-                    originalSource: 'requests'
-                });
-            }
-
-            // Update local arrays immediately for UI reflection (will be replaced by Firestore snapshot)
-            bookingsData = bookingsData.filter(b => b.id !== bookingToMove.id); // Remove from new
-            bookingToMove.Status = 'Pending';
-            pendingBookings.push(bookingToMove); // Add to pending
-            adjustCurrentBookingIndex();
-            renderBookingCard();
-            renderPendingBookings();
-            updateSaveButtonState();
-            console.log("Staged move to pending for booking ID:", bookingToMove.id);
-            console.log("Staged Changes after move to pending:", JSON.parse(JSON.stringify(stagedChanges)));
-        }
-
-        function deleteBooking() {
+            const bookingToSchedule = bookingsData[currentBookingIndex];
+            openBookingCalendarModal(bookingToSchedule);
+        });
+    
+        deleteBookingBtn.addEventListener('click', () => {
             if (bookingsData.length === 0) return;
-
             const bookingToDelete = bookingsData[currentBookingIndex];
-
+            
             const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToDelete.id);
             if (existingStagedIndex !== -1) {
                 stagedChanges[existingStagedIndex].newStatus = 'Deleted';
                 stagedChanges[existingStagedIndex].originalSource = 'requests';
-                delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
+                delete stagedChanges[existingStagedIndex].scheduledTime;
             } else {
                 stagedChanges.push({
                     id: bookingToDelete.id,
@@ -1507,20 +1391,17 @@
                     originalSource: 'requests'
                 });
             }
-
-            // Update local arrays immediately for UI reflection (will be replaced by Firestore snapshot)
-            bookingsData = bookingsData.filter(b => b.id !== bookingToDelete.id); // Remove from new
+            
+            bookingsData = bookingsData.filter(b => b.id !== bookingToDelete.id);
             bookingToDelete.Status = 'Deleted';
             bookingToDelete._originalSource = 'requests';
-            deletedBookings.push(bookingToDelete); // Add to deleted
+            deletedBookings.push(bookingToDelete);
             adjustCurrentBookingIndex();
             renderBookingCard();
             renderDeletedBookings();
             updateSaveButtonState();
-            console.log("Staged delete for booking ID:", bookingToDelete.id);
-            console.log("Staged Changes after delete:", JSON.parse(JSON.stringify(stagedChanges)));
-        }
-
+        });
+    
         function adjustCurrentBookingIndex() {
             if (bookingsData.length > 0) {
                 if (currentBookingIndex >= bookingsData.length) {
@@ -1530,33 +1411,45 @@
                 currentBookingIndex = 0;
             }
         }
-
-        moveToPendingBtn.addEventListener('click', moveBookingToPending);
-        deleteBookingBtn.addEventListener('click', deleteBooking);
-
-        // Event delegation for pending and deleted lists
+    
         pendingBookingsListElement.addEventListener('click', handleListButtonAction);
         deletedBookingsListElement.addEventListener('click', handleListButtonAction);
-
+    
         function handleListButtonAction(event) {
-            const button = event.target.closest('button[data-action]'); // Use .closest to handle clicks on child elements of the button
-            if (!button) return; // Not a button with data-action
-
+            const button = event.target.closest('button[data-action]');
+            if (!button) return;
+    
             const bookingId = button.dataset.id;
             const listType = button.dataset.listType;
             const action = button.dataset.action;
-
+    
             let bookingToProcess;
             let targetStatus;
             let originalSourceForStaging;
-
+    
             if (listType === 'pending') {
                 bookingToProcess = pendingBookings.find(b => b.id === bookingId);
                 if (!bookingToProcess) return;
-
+    
                 if (action === 'complete') {
-                    openBookingCalendarModal(bookingToProcess);
-                    return; // Exit, as calendar modal handles saving for completion
+                    showConfirm(`Are you sure you want to mark this booking as complete? This cannot be undone.`, async () => {
+                        showLoading("Completing booking...");
+                        try {
+                            const result = await sendBatchBookingUpdates([{ id: bookingId, newStatus: 'Completed', fullBookingData: bookingToProcess }]);
+                            if (result.success) {
+                                showMessage("Booking marked as complete and moved to scheduled meetings!", 'success');
+                            } else {
+                                showMessage("Failed to complete booking: " + result.error, 'error');
+                            }
+                        } catch (error) {
+                            showMessage("An error occurred during completion: " + error.message, 'error');
+                        } finally {
+                            hideLoading();
+                        }
+                    }, () => {
+                        showMessage("Action cancelled.", 'info');
+                    });
+                    return;
                 } else if (action === 'delete') {
                     targetStatus = 'Deleted';
                     originalSourceForStaging = 'pending';
@@ -1568,8 +1461,7 @@
                     targetStatus = 'New';
                     pendingBookings = pendingBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = 'New';
-                    // Reset _originalSource if it's going back to 'New' requests
-                    delete bookingToProcess._originalSource; 
+                    delete bookingToProcess._originalSource;
                     bookingsData.push(bookingToProcess);
                     if (bookingsData.length > 0) {
                         currentBookingIndex = bookingsData.length - 1;
@@ -1579,32 +1471,30 @@
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    // Only set originalSource if it's for 'Deleted' status, otherwise clear it.
                     if (targetStatus === 'Deleted') {
                         stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging;
                     } else {
                         delete stagedChanges[existingStagedIndex].originalSource;
                     }
-                    delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
+                    delete stagedChanges[existingStagedIndex].scheduledTime;
                 } else {
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: targetStatus === 'Deleted' ? originalSourceForStaging : undefined // Only set if target is Deleted
+                        originalSource: targetStatus === 'Deleted' ? originalSourceForStaging : undefined
                     });
                 }
-
+    
             } else if (listType === 'deleted') {
                 bookingToProcess = deletedBookings.find(b => b.id === bookingId);
                 if (!bookingToProcess) return;
-
+    
                 if (action === 'undo') {
                     targetStatus = bookingToProcess._originalSource === 'requests' ? 'New' : 'Pending';
                     originalSourceForStaging = bookingToProcess._originalSource;
-
+    
                     deletedBookings = deletedBookings.filter(b => b.id !== bookingId);
                     bookingToProcess.Status = targetStatus;
-                    // When undoing a delete, put it back to its _originalSource's list
                     if (originalSourceForStaging === 'requests') {
                         bookingsData.push(bookingToProcess);
                         if (bookingsData.length > 0) {
@@ -1617,66 +1507,54 @@
                 const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToProcess.id);
                 if (existingStagedIndex !== -1) {
                     stagedChanges[existingStagedIndex].newStatus = targetStatus;
-                    // Restore originalSource for staging purposes if moving back to pending, clear if to new
                     if (targetStatus === 'Pending') {
                         stagedChanges[existingStagedIndex].originalSource = originalSourceForStaging;
                     } else {
                         delete stagedChanges[existingStagedIndex].originalSource;
                     }
-                    delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
+                    delete stagedChanges[existingStagedIndex].scheduledTime;
                 } else {
                     stagedChanges.push({
                         id: bookingToProcess.id,
                         newStatus: targetStatus,
-                        originalSource: targetStatus === 'Pending' ? originalSourceForStaging : undefined // Only set if target is Pending
+                        originalSource: targetStatus === 'Pending' ? originalSourceForStaging : undefined
                     });
                 }
             }
-
-            // These are always called, unless `complete` action which `return`s early
+            
             renderBookingCard();
             renderPendingBookings();
             renderDeletedBookings();
             updateSaveButtonState();
-            console.log(`Staged ${action} from ${listType} for booking ID:`, bookingToProcess.id);
-            console.log("Staged Changes after list action:", JSON.parse(JSON.stringify(stagedChanges)));
         }
-
-        // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly and automatically saves
+    
         confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
                 showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
-                    showLoading("Completing and saving booking...");
-
+                    showLoading("Scheduling and saving booking...");
                     try {
                         const bookingId = currentBookingBeingScheduled.id;
                         
-                        // Create a single-element array for the batch update
                         const updatesToCommit = [{
                             id: bookingId,
-                            newStatus: 'Completed',
-                            scheduledTime: selectedEventDate, // This is the Date object
-                            fullBookingData: currentBookingBeingScheduled 
+                            newStatus: 'Pending',
+                            scheduledTime: selectedEventDate,
+                            fullBookingData: currentBookingBeingScheduled
                         }];
-
                         const result = await sendBatchBookingUpdates(updatesToCommit);
-
+    
                         if (result.success) {
-                            showMessage("Booking confirmed and saved successfully!", 'success');
-                            // The onSnapshot listener will handle the UI update due to data change in Firestore.
-                            // We close the calendar overlay immediately.
+                            showMessage("Booking scheduled successfully!", 'success');
                         } else {
-                            showMessage("Failed to confirm and save booking: " + result.error, 'error');
+                            showMessage("Failed to schedule and save booking: " + result.error, 'error');
                         }
                     } catch (error) {
-                        console.error("Error during booking completion:", error);
-                        showMessage("An unexpected error occurred during booking completion: " + error.message, 'error');
+                        console.error("Error during booking scheduling:", error);
+                        showMessage("An unexpected error occurred during booking scheduling: " + error.message, 'error');
                     } finally {
                         hideLoading();
                         calendarOverlay.classList.add('hidden');
                         document.body.style.overflow = '';
-                        // Re-render calendar to reflect the newly booked slot, relying on Firestore's onSnapshot.
-                        // renderCalendar() will be implicitly triggered by the onSnapshot listener if data changes.
                     }
                 }, () => {
                     showMessage("Booking confirmation cancelled.", 'info');
@@ -1685,24 +1563,23 @@
                 showMessage("Please select a date and time for the booking.", 'info');
             }
         });
-
+    
         saveChangesBtn.addEventListener('click', async () => {
-            console.log("Save Changes button clicked!"); // Debug log
             if (stagedChanges.length === 0) {
                 showMessage("No changes to save.", 'info');
                 return;
             }
-
+    
             showConfirm(`Are you sure you want to save ${stagedChanges.length} changes to the database?`, async () => {
                 showLoading("Saving changes to Database...");
-
+    
                 try {
                     const result = await sendBatchBookingUpdates(stagedChanges);
-
+    
                     if (result.success) {
                         showMessage("Changes saved successfully!", 'success');
-                        stagedChanges = []; // Clear staged changes only upon successful commit
-                        updateSaveButtonState(); // Update button state to reflect cleared changes
+                        stagedChanges = [];
+                        updateSaveButtonState();
                     } else {
                         showMessage("Failed to save changes: " + result.error, 'error');
                     }
@@ -1713,7 +1590,6 @@
                 showMessage("Save cancelled.", 'info');
             });
         });
-
     </script>
 </body>
 </html>
