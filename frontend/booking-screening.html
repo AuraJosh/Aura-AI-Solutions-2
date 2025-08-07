@@ -1101,46 +1101,36 @@
                         updateData.ScheduledDateTime = deleteField();
                     }
                     
-                    // This is the core logic that was in your original code
+                    // --- Re-integrated original logic for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
                     
                         const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
                         const extraData = {};
                         const meetingData = {
-                            // Start with the standard, non-optional fields
                             id: change.id,
                             Status: 'Completed',
                             ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
                             BookedBy: currentUserUid,
-                            ScheduledAt: Timestamp.now(), // New field to track when it was booked
+                            ScheduledAt: Timestamp.now(),
                         };
                     
-                        // Iterate over the original booking data.
                         for (const fieldName in change.fullBookingData) {
-                            // Skip internal/redundant fields from the original booking
                             if (['id', 'Status', '_originalSource'].includes(fieldName)) {
                                 continue;
                             }
-                        
                             const fieldValue = change.fullBookingData[fieldName];
-                        
-                            // Categorize the fields.
                             if (coreFields.includes(fieldName)) {
-                                // Map core fields directly.
                                 meetingData[fieldName] = fieldValue;
                             } else {
-                                // All other fields go into the 'extra' map.
                                 extraData[fieldName] = fieldValue;
                             }
                         }
                     
-                        // Add the 'extra' map to the main object if it has data.
                         if (Object.keys(extraData).length > 0) {
                             meetingData.Extra = extraData;
                         }
                         
-                        // Commit the standardized meetingData object.
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                     }
                 } else {
