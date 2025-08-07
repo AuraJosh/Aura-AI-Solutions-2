@@ -594,7 +594,7 @@ p {
 .category-title { color: var(--primary-color); margin-bottom: 2rem; text-align: center; font-size: 2.2rem; }
 .subjects-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
     gap: 2rem;
 }
 .subject-card { background: var(--white); padding: 2rem; border-radius: var(--border-radius); box-shadow: var(--shadow); transition: var(--transition); border-left: 4px solid var(--secondary-color); }
@@ -757,14 +757,18 @@ p {
   }
 }
 
+.stem-subjects-grid {
+    grid-template-columns: repeat(4, 1fr);
+}
+
 @media (max-width: 1200px) {
-    .subjects-grid {
+    .stem-subjects-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .subjects-grid {
+    .stem-subjects-grid {
         grid-template-columns: 1fr;
     }
 }
