@@ -366,7 +366,7 @@
     
         // Firebase Configuration (Using global __firebase_config if available)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8", // Replace with your actual API Key from Firebase Console
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
             authDomain: "aura-ai-85b65.firebaseapp.com",
             projectId: "aura-ai-85b65",
             storageBucket: "aura-ai-85b65.appspot.com",
@@ -487,7 +487,6 @@
         }
     
         // --- CUSTOM CALENDAR LOGIC ---
-    
         async function fetchCalendarEvents(startDate, endDate) {
             if (!currentAccountId) {
                 console.warn("Account ID not available for fetching calendar events.");
@@ -1105,34 +1104,35 @@
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
                     
-                        const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
-                        const extraData = {};
                         const meetingData = {
-                            id: change.id,
-                            Status: 'Completed',
-                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime),
+                            ...change.fullBookingData, // Spread all existing fields
+                            id: change.id, // Ensure id is correct
+                            Status: 'Completed', // Override status
+                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime), // Override date/time
                             BookedBy: currentUserUid,
                             ScheduledAt: Timestamp.now(),
                         };
-                    
-                        for (const fieldName in change.fullBookingData) {
-                            if (['id', 'Status', '_originalSource'].includes(fieldName)) {
-                                continue;
-                            }
                         
-                            const fieldValue = change.fullBookingData[fieldName];
+                        // Remove internal fields that shouldn't be in the final document
+                        delete meetingData._originalSource;
                         
-                            if (coreFields.includes(fieldName)) {
-                                meetingData[fieldName] = fieldValue;
-                            } else {
-                                extraData[fieldName] = fieldValue;
+                        // Remove fields that are being moved or handled differently
+                        delete meetingData.Extra; // We will rebuild the 'Extra' map
+    
+                        const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
+                        const extraData = {};
+                        
+                        for (const fieldName in meetingData) {
+                            if (!coreFields.includes(fieldName) && !['id', 'BookedBy', 'ScheduledAt'].includes(fieldName)) {
+                                extraData[fieldName] = meetingData[fieldName];
+                                delete meetingData[fieldName];
                             }
                         }
-                    
+    
                         if (Object.keys(extraData).length > 0) {
                             meetingData.Extra = extraData;
                         }
-                        
+    
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                     }
                 } else {
@@ -1435,7 +1435,7 @@
                     showConfirm(`Are you sure you want to mark this booking as complete? This cannot be undone.`, async () => {
                         showLoading("Completing booking...");
                         try {
-                            const result = await sendBatchBookingUpdates([{ id: bookingId, newStatus: 'Completed', fullBookingData: bookingToProcess }]);
+                            const result = await sendBatchBookingUpdates([{ id: bookingId, newStatus: 'Completed', scheduledTime: bookingToProcess.ScheduledDateTime.toDate(), fullBookingData: bookingToProcess }]);
                             if (result.success) {
                                 showMessage("Booking marked as complete and moved to scheduled meetings!", 'success');
                             } else {
