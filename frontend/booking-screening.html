@@ -1103,36 +1103,19 @@
                     
                     if (change.fullBookingData) {
                         const scheduledMeetingDocRef = doc(db, 'accounts', currentAccountId, 'scheduled_meetings', change.id);
-                    
-                        const meetingData = {
-                            ...change.fullBookingData, // Spread all existing fields
-                            id: change.id, // Ensure id is correct
-                            Status: 'Completed', // Override status
-                            ScheduledDateTime: Timestamp.fromDate(change.scheduledTime), // Override date/time
-                            BookedBy: currentUserUid,
-                            ScheduledAt: Timestamp.now(),
-                        };
                         
-                        // Remove internal fields that shouldn't be in the final document
+                        const meetingData = { ...change.fullBookingData }; // Copy all data from the original booking
+                        
+                        // Override fields that need to be changed for the new document
+                        meetingData.Status = 'Completed';
+                        meetingData.ScheduledDateTime = Timestamp.fromDate(change.scheduledTime);
+                        meetingData.BookedBy = currentUserUid;
+                        meetingData.ScheduledAt = Timestamp.now();
+    
+                        // Remove internal fields that are not needed in the final document
+                        delete meetingData.id;
                         delete meetingData._originalSource;
                         
-                        // Remove fields that are being moved or handled differently
-                        delete meetingData.Extra; // We will rebuild the 'Extra' map
-    
-                        const coreFields = ['Customer_Name', 'Email', 'Phone_Number', 'Status', 'ScheduledDateTime'];
-                        const extraData = {};
-                        
-                        for (const fieldName in meetingData) {
-                            if (!coreFields.includes(fieldName) && !['id', 'BookedBy', 'ScheduledAt'].includes(fieldName)) {
-                                extraData[fieldName] = meetingData[fieldName];
-                                delete meetingData[fieldName];
-                            }
-                        }
-    
-                        if (Object.keys(extraData).length > 0) {
-                            meetingData.Extra = extraData;
-                        }
-    
                         batch.set(scheduledMeetingDocRef, meetingData, { merge: true });
                     }
                 } else {
@@ -1368,7 +1351,6 @@
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
     
-        // This is the new, correct event listener for the "Schedule this booking" button
         moveToPendingBtn.addEventListener('click', () => {
             if (bookingsData.length === 0) return;
             const bookingToSchedule = bookingsData[currentBookingIndex];
