@@ -19,9 +19,9 @@
     .chat-logs-container {
         display: flex;
         flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;        /* Enables vertical scrolling */
-        height: 240px;            /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
-        justify-content: flex-start;    /* Aligns content to the start (bottom, due to reverse) */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        justify-content: flex-start; /* Aligns content to the start (bottom, due to reverse) */
     }
     .chat-log-message {
         padding-bottom: 8px;
@@ -95,7 +95,6 @@
     </div>
 
     <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
-        <div class="container mx-auto flex items-center justify-between p-4">
         <div class="container mx-auto flex items-center justify-between p-4 relative">
             <div class="flex items-center space-x-4">
                 <div class="relative h-20 w-[150px]">
@@ -103,7 +102,7 @@
                 </div>
                 <span class="text-white text-base">Aura AI Solutions</span>
             </div>
-            <h1 class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
+            <h1 id="page-title" class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
             <div class="flex items-center space-x-4">
                 <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
                 <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
@@ -113,7 +112,7 @@
 
     <main class="pt-40 px-4 flex justify-center relative z-10">
         <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-            </div>
+        </div>
     </main>
 
     <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
@@ -170,6 +169,8 @@
 
         let authInitialized = false; // Flag to ensure data loading happens only once
         const loadingOverlay = document.getElementById('loading-overlay'); // Get the loading overlay element
+        const pageTitle = document.getElementById('page-title');
+        const dataTableContainer = document.getElementById('data-table-container');
 
         // Function to show the loading overlay
         function showLoading() {
@@ -198,47 +199,111 @@
 
         // --- Protect this page and load data ---
         onAuthStateChanged(auth, async (user) => {
-            if (!authInitialized) { // This block runs only once when auth state is first determined
-                authInitialized = true; // Mark as initialized
-
-                if (user) {
-                    // User is logged in, proceed with page-specific data loading
-                    const userIdentifier = user.uid;
-                    console.log("User is logged in on analytics page:", userIdentifier);
-                    await loadCustomerData(userIdentifier);
-                } else {
-                    // User is NOT logged in, redirect to login
+            if (!authInitialized) {
+                authInitialized = true;
+                if (!user) {
                     console.log("User is not logged in. Redirecting to login.");
                     window.location.href = "login.html";
-                    hideLoading(); // Hide loading if redirecting
+                    hideLoading();
+                    return;
+                }
+
+                try {
+                    const idTokenResult = await user.getIdTokenResult();
+                    const isAdmin = idTokenResult.claims.admin === true;
+
+                    if (isAdmin) {
+                        console.log("Admin user logged in.");
+                        await setupAdminDashboard();
+                    } else {
+                        console.log("Regular user logged in:", user.uid);
+                        await loadCustomerData(user.uid);
+                    }
+                } catch (error) {
+                    console.error("Error checking user claims:", error);
+                    // Fallback to regular user view on error
+                    await loadCustomerData(user.uid);
                 }
             }
         });
 
-        // --- Logout button ---
-        document.getElementById("logout-btn").addEventListener("click", async () => {
+        // NEW: Function to set up the admin dashboard view
+        async function setupAdminDashboard() {
+            pageTitle.textContent = "Admin Dashboard";
+            showLoading();
+            
             try {
-                await signOut(auth);
-                console.log("User logged out. Redirecting to login.html");
-                window.location.href = "login.html";
-            } catch (err) {
-                console.error("Logout failed:", err.message);
-                showMessage("Logout failed: " + err.message, 'error');
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getAllAnalytics`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const allData = await response.json();
+
+                let adminHtml = `
+                    <h2 class="text-3xl font-bold text-white mb-6 text-center">All User Analytics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                `;
+                
+                if (allData.error) {
+                    adminHtml = `<p class="text-red-500 text-center">Error: ${allData.error}</p>`;
+                } else if (allData.length === 0) {
+                    adminHtml = `<p class="text-gray-400 text-center">No user data found.</p>`;
+                } else {
+                    allData.forEach(userData => {
+                        const totalSent = userData.totalMessagesSent || 0;
+                        const monthlyLimit = userData.monthlyLimit || 0;
+                        const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                        const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+
+                        adminHtml += `
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
+                                <h3 class="text-xl font-semibold text-white mb-2">${userData.email || 'N/A'}</h3>
+                                <p class="text-gray-400 text-sm mb-4">UID: ${userData.uid}</p>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Messages Used:</p>
+                                        <p class="text-white font-bold">${totalSent} / ${monthlyLimit}</p>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                        <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Current Tier:</p>
+                                        <p class="text-white font-medium">${userData.tier || 'N/A'}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Next Payment:</p>
+                                        <p class="text-white font-medium">${userData.nextPaymentDate || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                adminHtml += `</div>`;
+                dataTableContainer.innerHTML = adminHtml;
+                
+            } catch (error) {
+                console.error('Error fetching admin data:', error);
+                dataTableContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load admin dashboard.</p>`;
+            } finally {
+                hideLoading();
             }
-        });
-
-        // Function to fetch data from the Google Apps Script
+        }
+        
+        // REFACTORED: Your original loadCustomerData function, now takes a userIdentifier
         async function loadCustomerData(userIdentifier) {
-            showLoading(); // Show loading animation before fetching data
+            pageTitle.textContent = "Your Analytics Suite";
+            showLoading();
 
-            const dataTableContainer = document.getElementById('data-table-container');
             if (!dataTableContainer) {
                 console.error("Error: Element with ID 'data-table-container' not found.");
-                hideLoading(); // Hide loading even if element is missing
+                hideLoading();
                 return;
             }
 
-            dataTableContainer.innerHTML = ''; // Clear previous loading text
+            dataTableContainer.innerHTML = '';
 
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
@@ -251,7 +316,7 @@
                 
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
-                    hideLoading(); // Hide loading on error
+                    hideLoading();
                     return;
                 }
                 
@@ -469,9 +534,21 @@
                 console.error('Error fetching or parsing data:', error);
                 dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
             } finally {
-                hideLoading(); // Always hide loading animation after fetch attempt
+                hideLoading();
             }
         }
+
+        // --- Logout button ---
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out. Redirecting to login.html");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout failed:", err.message);
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
 
         const feedbackBtn = document.getElementById('feedback-btn');
         const updateInfoBtn = document.getElementById('update-info-btn');
