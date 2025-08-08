@@ -198,7 +198,7 @@
         }
 
         // --- Protect this page and load data ---
-        onAuthStateChanged(auth, async (user) => {
+       onAuthStateChanged(auth, async (user) => {
             if (!authInitialized) {
                 authInitialized = true;
                 if (!user) {
@@ -207,16 +207,30 @@
                     hideLoading();
                     return;
                 }
-
+        
                 try {
                     const idTokenResult = await user.getIdTokenResult();
                     const isAdmin = idTokenResult.claims.admin === true;
-
+        
+                    // Check for admin view parameters in the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const adminView = urlParams.get('adminView');
+                    const targetUserId = urlParams.get('userId');
+        
                     if (isAdmin) {
                         console.log("Admin user logged in.");
-                        await setupAdminDashboard();
+                        if (adminView && targetUserId) {
+                            // Admin is viewing a specific user's detailed dashboard
+                            console.log(`Admin viewing detailed analytics for user: ${targetUserId}`);
+                            await loadCustomerData(targetUserId);
+                        } else {
+                            // Admin's default view - the summary dashboard
+                            console.log("Admin viewing summary dashboard.");
+                            await setupAdminDashboard();
+                        }
                     } else {
                         console.log("Regular user logged in:", user.uid);
+                        // Regular users can only see their own data
                         await loadCustomerData(user.uid);
                     }
                 } catch (error) {
@@ -254,29 +268,31 @@
                         const monthlyLimit = userData.monthlyLimit || 0;
                         const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
                         const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-
+                    
                         adminHtml += `
-                            <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700">
-                                <h3 class="text-xl font-semibold text-white mb-2">${userData.accountName}</h3>
-                                <p class="text-gray-400 text-sm mb-4">UID: ${userData.uid}</p>
-                                <div class="space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Messages Used:</p>
-                                        <p class="text-white font-bold">${totalSent} / ${monthlyLimit}</p>
-                                    </div>
-                                    <div class="w-full bg-gray-700 rounded-full h-2.5">
-                                        <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Current Tier:</p>
-                                        <p class="text-white font-medium">${userData.tier || 'N/A'}</p>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-300">Next Payment:</p>
-                                        <p class="text-white font-medium">${userData.nextPaymentDate || 'N/A'}</p>
+                            <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
+                                <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
+                                    <h3 class="text-xl font-semibold text-white mb-2">${userData.accountName}</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UID: ${userData.uid}</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Messages Used:</p>
+                                            <p class="text-white font-bold">${totalSent} / ${monthlyLimit}</p>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Current Tier:</p>
+                                            <p class="text-white font-medium">${userData.tier || 'N/A'}</p>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Next Payment:</p>
+                                            <p class="text-white font-medium">${userData.nextPaymentDate || 'N/A'}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         `;
                     });
                 }
