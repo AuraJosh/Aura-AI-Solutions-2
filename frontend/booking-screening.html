@@ -515,8 +515,9 @@
                 const scheduledMeetingsRef = collection(db, 'accounts', currentAccountId, 'scheduled_meetings'); // New collection for scheduled meetings
 
                 // Query for 'Completed' meetings from scheduled_meetings collection (Primary source for completed)
+                // Query for 'Completed' meetings from scheduled_meetings collection (Primary source for completed)
                 const qScheduledMeetings = query(scheduledMeetingsRef,
-                    where('Status', '==', 'Completed'), // Assuming scheduled_meetings also have a 'Status' field
+                    where('Status', '==', 'Completed'),
                     where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
@@ -524,32 +525,45 @@
                 querySnapshotScheduledMeetings.docs.forEach(doc => {
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        const eventStart = data.ScheduledDateTime.toDate();
+                        // Use ScheduledEndTime if it exists, otherwise default to a 1-hour slot
+                        const eventEnd = data.ScheduledEndTime && data.ScheduledEndTime.toDate
+                            ? data.ScheduledEndTime.toDate()
+                            : new Date(eventStart.getTime() + 60 * 60 * 1000);
+                
                         events.push({
                             title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
-                            type: 'completed', // Use same completed style
-                            originalData: data // Pass the full data object for detailed tooltip
+                            start: eventStart,
+                            end: eventEnd,
+                            type: 'completed',
+                            originalData: data
                         });
                     }
                 });
 
                 // Query for 'Pending' bookings from bookings collection (only pending status, as completed are now in scheduled_meetings)
+                // Query for 'Pending' bookings from bookings collection (only pending status, as completed are now in scheduled_meetings)
                 const qPending = query(bookingsRef,
                     where('Status', '==', 'Pending'),
-                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)), // Include if Pending bookings can have a scheduled time in calendar
+                    where('ScheduledDateTime', '>=', Timestamp.fromDate(startDate)),
                     where('ScheduledDateTime', '<=', Timestamp.fromDate(endDate))
                 );
                 const querySnapshotPending = await getDocs(qPending);
                 querySnapshotPending.docs.forEach(doc => {
                     const data = doc.data();
                     if (data.ScheduledDateTime && data.ScheduledDateTime.toDate) {
+                        const eventStart = data.ScheduledDateTime.toDate();
+                        // Use ScheduledEndTime if it exists, otherwise default to a 1-hour slot
+                        const eventEnd = data.ScheduledEndTime && data.ScheduledEndTime.toDate
+                            ? data.ScheduledEndTime.toDate()
+                            : new Date(eventStart.getTime() + 60 * 60 * 1000);
+                
                         events.push({
                             title: data.Customer_Name || data.Contact_Name || data.Name || data.Email || data.Contact_Number || 'Scheduled',
-                            start: data.ScheduledDateTime.toDate(),
-                            end: new Date(data.ScheduledDateTime.toDate().getTime() + 60 * 60 * 1000), // Assume 1 hour default
+                            start: eventStart,
+                            end: eventEnd,
                             type: 'pending',
-                            originalData: data // Pass the full data object for detailed tooltip
+                            originalData: data
                         });
                     }
                 });
@@ -779,17 +793,16 @@
         function renderWeekView(fetchStartDate, fetchEndDate) {
             const startOfWeek = new Date(currentDate);
             startOfWeek.setDate(currentDate.getDate() - currentDate.getDay()); // Start on Sunday
-            startOfWeek.setHours(0,0,0,0);
-
-            // Create header row with blank corner and days of week
+            startOfWeek.setHours(0, 0, 0, 0);
+        
             const headerRow = document.createElement('div');
             headerRow.className = 'grid grid-cols-8 gap-1';
-            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`; // Corner for time column
+            headerRow.innerHTML = `<div class="p-2 border-b border-gray-700"></div>`;
             for (let i = 0; i < 7; i++) {
                 const day = new Date(startOfWeek);
                 day.setDate(startOfWeek.getDate() + i);
                 const isToday = day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth() && day.getFullYear() === new Date().getFullYear();
-                
+        
                 headerRow.innerHTML += `
                     <div class="text-center p-2 border-b border-gray-700">
                         <div class="text-gray-400 text-sm">${day.toLocaleDateString('en-US', { weekday: 'short' })}</div>
@@ -800,240 +813,178 @@
                 `;
             }
             calendarGrid.appendChild(headerRow);
-
-            // Time slots and event areas
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
-                const timeRow = document.createElement('div');
-                timeRow.className = 'grid grid-cols-8 gap-1 border-t border-gray-700 h-16'; // Fixed height for time slot
-                
-                // Time label column
+        
+            // Grid container for time slots and events
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'grid grid-cols-8 gap-1 relative h-full';
+        
+            // Time label column
+            const timeColumn = document.createElement('div');
+            timeColumn.className = 'col-span-1 h-full relative';
+            for (let hour = 8; hour < 20; hour++) {
                 const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 self-start -mt-2 z-10'; // Sticky for scrolling
+                timeLabel.className = 'w-16 text-gray-400 text-xs p-1 text-right pr-2 sticky left-0 bg-gray-800/90 -top-2 z-10';
+                timeLabel.style.height = '64px'; // Match row height
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
-                timeRow.appendChild(timeLabel);
-
-                // Day cells for each hour
-                for (let i = 0; i < 7; i++) {
-                    const day = new Date(startOfWeek);
-                    day.setDate(startOfWeek.getDate() + i);
-                    
-                    const timeCell = document.createElement('div');
-                    timeCell.className = 'time-slot h-full border-r border-gray-700 relative'; 
-
-                    // Calculate the full date and time for this specific cell/slot
+                timeColumn.appendChild(timeLabel);
+            }
+            gridContainer.appendChild(timeColumn);
+        
+            // Event columns
+            for (let i = 0; i < 7; i++) {
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'col-span-1 border-r border-gray-700 relative h-full';
+                const day = new Date(startOfWeek);
+                day.setDate(startOfWeek.getDate() + i);
+        
+                // Add clickable/occupied time slots for each hour
+                for (let hour = 8; hour < 20; hour++) {
+                    const timeSlot = document.createElement('div');
+                    timeSlot.className = 'time-slot h-16 border-t border-gray-700 relative';
                     const cellDateTime = new Date(day);
                     cellDateTime.setHours(hour, 0, 0, 0);
-                    
-                    // NEW: Check if the time slot is in the past
                     const isSlotInPast = isPastTime(cellDateTime);
-
-                    // Check if this time slot is already occupied by a fetched event
                     const isSlotOccupied = fetchedCalendarEvents.some(event => {
                         return event.start.getFullYear() === cellDateTime.getFullYear() &&
                                event.start.getMonth() === cellDateTime.getMonth() &&
                                event.start.getDate() === cellDateTime.getDate() &&
-                               event.start.getHours() === cellDateTime.getHours();
+                               (cellDateTime >= event.start && cellDateTime < event.end); // Check if slot is within event duration
                     });
-                    
-                    // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
+        
                     if (isSlotOccupied) {
-                        timeCell.classList.add('occupied-slot'); // Mark as occupied
-                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                        timeSlot.classList.add('occupied-slot');
+                        timeSlot.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                     } else if (isSlotInPast) {
-                        timeCell.classList.add('past-slot'); // Mark as past and unavailable
-                        timeCell.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                        timeSlot.classList.add('past-slot');
+                        timeSlot.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                     } else {
-                        timeCell.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
-                        timeCell.dataset.date = day.toISOString(); // Full date for the day
-                        timeCell.dataset.hour = hour; // Hour for selection
-
-                        // Add click listener for time slot selection ONLY if not occupied or in the past
-                        timeCell.addEventListener('click', (e) => {
-                            // Clear previous selection
+                        timeSlot.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
+                        timeSlot.dataset.date = day.toISOString();
+                        timeSlot.dataset.hour = hour;
+                        timeSlot.addEventListener('click', (e) => {
                             document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                            document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                            // Set the selected date/time
                             const selectedDate = new Date(e.currentTarget.dataset.date);
-                            selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                            selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                             selectedEventDate = selectedDate;
                             confirmScheduleBtn.disabled = false;
-                            // --- MODIFIED LINE: Added .selected class ---
-                            e.currentTarget.classList.add('selected'); // Add the 'selected' class here
+                            e.currentTarget.classList.add('selected');
                             showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                             console.log("Selected week/day view date/time:", selectedEventDate);
                         });
                     }
-
-                    // Add events that fall within this hour slot
-                    fetchedCalendarEvents.forEach(event => {
-                        if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                            event.start.getMonth() === cellDateTime.getMonth() &&
-                            event.start.getDate() === cellDateTime.getDate() &&
-                            event.start.getHours() === cellDateTime.getHours()) {
-                            addEventToCell(timeCell, event, 'week'); // Pass 'week' view type
-                        }
-                    });
-                    
-                    timeRow.appendChild(timeCell);
+                    dayColumn.appendChild(timeSlot);
                 }
-                calendarGrid.appendChild(timeRow);
+        
+                // Draw the events that span multiple slots
+                fetchedCalendarEvents.forEach(event => {
+                    if (event.start.getFullYear() === day.getFullYear() &&
+                        event.start.getMonth() === day.getMonth() &&
+                        event.start.getDate() === day.getDate()) {
+                        
+                        const startHour = event.start.getHours();
+                        const endHour = event.end.getHours();
+                        const eventDurationInHours = (event.end.getTime() - event.start.getTime()) / (1000 * 60 * 60);
+                        const heightInPixels = eventDurationInHours * 64; // Assuming 64px per hour slot
+        
+                        const eventElement = document.createElement('div');
+                        eventElement.className = `calendar-event-block absolute left-0 right-0 p-1 rounded-lg text-white text-xs z-20 overflow-hidden ${event.type === 'pending' ? 'bg-yellow-600' : 'bg-purple-600'}`;
+                        eventElement.style.top = `${(startHour - 8) * 64 + 4}px`; // Start position (8 AM is index 0)
+                        eventElement.style.height = `${heightInPixels - 8}px`; // Height with padding
+        
+                        eventElement.innerHTML = `
+                            <div class="font-bold">${event.originalData.Customer_Name || 'Scheduled Booking'}</div>
+                            <div>${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        `;
+                        dayColumn.appendChild(eventElement);
+                    }
+                });
+                gridContainer.appendChild(dayColumn);
             }
+            calendarGrid.appendChild(gridContainer);
         }
 
         function renderDayView(fetchStartDate, fetchEndDate) {
             const day = currentDate;
             const currentDayMs = day.setHours(0,0,0,0);
-
+        
             const timeSlotsContainer = document.createElement('div');
-            timeSlotsContainer.className = 'space-y-1';
-
-            for (let hour = 8; hour < 20; hour++) { // 8 AM to 7 PM
+            timeSlotsContainer.className = 'space-y-1 relative h-full';
+        
+            for (let hour = 8; hour < 20; hour++) {
                 const timeSlot = document.createElement('div');
-                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16'; // Fixed height for time slot
-                
-                // Time label
+                timeSlot.className = 'flex border-t border-gray-700 pt-1 h-16 relative';
                 const timeLabel = document.createElement('div');
-                timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2';
+                timeLabel.className = 'w-16 text-gray-400 text-xs text-right pr-2 sticky left-0 bg-gray-800/90 z-10';
                 timeLabel.textContent = `${hour % 12 === 0 ? 12 : hour % 12}${hour < 12 ? 'am' : 'pm'}`;
                 timeSlot.appendChild(timeLabel);
-
-                // Main content area for the hour
+        
                 const contentArea = document.createElement('div');
-                contentArea.className = 'time-slot flex-1 h-full relative'; 
-                
-                // Calculate the full date and time for this specific cell/slot
+                contentArea.className = 'time-slot flex-1 h-full relative';
                 const cellDateTime = new Date(day);
                 cellDateTime.setHours(hour, 0, 0, 0);
-
-                // NEW: Check if the time slot is in the past
+        
                 const isSlotInPast = isPastTime(cellDateTime);
-
-                // Check if this time slot is already occupied by a fetched event
                 const isSlotOccupied = fetchedCalendarEvents.some(event => {
                     return event.start.getFullYear() === cellDateTime.getFullYear() &&
-                               event.start.getMonth() === cellDateTime.getMonth() &&
-                               event.start.getDate() === cellDateTime.getDate() &&
-                               event.start.getHours() === cellDateTime.getHours();
+                           event.start.getMonth() === cellDateTime.getMonth() &&
+                           event.start.getDate() === cellDateTime.getDate() &&
+                           (cellDateTime >= event.start && cellDateTime < event.end);
                 });
-
-                // MODIFIED: Apply occupied-slot class and handle clickability based on availability and time
+        
                 if (isSlotOccupied) {
-                    contentArea.classList.add('occupied-slot'); // Mark as occupied
-                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    contentArea.classList.add('occupied-slot');
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                 } else if (isSlotInPast) {
-                    contentArea.classList.add('past-slot'); // Mark as past and unavailable
-                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50'); 
+                    contentArea.classList.add('past-slot');
+                    contentArea.classList.remove('cursor-pointer', 'hover:bg-gray-700/50');
                 } else {
-                    contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50'); // Only add for available slots
+                    contentArea.classList.add('cursor-pointer', 'hover:bg-gray-700/50');
                     contentArea.dataset.date = day.toISOString();
                     contentArea.dataset.hour = hour;
-
-                    // Add click listener for time slot selection ONLY if not occupied or in the past
                     contentArea.addEventListener('click', (e) => {
-                        // Clear previous selection
                         document.querySelectorAll('.time-slot.selected').forEach(el => el.classList.remove('selected'));
-                        document.querySelectorAll('.day-cell-month-selected').forEach(el => el.classList.remove('day-cell-month-selected'));
-
-                        // Set the selected date/time
                         const selectedDate = new Date(e.currentTarget.dataset.date);
-                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0); // Set hour, minute to 0
+                        selectedDate.setHours(parseInt(e.currentTarget.dataset.hour), 0, 0, 0);
                         selectedEventDate = selectedDate;
                         confirmScheduleBtn.disabled = false;
-                        // --- MODIFIED LINE: Added .selected class ---
-                        e.currentTarget.classList.add('selected'); // Add the 'selected' class here
+                        e.currentTarget.classList.add('selected');
                         showMessage(`Selected: ${selectedEventDate.toLocaleString()}`, 'info');
                         console.log("Selected day view date/time:", selectedEventDate);
                     });
                 }
-                
-                // Add events that fall within this hour slot
-                fetchedCalendarEvents.forEach(event => {
-                    if (event.start.getFullYear() === cellDateTime.getFullYear() &&
-                        event.start.getMonth() === cellDateTime.getMonth() &&
-                        event.start.getDate() === cellDateTime.getDate() &&
-                        event.start.getHours() === cellDateTime.getHours()) {
-                        addEventToCell(contentArea, event, 'day'); // Pass 'day' view type
-                    }
-                });
-
                 timeSlot.appendChild(contentArea);
                 timeSlotsContainer.appendChild(timeSlot);
             }
+        
+            // Draw the events that span multiple slots
+            fetchedCalendarEvents.forEach(event => {
+                if (event.start.getFullYear() === day.getFullYear() &&
+                    event.start.getMonth() === day.getMonth() &&
+                    event.start.getDate() === day.getDate()) {
+                    
+                    const startHour = event.start.getHours();
+                    const endHour = event.end.getHours();
+                    const eventDurationInHours = (event.end.getTime() - event.start.getTime()) / (1000 * 60 * 60);
+                    const heightInPixels = eventDurationInHours * 64; // Assuming 64px per hour slot
+        
+                    const eventElement = document.createElement('div');
+                    eventElement.className = `calendar-event-block absolute p-1 rounded-lg text-white text-xs z-20 overflow-hidden ${event.type === 'pending' ? 'bg-yellow-600' : 'bg-purple-600'}`;
+                    eventElement.style.top = `${(startHour - 8) * 64 + 4}px`; // Start position (8 AM is index 0)
+                    eventElement.style.left = '64px'; // Offset for time label
+                    eventElement.style.right = '4px'; // Offset for padding
+                    eventElement.style.height = `${heightInPixels - 8}px`; // Height with padding
+        
+                    eventElement.innerHTML = `
+                        <div class="font-bold">${event.originalData.Customer_Name || 'Scheduled Booking'}</div>
+                        <div>${event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    `;
+                    timeSlotsContainer.appendChild(eventElement);
+                }
+            });
+        
             calendarGrid.appendChild(timeSlotsContainer);
         }
-
-        // Calendar event listeners (for navigation and view change)
-        calendarClose.addEventListener('click', () => {
-            calendarOverlay.classList.add('hidden');
-            document.body.style.overflow = '';
-        });
-
-        calendarPrev.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() - 7);
-            } else { // day
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
-            renderCalendar();
-        });
-
-        calendarNext.addEventListener('click', () => {
-            if (currentView === 'month') {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-            } else if (currentView === 'week') {
-                currentDate.setDate(currentDate.getDate() + 7);
-            } else { // day
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            renderCalendar();
-        });
-
-        calendarToday.addEventListener('click', () => {
-            currentDate = new Date();
-            renderCalendar();
-        });
-
-        calendarViewSelect.addEventListener('change', (e) => {
-            currentView = e.target.value;
-            renderCalendar();
-        });
-
-        // --- Core Booking App Logic ---
-
-        // Initial authentication check and data loading
-        onAuthStateChanged(auth, async (user) => {
-            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
-                try {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token from Canvas.");
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                    showMessage("Authentication failed. Please try logging in again.", 'error');
-                    window.location.href = "login.html";
-                }
-                return;
-            }
-
-            if (!user) {
-                if (authInitialized) {
-                    window.location.href = "login.html";
-                } else {
-                    console.log("Auth state not yet resolved, waiting for user object...");
-                }
-                return;
-            }
-
-            if (!authInitialized) {
-                authInitialized = true;
-                currentUserUid = user.uid;
-                console.log("Logged-in user ID (Firebase UID):", currentUserUid);
-                initializeBookingData();
-            }
-        });
-
+        
         async function initializeBookingData() {
             showLoading("Finding your account...");
 
