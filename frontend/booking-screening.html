@@ -167,6 +167,20 @@
         z-index: 2; /* Ensure event text is above background */
         background-color: transparent; /* Event itself doesn't have a background anymore */
     }
+
+    /* NEW: Styles for the new dynamically sized event blocks */
+    .calendar-event-block {
+        background-color: #4C1D95; /* A deep purple, adjust as needed */
+        position: absolute;
+        overflow: hidden;
+        border-radius: 0.5rem;
+        border: 1px solid #7C3AED;
+    }
+    .calendar-event-block.pending {
+        background-color: #CC8A00; /* Amber-700 for pending */
+        border: 1px solid #F59E0B; /* Amber-500 border */
+    }
+        
     /* Specific styling for pending events (text only now, background is handled by parent .occupied-slot) */
     .calendar-event.pending {
         color: #F59E0B; /* Amber-500 text for pending */
@@ -908,7 +922,7 @@
             const currentDayMs = day.setHours(0,0,0,0);
         
             const timeSlotsContainer = document.createElement('div');
-            timeSlotsContainer.className = 'space-y-1 relative h-full';
+            timeSlotsContainer.className = 'space-y-1 relative h-full flex flex-col';
         
             for (let hour = 8; hour < 20; hour++) {
                 const timeSlot = document.createElement('div');
