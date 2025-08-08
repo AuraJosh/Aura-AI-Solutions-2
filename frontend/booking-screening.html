@@ -1460,34 +1460,11 @@
         prevButton.addEventListener('click', showPrevCard);
         nextButton.addEventListener('click', showNextCard);
 
-        function moveBookingToPending() {
+        // NEW: Function to open the calendar for a new booking request.
+        function openCalendarForNewBooking() {
             if (bookingsData.length === 0) return;
-
-            const bookingToMove = bookingsData[currentBookingIndex];
-            
-            const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingToMove.id);
-            if (existingStagedIndex !== -1) {
-                stagedChanges[existingStagedIndex].newStatus = 'Pending';
-                stagedChanges[existingStagedIndex].originalSource = 'requests';
-                delete stagedChanges[existingStagedIndex].scheduledTime; // Clear scheduledTime
-            } else {
-                stagedChanges.push({
-                    id: bookingToMove.id,
-                    newStatus: 'Pending',
-                    originalSource: 'requests'
-                });
-            }
-
-            // Update local arrays immediately for UI reflection (will be replaced by Firestore snapshot)
-            bookingsData = bookingsData.filter(b => b.id !== bookingToMove.id); // Remove from new
-            bookingToMove.Status = 'Pending';
-            pendingBookings.push(bookingToMove); // Add to pending
-            adjustCurrentBookingIndex();
-            renderBookingCard();
-            renderPendingBookings();
-            updateSaveButtonState();
-            console.log("Staged move to pending for booking ID:", bookingToMove.id);
-            console.log("Staged Changes after move to pending:", JSON.parse(JSON.stringify(stagedChanges)));
+            const bookingToSchedule = bookingsData[currentBookingIndex];
+            openBookingCalendarModal(bookingToSchedule);
         }
 
         function deleteBooking() {
@@ -1531,7 +1508,7 @@
             }
         }
 
-        moveToPendingBtn.addEventListener('click', moveBookingToPending);
+        moveToPendingBtn.addEventListener('click', openCalendarForNewBooking);
         deleteBookingBtn.addEventListener('click', deleteBooking);
 
         // Event delegation for pending and deleted lists
@@ -1643,43 +1620,52 @@
         }
 
         // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly and automatically saves
-        confirmScheduleBtn.addEventListener('click', async () => {
+        confirmScheduleBtn.addEventListener('click', () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
-                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
-                    showLoading("Completing and saving booking...");
-
-                    try {
-                        const bookingId = currentBookingBeingScheduled.id;
-                        
-                        // Create a single-element array for the batch update
-                        const updatesToCommit = [{
+                showConfirm(`Schedule booking for ${selectedEventDate.toLocaleString()}?`, () => {
+                    const bookingToSchedule = currentBookingBeingScheduled;
+                    const bookingId = bookingToSchedule.id;
+        
+                    // Stage the change locally
+                    const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
+                    if (existingStagedIndex !== -1) {
+                        stagedChanges[existingStagedIndex].newStatus = 'Pending';
+                        stagedChanges[existingStagedIndex].scheduledTime = selectedEventDate;
+                        stagedChanges[existingStagedIndex].originalSource = 'requests'; // Correct source
+                    } else {
+                        stagedChanges.push({
                             id: bookingId,
-                            newStatus: 'Completed',
-                            scheduledTime: selectedEventDate, // This is the Date object
-                            fullBookingData: currentBookingBeingScheduled 
-                        }];
-
-                        const result = await sendBatchBookingUpdates(updatesToCommit);
-
-                        if (result.success) {
-                            showMessage("Booking confirmed and saved successfully!", 'success');
-                            // The onSnapshot listener will handle the UI update due to data change in Firestore.
-                            // We close the calendar overlay immediately.
-                        } else {
-                            showMessage("Failed to confirm and save booking: " + result.error, 'error');
-                        }
-                    } catch (error) {
-                        console.error("Error during booking completion:", error);
-                        showMessage("An unexpected error occurred during booking completion: " + error.message, 'error');
-                    } finally {
-                        hideLoading();
-                        calendarOverlay.classList.add('hidden');
-                        document.body.style.overflow = '';
-                        // Re-render calendar to reflect the newly booked slot, relying on Firestore's onSnapshot.
-                        // renderCalendar() will be implicitly triggered by the onSnapshot listener if data changes.
+                            newStatus: 'Pending',
+                            scheduledTime: selectedEventDate,
+                            originalSource: 'requests' // Correct source
+                        });
                     }
+                    
+                    // --- NEW: Update the local arrays to reflect the UI change immediately ---
+                    // Remove from new bookings list
+                    bookingsData = bookingsData.filter(b => b.id !== bookingId); 
+                    
+                    // Add to pending bookings list
+                    const updatedBooking = { ...bookingToSchedule, Status: 'Pending', ScheduledDateTime: selectedEventDate };
+                    pendingBookings.push(updatedBooking);
+        
+                    // Re-render the booking card and lists
+                    adjustCurrentBookingIndex();
+                    renderBookingCard();
+                    renderPendingBookings();
+                    updateSaveButtonState();
+                    // --- END NEW UI UPDATE ---
+                    
+                    console.log(`Staged a pending booking for ID: ${bookingId} at ${selectedEventDate.toLocaleString()}`);
+                    console.log("Staged Changes:", JSON.parse(JSON.stringify(stagedChanges)));
+                    showMessage("Booking has been added to the 'Scheduled Bookings' list. Click 'Save Changes' to finalize.", 'success');
+                    
+                    // Close the calendar overlay
+                    calendarOverlay.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    
                 }, () => {
-                    showMessage("Booking confirmation cancelled.", 'info');
+                    showMessage("Booking scheduling cancelled.", 'info');
                 });
             } else {
                 showMessage("Please select a date and time for the booking.", 'info');
