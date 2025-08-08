@@ -313,7 +313,16 @@
             </div>
             <div id="calendar-grid" class="flex-1 p-4 overflow-y-auto">
                 </div>
-            <div class="flex justify-end space-x-4 p-4 border-t border-gray-700">
+            <div class="flex justify-between items-center p-4 border-t border-gray-700">
+                <div class="flex items-center space-x-2">
+                    <label for="booking-duration" class="text-sm text-gray-300">Duration:</label>
+                    <select id="booking-duration" class="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm">
+                        <option value="30">30 minutes</option>
+                        <option value="60" selected>1 hour</option>
+                        <option value="90">1 hour 30 minutes</option>
+                        <option value="120">2 hours</option>
+                    </select>
+                </div>
                 <button id="confirm-schedule-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-base font-semibold transition duration-200" disabled>Confirm Booking</button>
             </div>
         </div>
@@ -412,6 +421,7 @@
         const calendarViewSelect = document.getElementById('calendar-view'); // Renamed to avoid conflict
         const calendarClose = document.getElementById('calendar-close');
         const confirmScheduleBtn = document.getElementById('confirm-schedule-btn');
+        const bookingDurationSelect = document.getElementById('booking-duration');
         const clientAvailableTimesElement = document.getElementById('client-available-times'); // NEW: Client availability element
 
 
@@ -1158,6 +1168,11 @@
                     } else {
                         updateData.ScheduledDateTime = deleteField();
                     }
+                    if (change.scheduledEndTime) {
+                        updateData.ScheduledEndTime = Timestamp.fromDate(change.scheduledEndTime);
+                    } else {
+                        updateData.ScheduledEndTime = deleteField();
+                    }
                     
                     // --- CORRECTED LOGIC for creating the scheduled_meetings entry ---
                     if (change.fullBookingData) {
@@ -1622,7 +1637,11 @@
         // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly and automatically saves
         confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
-                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
+                // Get the selected duration from the dropdown
+                const durationInMinutes = parseInt(bookingDurationSelect.value, 10);
+                const bookingEndDate = new Date(selectedEventDate.getTime() + durationInMinutes * 60 * 1000);
+        
+                showConfirm(`Confirm booking for ${selectedEventDate.toLocaleString()} to ${bookingEndDate.toLocaleString()}?`, async () => {
                     showLoading("Completing and saving booking...");
         
                     try {
@@ -1632,7 +1651,8 @@
                         const updatesToCommit = [{
                             id: bookingId,
                             newStatus: 'Completed',
-                            scheduledTime: selectedEventDate, // This is the Date object
+                            scheduledTime: selectedEventDate,
+                            scheduledEndTime: bookingEndDate, // Pass the new end time
                             fullBookingData: currentBookingBeingScheduled 
                         }];
         
@@ -1640,8 +1660,6 @@
         
                         if (result.success) {
                             showMessage("Booking confirmed and saved successfully!", 'success');
-                            // The onSnapshot listener will handle the UI update due to data change in Firestore.
-                            // We close the calendar overlay immediately.
                         } else {
                             showMessage("Failed to confirm and save booking: " + result.error, 'error');
                         }
@@ -1652,8 +1670,6 @@
                         hideLoading();
                         calendarOverlay.classList.add('hidden');
                         document.body.style.overflow = '';
-                        // Re-render calendar to reflect the newly booked slot, relying on Firestore's onSnapshot.
-                        // renderCalendar() will be implicitly triggered by the onSnapshot listener if data changes.
                     }
                 }, () => {
                     showMessage("Booking confirmation cancelled.", 'info');
