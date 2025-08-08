@@ -766,31 +766,38 @@
         });
     
         // AUTHENTICATION AND INITIALIZATION
+        // Initial authentication check and data loading
         onAuthStateChanged(auth, async (user) => {
-            if (typeof __initial_auth_token !== 'undefined' && !authInitialized) {
-                try {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                    console.log("Signed in with custom token from Canvas.");
-                } catch (error) {
-                    console.error("Error signing in with custom token:", error);
-                    showMessage("Authentication failed. Please try logging in again.", 'error');
-                    window.location.href = "login.html";
-                }
-                return;
-            }
-    
             if (!user) {
                 if (authInitialized) {
                     window.location.href = "login.html";
+                } else {
+                    console.log("Auth state not yet resolved, waiting for user object...");
                 }
                 return;
             }
-    
+        
             if (!authInitialized) {
                 authInitialized = true;
-                currentUserUid = user.uid;
-                console.log("Logged-in user ID:", currentUserUid);
-                initializeCalendarPage();
+        
+                const urlParams = new URLSearchParams(window.location.search);
+                const adminView = urlParams.get('adminView');
+                const targetUserId = urlParams.get('userId');
+        
+                const idTokenResult = await user.getIdTokenResult();
+                const isAdmin = idTokenResult.claims.admin === true;
+        
+                if (isAdmin && adminView && targetUserId) {
+                    // Admin is viewing a specific user's page. Use the targetUserId.
+                    currentUserUid = targetUserId;
+                    console.log(`Admin viewing calendar data for user: ${currentUserUid}`);
+                } else {
+                    // Regular user or admin viewing their own page. Use the logged-in user's UID.
+                    currentUserUid = user.uid;
+                    console.log("Logged-in user ID (Firebase UID):", currentUserUid);
+                }
+        
+                initializeBookingData();
             }
         });
     
