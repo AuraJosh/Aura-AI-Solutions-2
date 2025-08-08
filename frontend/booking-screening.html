@@ -1620,52 +1620,43 @@
         }
 
         // MODIFIED: confirmScheduleBtn now calls sendBatchBookingUpdates directly and automatically saves
-        confirmScheduleBtn.addEventListener('click', () => {
+        confirmScheduleBtn.addEventListener('click', async () => {
             if (selectedEventDate && currentBookingBeingScheduled) {
-                showConfirm(`Schedule booking for ${selectedEventDate.toLocaleString()}?`, () => {
-                    const bookingToSchedule = currentBookingBeingScheduled;
-                    const bookingId = bookingToSchedule.id;
+                showConfirm(`Confirm booking "${currentBookingBeingScheduled.id}" for ${selectedEventDate.toLocaleString()}?`, async () => {
+                    showLoading("Completing and saving booking...");
         
-                    // Stage the change locally
-                    const existingStagedIndex = stagedChanges.findIndex(s => s.id === bookingId);
-                    if (existingStagedIndex !== -1) {
-                        stagedChanges[existingStagedIndex].newStatus = 'Pending';
-                        stagedChanges[existingStagedIndex].scheduledTime = selectedEventDate;
-                        stagedChanges[existingStagedIndex].originalSource = 'requests'; // Correct source
-                    } else {
-                        stagedChanges.push({
+                    try {
+                        const bookingId = currentBookingBeingScheduled.id;
+                        
+                        // Create a single-element array for the batch update
+                        const updatesToCommit = [{
                             id: bookingId,
-                            newStatus: 'Pending',
-                            scheduledTime: selectedEventDate,
-                            originalSource: 'requests' // Correct source
-                        });
-                    }
-                    
-                    // --- NEW: Update the local arrays to reflect the UI change immediately ---
-                    // Remove from new bookings list
-                    bookingsData = bookingsData.filter(b => b.id !== bookingId); 
-                    
-                    // Add to pending bookings list
-                    const updatedBooking = { ...bookingToSchedule, Status: 'Pending', ScheduledDateTime: selectedEventDate };
-                    pendingBookings.push(updatedBooking);
+                            newStatus: 'Completed',
+                            scheduledTime: selectedEventDate, // This is the Date object
+                            fullBookingData: currentBookingBeingScheduled 
+                        }];
         
-                    // Re-render the booking card and lists
-                    adjustCurrentBookingIndex();
-                    renderBookingCard();
-                    renderPendingBookings();
-                    updateSaveButtonState();
-                    // --- END NEW UI UPDATE ---
-                    
-                    console.log(`Staged a pending booking for ID: ${bookingId} at ${selectedEventDate.toLocaleString()}`);
-                    console.log("Staged Changes:", JSON.parse(JSON.stringify(stagedChanges)));
-                    showMessage("Booking has been added to the 'Scheduled Bookings' list. Click 'Save Changes' to finalize.", 'success');
-                    
-                    // Close the calendar overlay
-                    calendarOverlay.classList.add('hidden');
-                    document.body.style.overflow = '';
-                    
+                        const result = await sendBatchBookingUpdates(updatesToCommit);
+        
+                        if (result.success) {
+                            showMessage("Booking confirmed and saved successfully!", 'success');
+                            // The onSnapshot listener will handle the UI update due to data change in Firestore.
+                            // We close the calendar overlay immediately.
+                        } else {
+                            showMessage("Failed to confirm and save booking: " + result.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error("Error during booking completion:", error);
+                        showMessage("An unexpected error occurred during booking completion: " + error.message, 'error');
+                    } finally {
+                        hideLoading();
+                        calendarOverlay.classList.add('hidden');
+                        document.body.style.overflow = '';
+                        // Re-render calendar to reflect the newly booked slot, relying on Firestore's onSnapshot.
+                        // renderCalendar() will be implicitly triggered by the onSnapshot listener if data changes.
+                    }
                 }, () => {
-                    showMessage("Booking scheduling cancelled.", 'info');
+                    showMessage("Booking confirmation cancelled.", 'info');
                 });
             } else {
                 showMessage("Please select a date and time for the booking.", 'info');
