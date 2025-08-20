@@ -88,6 +88,22 @@
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen overflow-auto">
+    <style>
+        /* Set the base background color */
+        body {
+            background-color: #ffffff;
+            /* Add the dual gradient and grid textures using multiple background images */
+            background-image:
+                linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
+                radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
+                radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
+            /* Set the size for each background image layer */
+            background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+            color: #1f2937; /* Dark gray for readability on light background */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        }
+    </style>
 
     <div id="loading-overlay" class="loading-overlay">
         <div class="loader"></div>
@@ -138,16 +154,7 @@
         </div>
     </div>
 
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
-        </video>
-        <div class="absolute inset-0 bg-black/60"></div>
-    </div>
-
-   <script type="module">
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
     
@@ -259,7 +266,7 @@
         async function setupAdminDashboard() {
             pageTitle.textContent = "Admin Dashboard";
             showLoading();
-            
+    
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getAllAnalytics`);
                 if (!response.ok) {
@@ -271,7 +278,7 @@
                     <h2 class="text-3xl font-bold text-white mb-6 text-center">All User Analytics</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 `;
-                
+    
                 if (allData.error) {
                     adminHtml = `<p class="text-red-500 text-center">Error: ${allData.error}</p>`;
                 } else if (allData.length === 0) {
@@ -282,7 +289,7 @@
                         const monthlyLimit = userData.monthlyLimit || 0;
                         const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
                         const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-                    
+    
                         adminHtml += `
                             <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
                                 <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
@@ -313,7 +320,7 @@
     
                 adminHtml += `</div>`;
                 dataTableContainer.innerHTML = adminHtml;
-                
+    
             } catch (error) {
                 console.error('Error fetching admin data:', error);
                 dataTableContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load admin dashboard.</p>`;
@@ -321,7 +328,7 @@
                 hideLoading();
             }
         }
-        
+    
         // REFACTORED: Your original loadCustomerData function, now takes a userIdentifier
         async function loadCustomerData(userIdentifier) {
             pageTitle.textContent = "Your Analytics Suite";
@@ -337,19 +344,19 @@
     
             try {
                 const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
-                
+    
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
                 }
     
                 const data = await response.json();
-                
+    
                 if (data.error) {
                     dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
                     hideLoading();
                     return;
                 }
-                
+    
                 if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
                     typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
                     Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
@@ -375,7 +382,7 @@
                             });
                         }
                     }
-                    
+    
                     const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
     
                     let chartLabels = [];
@@ -385,7 +392,7 @@
                     if (hasEliteOrExecutiveAccess) {
                         chartLabels = dailyUsageDataReal.map(item => item.date);
                         chartData = dailyUsageDataReal.map(item => item.count);
-                        
+    
                         if (chatLogsReal.length > 0) {
                             chatLogsReal.slice().reverse().forEach(log => {
                                 const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
@@ -407,7 +414,7 @@
                             <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
                         `;
                     }
-                    
+    
                     let displayHTML = `
                         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
@@ -513,7 +520,7 @@
                                 <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
                             </div>
                         </div>`;
-                    
+    
                     dataTableContainer.innerHTML = displayHTML;
     
                     const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
