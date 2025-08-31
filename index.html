@@ -172,7 +172,7 @@
             <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1">
                 <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4">
                     <div class="relative h-16 w-[120px] md:h-20 md:w-[150px]">
-                        <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block"> </div>
+                        <img src="frontend/media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block"> </div>
                     <span class="typing-text text-sm md:text-base text-gray-900 whitespace-nowrap">Aura AI Solutions</span> </a>
             </div>
     
@@ -546,6 +546,16 @@
                 }, 120);
             }
         }
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const typingEl = document.querySelector('.typing-text');
+            if (typingEl) {
+                setTimeout(() => {
+                    typingEl.classList.add('finished');
+                }, 4500);
+            }
+        });
     </script>
 </body>
 </html>
