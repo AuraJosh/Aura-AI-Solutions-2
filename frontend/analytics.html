@@ -1,686 +1,679 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Aura Analytics Suite</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-03MPB9XG9B');
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="icon" href="media/favicon.png" type="image/png">
-    <style>
-    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
-    .chat-logs-container {
-        display: flex;
-        flex-direction: column-reverse; /* Stacks items from bottom to top */
-        overflow-y: auto;          /* Enables vertical scrolling */
-        height: 240px;             /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
-        justify-content: flex-start; /* Aligns content to the start (bottom, due to reverse) */
-    }
-    .chat-log-message {
-        padding-bottom: 8px;
-    }
-    /* Basic styling for custom message box */
-    .message-box {
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        padding: 0.75rem 1.25rem;
-        border-radius: 0.5rem;
-        color: white;
-        z-index: 1000;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
-    .message-box.error { background-color: #EF4444; /* red-500 */ }
-    .message-box.success { background-color: #22C55E; /* green-500 */ }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Analytics Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-03MPB9XG9B');
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <style>
+    /* Custom CSS to make chat logs start from the bottom and maintain fixed height */
+    .chat-logs-container {
+        display: flex;
+        flex-direction: column-reverse; /* Stacks items from bottom to top */
+        overflow-y: auto;          /* Enables vertical scrolling */
+        height: 240px;               /* Set a fixed height (h-60 in Tailwind is 15rem = 240px) */
+        justify-content: flex-start; /* Aligns content to the start (bottom, due to reverse) */
+    }
+    .chat-log-message {
+        padding-bottom: 8px;
+    }
+    /* Basic styling for custom message box */
+    .message-box {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        color: white;
+        z-index: 1000;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .message-box.info { background-color: #3B82F6; /* blue-500 */ }
+    .message-box.error { background-color: #EF4444; /* red-500 */ }
+    .message-box.success { background-color: #22C55E; /* green-500 */ }
 
-    /* --- Loading Animation Styles --- */
-    .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999; /* Ensure it's on top of everything */
-        color: white;
-        font-size: 1.2rem;
-    }
+    /* --- Loading Animation Styles --- */
+    .loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Dark overlay */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999; /* Ensure it's on top of everything */
+        color: white;
+        font-size: 1.2rem;
+    }
 
-    .loader {
-        height: 60px;
-        aspect-ratio: 2;
-        border-bottom: 3px solid #0000;
-        background:
-            linear-gradient(90deg,#524656 50%,#0000 0)
-            -25% 100%/50% 3px repeat-x border-box;
-        position: relative;
-        animation: l3-0 .75s linear infinite;
-        margin-bottom: 20px; /* Space between loader and text */
-    }
-    .loader:before {
-        content: "";
-        position: absolute;
-        inset: auto 42.5% 0;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: #4e3abd;
-        animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
-    }
-    @keyframes l3-0 {
-        to {background-position: -125% 100%}
-    }
-    @keyframes l3-1 {
-        0%,2% {bottom: 0%}
-        98%,to {bottom:.1%}
-    }
-    body {
-        background-color: #ffffff;
-        background-image:
-            linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
-            radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
-            radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
-        background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
-        color: #1f2937;
-        /* Add these lines below */
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    </style>
+    .loader {
+        height: 60px;
+        aspect-ratio: 2;
+        border-bottom: 3px solid #0000;
+        background:
+            linear-gradient(90deg,#524656 50%,#0000 0)
+            -25% 100%/50% 3px repeat-x border-box;
+        position: relative;
+        animation: l3-0 .75s linear infinite;
+        margin-bottom: 20px; /* Space between loader and text */
+    }
+    .loader:before {
+        content: "";
+        position: absolute;
+        inset: auto 42.5% 0;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #4e3abd;
+        animation: l3-1 .75s cubic-bezier(0,900,1,900) infinite;
+    }
+    @keyframes l3-0 {
+        to {background-position: -125% 100%}
+    }
+    @keyframes l3-1 {
+        0%,2% {bottom: 0%}
+        98%,to {bottom:.1%}
+    }
+
+    body {
+        /* Set the base background color */
+        background-color: #ffffff;
+        /* Add the dual gradient and grid textures using multiple background images */
+        background-image:
+            linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
+            radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
+            radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
+        /* Set the size for each background image layer */
+        background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+        color: #1f2937; /* Dark gray for readability on light background */
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen overflow-auto">
+<body>
 
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="loader"></div>
-        <p class="text-gray-900">Loading your analytics data...</p>
-    </div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loader"></div>
+        <p>Loading your analytics data...</p>
+    </div>
 
-    <header class="fixed top-0 w-full bg-[#f3f4f6] shadow z-20">
-        <div class="container mx-auto flex items-center justify-between p-4 relative">
-            <div class="flex items-center space-x-4">
-                <div class="relative h-20 w-[150px]">
-                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
-                </div>
-                <span class="text-gray-900 text-base">Aura AI Solutions</span>
-            </div>
-            <h1 id="page-title" class="text-gray-900 font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
-            <div class="flex items-center space-x-4">
-                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
-                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
-            </div>
-        </div>
-    </header>
+    <header class="fixed top-0 w-full bg-[#060d1f] shadow z-20">
+        <div class="container mx-auto flex items-center justify-between p-4 relative">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-20 w-[150px]">
+                    <img src="media/logo-dark.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
+                </div>
+                <span class="text-white text-base">Aura AI Solutions</span>
+            </div>
+            <h1 id="page-title" class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
+            <div class="flex items-center space-x-4">
+                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+            </div>
+        </div>
+    </header>
 
-    <main class="pt-40 px-4 flex justify-center relative z-10">
-        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/50 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
-        </div>
-    </main>
+    <main class="pt-40 px-4 flex justify-center relative z-10">
+        <div id="data-table-container" class="w-full max-w-[1600px] h-[80vh] bg-white/10 backdrop-blur-md py-4 px-10 rounded-xl shadow-lg overflow-y-auto">
+        </div>
+    </main>
 
-    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg relative">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl leading-none">&times;</button>
-            <h2 class="text-2xl font-semibold text-gray-900 mb-6 text-center">Request Business Info Update</h2>
-            <form id="business-info-form">
-                <div class="mb-4">
-                    <label for="update-details" class="block text-gray-700 text-sm font-bold mb-2">
-                        Please describe the changes you would like to make to your AI's business information:
-                    </label>
-                    <textarea id="update-details" name="updateDetails" rows="8"
-                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-200 border-gray-300 focus:ring focus:ring-blue-500/50"
-                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
-                </div>
-                <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
-                        Send Update Request
-                    </button>
-                    <p id="form-message" class="text-sm text-gray-600"></p>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div id="update-info-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg relative">
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <form id="business-info-form">
+                <div class="mb-4">
+                    <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
+                        Please describe the changes you would like to make to your AI's business information:
+                    </label>
+                    <textarea id="update-details" name="updateDetails" rows="8"
+                                class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-900 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 focus:ring focus:ring-blue-500/50"
+                                placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                        Send Update Request
+                    </button>
+                    <p id="form-message" class="text-sm text-gray-400"></p>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <div class="fixed inset-0 -z-10 pointer-events-none">
-        <video autoplay loop muted class="w-full h-full object-cover pointer-events-none">
-            <source src="media/background.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-            <img src="media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover block" />
-        </video>
-        <div class="absolute inset-0 bg-white/60"></div>
-    </div>
-
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
-    
-        // IMPORTANT: Replace with your actual Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
-            authDomain: "aura-ai-85b65.firebaseapp.com",
-            projectId: "aura-ai-85b65",
-            storageBucket: "aura-ai-85b65.appspot.com",
-            messagingSenderId: "492492484793",
-            appId: "1:492492484793:web:7f9038d50f523241536b68"
-        };
-    
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-    
-        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
-    
-        let authInitialized = false; // Flag to ensure data loading happens only once
-        const loadingOverlay = document.getElementById('loading-overlay'); // Get the loading overlay element
-        const pageTitle = document.getElementById('page-title');
-        const dataTableContainer = document.getElementById('data-table-container');
-        const bookingsLink = document.querySelector('a[href="booking-screening.html"]'); // New variable
-    
-        // Function to show the loading overlay
-        function showLoading() {
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'flex'; // Use flex to center content
-            }
-        }
-    
-        // Function to hide the loading overlay
-        function hideLoading() {
-            if (loadingOverlay) {
-                loadingOverlay.style.display = 'none';
-            }
-        }
-    
-        // --- Custom Message Function (replaces alert) ---
-        function showMessage(message, type = 'info') {
-            const messageBox = document.createElement('div');
-            messageBox.className = `message-box ${type}`;
-            document.body.appendChild(messageBox);
-            setTimeout(() => {
-                messageBox.remove();
-            }, 3000); // Remove after 3 seconds
-        }
-    
-        // NEW: Function to update the header links
-        function updateHeaderLinks(isAdmin, targetUserId) {
-            if (isAdmin && targetUserId) {
-                bookingsLink.href = `booking-screening.html?adminView=true&userId=${targetUserId}`;
-            } else {
-                bookingsLink.href = "booking-screening.html";
-            }
-        }
-    
-        // --- Protect this page and load data ---
-        onAuthStateChanged(auth, async (user) => {
-            if (!authInitialized) {
-                authInitialized = true;
-                if (!user) {
-                    console.log("User is not logged in. Redirecting to login.");
-                    window.location.href = "login.html";
-                    hideLoading();
-                    return;
-                }
-    
-                try {
-                    const idTokenResult = await user.getIdTokenResult();
-                    const isAdmin = idTokenResult.claims.admin === true;
-    
-                    // Check for admin view parameters in the URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const adminView = urlParams.get('adminView');
-                    const targetUserId = urlParams.get('userId');
-    
-                    if (isAdmin) {
-                        console.log("Admin user logged in.");
-                        if (adminView && targetUserId) {
-                            // Admin is viewing a specific user's detailed dashboard
-                            console.log(`Admin viewing detailed analytics for user: ${targetUserId}`);
-                            updateHeaderLinks(true, targetUserId); // NEW: Update the bookings link
-                            await loadCustomerData(targetUserId);
-                        } else {
-                            // Admin's default view - the summary dashboard
-                            console.log("Admin viewing summary dashboard.");
-                            updateHeaderLinks(false); // NEW: Reset the bookings link for the admin's own view
-                            await setupAdminDashboard();
-                        }
-                    } else {
-                        console.log("Regular user logged in:", user.uid);
-                        // Regular users can only see their own data
-                        updateHeaderLinks(false); // NEW: Always show the default link for regular users
-                        await loadCustomerData(user.uid);
-                    }
-                } catch (error) {
-                    console.error("Error checking user claims:", error);
-                    // Fallback to regular user view on error
-                    updateHeaderLinks(false); // NEW: Always show the default link on error
-                    await loadCustomerData(user.uid);
-                }
-            }
-        });
-    
-        // NEW: Function to set up the admin dashboard view
-        async function setupAdminDashboard() {
-            pageTitle.textContent = "Admin Dashboard";
-            showLoading();
-            
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getAllAnalytics`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const allData = await response.json();
-    
-                let adminHtml = `
-                    <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">All User Analytics</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                `;
-                
-                if (allData.error) {
-                    adminHtml = `<p class="text-red-500 text-center">Error: ${allData.error}</p>`;
-                } else if (allData.length === 0) {
-                    adminHtml = `<p class="text-gray-600 text-center">No user data found.</p>`;
-                } else {
-                    allData.forEach(userData => {
-                        const totalSent = userData.totalMessagesSent || 0;
-                        const monthlyLimit = userData.monthlyLimit || 0;
-                        const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
-                        const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-                    
-                        adminHtml += `
-                            <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
-                                <div class="bg-gray-200 p-6 rounded-lg shadow-xl border border-gray-300 hover:bg-gray-300 transition duration-200 cursor-pointer h-full">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">${userData.accountName}</h3>
-                                    <p class="text-gray-600 text-sm mb-4">UID: ${userData.uid}</p>
-                                    <div class="space-y-2">
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-gray-700">Messages Used:</p>
-                                            <p class="text-gray-900 font-bold">${totalSent} / ${monthlyLimit}</p>
-                                        </div>
-                                        <div class="w-full bg-gray-400 rounded-full h-2.5">
-                                            <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-gray-700">Current Tier:</p>
-                                            <p class="text-gray-900 font-medium">${userData.tier || 'N/A'}</p>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <p class="text-gray-700">Next Payment:</p>
-                                            <p class="text-gray-900 font-medium">${userData.nextPaymentDate || 'N/A'}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
-                    });
-                }
-    
-                adminHtml += `</div>`;
-                dataTableContainer.innerHTML = adminHtml;
-                
-            } catch (error) {
-                console.error('Error fetching admin data:', error);
-                dataTableContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load admin dashboard.</p>`;
-            } finally {
-                hideLoading();
-            }
-        }
-        
-        // REFACTORED: Your original loadCustomerData function, now takes a userIdentifier
-        async function loadCustomerData(userIdentifier) {
-            pageTitle.textContent = "Your Analytics Suite";
-            showLoading();
-    
-            if (!dataTableContainer) {
-                console.error("Error: Element with ID 'data-table-container' not found.");
-                hideLoading();
-                return;
-            }
-    
-            dataTableContainer.innerHTML = '';
-    
-            try {
-                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-                }
-    
-                const data = await response.json();
-                
-                if (data.error) {
-                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
-                    hideLoading();
-                    return;
-                }
-                
-                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
-                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
-                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
-    
-                    const totalSent = data.totalMessagesSent;
-                    const monthlyLimit = data.monthlyLimit;
-                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
-                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
-    
-                    const tier = data.tier;
-                    const paymentTerm = data.paymentTerm;
-                    const dailyUsageDataReal = data.dailyUsageData;
-                    const chatLogsReal = data.chatLogs;
-    
-                    let formattedNextPaymentDate = 'N/A';
-                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
-                        const dateObj = new Date(data.nextPaymentDate);
-                        if (!isNaN(dateObj.getTime())) {
-                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
-                                year: 'numeric',
-                                month: '2-digit',
-                                day: '2-digit'
-                            });
-                        }
-                    }
-                    
-                    const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
-    
-                    let chartLabels = [];
-                    let chartData = [];
-                    let chatContentHTML = '';
-    
-                    if (hasEliteOrExecutiveAccess) {
-                        chartLabels = dailyUsageDataReal.map(item => item.date);
-                        chartData = dailyUsageDataReal.map(item => item.count);
-                        
-                        if (chatLogsReal.length > 0) {
-                            chatLogsReal.slice().reverse().forEach(log => {
-                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-600' : 'text-green-600';
-                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
-                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
-                            });
-                        } else {
-                            chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
-                        }
-    
-                    } else {
-                        chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
-                        chartData = [10, 15, 8, 20, 12, 25, 18];
-    
-                        chatContentHTML = `
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-600">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-600">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-600">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-600">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                        `;
-                    }
-                    
-                    let displayHTML = `
-                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                        <div class="xl:col-span-2 bg-gray-200 p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Monthly Message Usage</h2>
-                                <div class="flex items-center justify-between">
-                                    <p class="text-gray-700 text-lg">Messages Used:</p>
-                                    <p class="text-gray-900 text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
-                                </div>
-                                <div class="w-full bg-gray-400 rounded-full h-2.5 mt-4">
-                                    <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
-                                </div>
-                                <p class="text-gray-600 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
-                                ${totalSent >= monthlyLimit ? '<p class="text-red-600 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
-                            </div>
-    
-                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Payment Information</h2>
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-700">Current Tier:</p>
-                                        <p class="text-gray-900 font-medium">${tier}</p>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-700">Payment Term:</p>
-                                        <p class="text-gray-900 font-medium">${paymentTerm}</p>
-                                    </div>
-                                    <div class="flex items-center justify-between">
-                                        <p class="text-gray-700">Next Payment Date:</p>
-                                        <p class="text-gray-900 font-medium">${formattedNextPaymentDate}</p>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Daily Message Usage</h2>
-                                ${hasEliteOrExecutiveAccess ? `
-                                    <div class="h-60">
-                                        <canvas id="dailyUsageChart"></canvas>
-                                    </div>
-                                ` : `
-                                    <div class="absolute inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
-                                        <div class="text-center">
-                                            <p class="text-gray-900 text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                            <p class="text-gray-700 text-sm">Unlock detailed daily usage analytics.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
-                                        </div>
-                                    </div>
-                                    <div class="h-60 opacity-20">
-                                        <canvas id="dailyUsageChartDummy"></canvas>
-                                    </div>
-                                `}
-                            </div>
-    
-                           <div class="xl:col-span-2 bg-gray-200 p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Chat Logs</h2>
-                                ${hasEliteOrExecutiveAccess ? `
-                                    <div class="text-gray-700 chat-logs-container"> ${chatContentHTML}
-                                    </div>
-                                ` : `
-                                    <div class="absolute inset-0 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
-                                        <div class="text-center">
-                                            <p class="text-gray-900 text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
-                                            <p class="text-gray-700 text-sm">Unlock detailed chat logs.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
-                                        </div>
-                                    </div>
-                                    <div class="opacity-20 text-gray-700 chat-logs-container"> ${chatContentHTML}
-                                    </div>
-                                `}
-                            </div>
-    
-                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Manage Subscription</h2>
-                                <p class="text-gray-600 text-sm mb-4">Need to make a change to your plan?</p>
-                                <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
-                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
-                                        Cancel Subscription
-                                    </button>
-                                </a>
-                                <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
-                            </div>
-    
-                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Feedback</h2>
-                                <p class="text-gray-600 text-sm mb-4">Help us improve Aura AI during beta!</p>
-                                <a href="form.html"
-                                        id="feedback-btn"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
-                                        Provide Feedback
-                                </a>
-    
-                                <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
-                            </div>
-    
-                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-gray-900 mb-4">Update Business Info</h2>
-                                <p class="text-gray-600 text-sm mb-4">Request changes to your AI's knowledge base.</p>
-                                <a href="update.html" class="inline-block">
-                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
-                                        Request Update
-                                    </button>
-                                </a>
-                                <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
-                            </div>
-                        </div>`;
-                    
-                    dataTableContainer.innerHTML = displayHTML;
-    
-                    const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
-                    const ctx = document.getElementById(chartId);
-    
-                    if (ctx) {
-                        new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: chartLabels,
-                                datasets: [{
-                                    label: 'Messages Sent',
-                                    data: chartData,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    tension: 0.1,
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    fill: true,
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        ticks: { color: hasEliteOrExecutiveAccess ? '#1f2937' : 'rgba(31,41,55,0.3)' },
-                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(31,41,55,0.1)' : 'rgba(31,41,55,0.05)' }
-                                    },
-                                    x: {
-                                        ticks: { color: hasEliteOrExecutiveAccess ? '#1f2937' : 'rgba(31,41,55,0.3)' },
-                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(31,41,55,0.1)' : 'rgba(31,41,55,0.05)' }
-                                    }
-                                },
-                                plugins: {
-                                    legend: {
-                                        labels: { color: hasEliteOrExecutiveAccess ? '#1f2937' : 'rgba(31,41,55,0.3)' }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                } else {
-                    dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
-                    console.error("Received unexpected data format:", data);
-                }
-    
-            } catch (error) {
-                console.error('Error fetching or parsing data:', error);
-                dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
-            } finally {
-                hideLoading();
-            }
-        }
-    
-        // --- Logout button ---
-        document.getElementById("logout-btn").addEventListener("click", async () => {
-            try {
-                await signOut(auth);
-                console.log("User logged out. Redirecting to login.html");
-                window.location.href = "login.html";
-            } catch (err) {
-                console.error("Logout failed:", err.message);
-                showMessage("Logout failed: " + err.message, 'error');
-            }
-        });
-    
-        const feedbackBtn = document.getElementById('feedback-btn');
-        const updateInfoBtn = document.getElementById('update-info-btn');
-        const updateInfoModal = document.getElementById('update-info-modal');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const businessInfoForm = document.getElementById('business-info-form');
-        const formMessage = document.getElementById('form-message');
-        const updateDetailsTextArea = document.getElementById('update-details');
-    
-        if (feedbackBtn) {
-            feedbackBtn.addEventListener('click', () => {
-                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
-            });
-        }
-    
-        if (updateInfoBtn) {
-            updateInfoBtn.addEventListener('click', (event) => {
-                event.preventDefault(); // Prevent default link behavior
-                updateInfoModal.classList.remove('hidden');
-            });
-        }
-    
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', () => {
-                updateInfoModal.classList.add('hidden');
-                formMessage.textContent = '';
-                businessInfoForm.reset();
-            });
-        }
-    
-        if (updateInfoModal) {
-            updateInfoModal.addEventListener('click', (event) => {
-                if (event.target === updateInfoModal) {
-                    updateInfoModal.classList.add('hidden');
-                    formMessage.textContent = '';
-                    businessInfoForm.reset();
-                }
-            });
-        }
-    
-        if (businessInfoForm) {
-            businessInfoForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-    
-                formMessage.textContent = 'Sending request...';
-                formMessage.className = 'text-sm text-gray-600';
-    
-                const requestedChanges = updateDetailsTextArea.value;
-    
-                const currentUser = auth.currentUser;
-                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
-    
-                if (!requestedChanges.trim()) {
-                    formMessage.textContent = 'Please describe the changes.';
-                    formMessage.className = 'text-sm text-red-600';
-                    return;
-                }
-    
-                try {
-                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: new URLSearchParams({
-                            action: 'sendBusinessInfoUpdate',
-                            userId: submitterUserId,
-                            changes: requestedChanges
-                        })
-                    });
-    
-                    const result = await response.json();
-    
-                    if (result.success) {
-                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
-                        formMessage.className = 'text-sm text-green-600';
-                        businessInfoForm.reset();
-                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
-                    } else {
-                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
-                        formMessage.className = 'text-sm text-red-600';
-                    }
-                } catch (error) {
-                    console.error('Error submitting business info update:', error);
-                    formMessage.textContent = 'Failed to send request. Please try again later.';
-                    formMessage.className = 'text-sm text-red-600';
-                }
-            });
-        }
-    </script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js";
+    
+        // IMPORTANT: Replace with your actual Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwfckZ8iU2XuHqOV-Yp4RG4D9Jwjsw-P8",
+            authDomain: "aura-ai-85b65.firebaseapp.com",
+            projectId: "aura-ai-85b65",
+            storageBucket: "aura-ai-85b65.appspot.com",
+            messagingSenderId: "492492484793",
+            appId: "1:492492484793:web:7f9038d50f523241536b68"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+    
+        // IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL!
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxQ_19E4zCMGH1ELYhLj3xVsHt9LUX3FiNIsUk-z--uiSWsgM8XvOTakvIg2V1eiHF5/exec';
+    
+        let authInitialized = false; // Flag to ensure data loading happens only once
+        const loadingOverlay = document.getElementById('loading-overlay'); // Get the loading overlay element
+        const pageTitle = document.getElementById('page-title');
+        const dataTableContainer = document.getElementById('data-table-container');
+        const bookingsLink = document.querySelector('a[href="booking-screening.html"]'); // New variable
+    
+        // Function to show the loading overlay
+        function showLoading() {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'flex'; // Use flex to center content
+            }
+        }
+    
+        // Function to hide the loading overlay
+        function hideLoading() {
+            if (loadingOverlay) {
+                loadingOverlay.style.display = 'none';
+            }
+        }
+    
+        // --- Custom Message Function (replaces alert) ---
+        function showMessage(message, type = 'info') {
+            const messageBox = document.createElement('div');
+            messageBox.className = `message-box ${type}`;
+            messageBox.textContent = message;
+            document.body.appendChild(messageBox);
+            setTimeout(() => {
+                messageBox.remove();
+            }, 3000); // Remove after 3 seconds
+        }
+    
+        // NEW: Function to update the header links
+        function updateHeaderLinks(isAdmin, targetUserId) {
+            if (isAdmin && targetUserId) {
+                bookingsLink.href = `booking-screening.html?adminView=true&userId=${targetUserId}`;
+            } else {
+                bookingsLink.href = "booking-screening.html";
+            }
+        }
+    
+        // --- Protect this page and load data ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!authInitialized) {
+                authInitialized = true;
+                if (!user) {
+                    console.log("User is not logged in. Redirecting to login.");
+                    window.location.href = "login.html";
+                    hideLoading();
+                    return;
+                }
+    
+                try {
+                    const idTokenResult = await user.getIdTokenResult();
+                    const isAdmin = idTokenResult.claims.admin === true;
+    
+                    // Check for admin view parameters in the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const adminView = urlParams.get('adminView');
+                    const targetUserId = urlParams.get('userId');
+    
+                    if (isAdmin) {
+                        console.log("Admin user logged in.");
+                        if (adminView && targetUserId) {
+                            // Admin is viewing a specific user's detailed dashboard
+                            console.log(`Admin viewing detailed analytics for user: ${targetUserId}`);
+                            updateHeaderLinks(true, targetUserId); // NEW: Update the bookings link
+                            await loadCustomerData(targetUserId);
+                        } else {
+                            // Admin's default view - the summary dashboard
+                            console.log("Admin viewing summary dashboard.");
+                            updateHeaderLinks(false); // NEW: Reset the bookings link for the admin's own view
+                            await setupAdminDashboard();
+                        }
+                    } else {
+                        console.log("Regular user logged in:", user.uid);
+                        // Regular users can only see their own data
+                        updateHeaderLinks(false); // NEW: Always show the default link for regular users
+                        await loadCustomerData(user.uid);
+                    }
+                } catch (error) {
+                    console.error("Error checking user claims:", error);
+                    // Fallback to regular user view on error
+                    updateHeaderLinks(false); // NEW: Always show the default link on error
+                    await loadCustomerData(user.uid);
+                }
+            }
+        });
+    
+        // NEW: Function to set up the admin dashboard view
+        async function setupAdminDashboard() {
+            pageTitle.textContent = "Admin Dashboard";
+            showLoading();
+    
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=getAllAnalytics`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const allData = await response.json();
+    
+                let adminHtml = `
+                    <h2 class="text-3xl font-bold text-white mb-6 text-center">All User Analytics</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                `;
+    
+                if (allData.error) {
+                    adminHtml = `<p class="text-red-500 text-center">Error: ${allData.error}</p>`;
+                } else if (allData.length === 0) {
+                    adminHtml = `<p class="text-gray-400 text-center">No user data found.</p>`;
+                } else {
+                    allData.forEach(userData => {
+                        const totalSent = userData.totalMessagesSent || 0;
+                        const monthlyLimit = userData.monthlyLimit || 0;
+                        const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                        const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+    
+                        adminHtml += `
+                            <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
+                                <div class="bg-gray-800 p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
+                                    <h3 class="text-xl font-semibold text-white mb-2">${userData.accountName}</h3>
+                                    <p class="text-gray-400 text-sm mb-4">UID: ${userData.uid}</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Messages Used:</p>
+                                            <p class="text-white font-bold">${totalSent} / ${monthlyLimit}</p>
+                                        </div>
+                                        <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                            <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Current Tier:</p>
+                                            <p class="text-white font-medium">${userData.tier || 'N/A'}</p>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <p class="text-gray-300">Next Payment:</p>
+                                            <p class="text-white font-medium">${userData.nextPaymentDate || 'N/A'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                }
+    
+                adminHtml += `</div>`;
+                dataTableContainer.innerHTML = adminHtml;
+    
+            } catch (error) {
+                console.error('Error fetching admin data:', error);
+                dataTableContainer.innerHTML = `<p class="text-red-500 text-center">Failed to load admin dashboard.</p>`;
+            } finally {
+                hideLoading();
+            }
+        }
+    
+        // REFACTORED: Your original loadCustomerData function, now takes a userIdentifier
+        async function loadCustomerData(userIdentifier) {
+            pageTitle.textContent = "Your Analytics Suite";
+            showLoading();
+    
+            if (!dataTableContainer) {
+                console.error("Error: Element with ID 'data-table-container' not found.");
+                hideLoading();
+                return;
+            }
+    
+            dataTableContainer.innerHTML = '';
+    
+            try {
+                const response = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?userId=${encodeURIComponent(userIdentifier)}`);
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+    
+                const data = await response.json();
+    
+                if (data.error) {
+                    dataTableContainer.innerHTML = `<p style="color: red; text-align: center;">Error: ${data.error}</p>`;
+                    hideLoading();
+                    return;
+                }
+    
+                if (typeof data.totalMessagesSent === 'number' && typeof data.monthlyLimit === 'number' &&
+                    typeof data.tier === 'string' && typeof data.paymentTerm === 'string' && typeof data.nextPaymentDate === 'string' &&
+                    Array.isArray(data.dailyUsageData) && Array.isArray(data.chatLogs)) {
+    
+                    const totalSent = data.totalMessagesSent;
+                    const monthlyLimit = data.monthlyLimit;
+                    const percentageUsed = monthlyLimit > 0 ? Math.min(100, (totalSent / monthlyLimit) * 100) : 0;
+                    const progressBarColor = percentageUsed > 90 ? 'bg-red-500' : (percentageUsed > 70 ? 'bg-yellow-500' : 'bg-blue-500');
+    
+                    const tier = data.tier;
+                    const paymentTerm = data.paymentTerm;
+                    const dailyUsageDataReal = data.dailyUsageData;
+                    const chatLogsReal = data.chatLogs;
+    
+                    let formattedNextPaymentDate = 'N/A';
+                    if (data.nextPaymentDate && data.nextPaymentDate !== 'N/A') {
+                        const dateObj = new Date(data.nextPaymentDate);
+                        if (!isNaN(dateObj.getTime())) {
+                            formattedNextPaymentDate = dateObj.toLocaleDateString('en-GB', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit'
+                            });
+                        }
+                    }
+                    
+                    const hasEliteOrExecutiveAccess = (tier === 'Beta' || tier === 'Elite' || tier === 'Executive');
+    
+                    let chartLabels = [];
+                    let chartData = [];
+                    let chatContentHTML = '';
+    
+                    if (hasEliteOrExecutiveAccess) {
+                        chartLabels = dailyUsageDataReal.map(item => item.date);
+                        chartData = dailyUsageDataReal.map(item => item.count);
+                        
+                        if (chatLogsReal.length > 0) {
+                            chatLogsReal.slice().reverse().forEach(log => {
+                                const messageClass = log.userType.toLowerCase() === 'user' ? 'text-blue-300' : 'text-green-300';
+                                const userName = log.userType.toLowerCase() === 'user' ? 'User' : 'AI';
+                                chatContentHTML += `<p class="mb-2 chat-log-message"><span class="font-bold ${messageClass}">${userName}:</span> ${log.message}</p>`;
+                            });
+                        } else {
+                            chatContentHTML = '<p class="text-gray-400 text-center">No chat logs found for this account.</p>';
+                        }
+    
+                    } else {
+                        chartLabels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+                        chartData = [10, 15, 8, 20, 12, 25, 18];
+    
+                        chatContentHTML = `
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-green-300">AI:</span> Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                            <p class="mb-2 chat-log-message"><span class="font-bold text-blue-300">User:</span> Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                        `;
+                    }
+                    
+                    let displayHTML = `
+                        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                                <div class="flex items-center justify-between">
+                                    <p class="text-gray-300 text-lg">Messages Used:</p>
+                                    <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                                    <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
+                                </div>
+                                <p class="text-gray-400 text-sm mt-2 text-right">Progress towards your monthly limit.</p>
+                                ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
+                            </div>
+    
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl">
+                                <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Current Tier:</p>
+                                        <p class="text-white font-medium">${tier}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Payment Term:</p>
+                                        <p class="text-white font-medium">${paymentTerm}</p>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-gray-300">Next Payment Date:</p>
+                                        <p class="text-white font-medium">${formattedNextPaymentDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="h-60">
+                                        <canvas id="dailyUsageChart"></canvas>
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                        </div>
+                                    </div>
+                                    <div class="h-60 opacity-20">
+                                        <canvas id="dailyUsageChartDummy"></canvas>
+                                    </div>
+                                `}
+                            </div>
+    
+                           <div class="xl:col-span-2 bg-gray-800 p-6 rounded-lg shadow-xl relative overflow-hidden">
+                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
+                                ${hasEliteOrExecutiveAccess ? `
+                                    <div class="text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                ` : `
+                                    <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
+                                        <div class="text-center">
+                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-gray-300 text-sm">Unlock detailed chat logs.</p>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                        </div>
+                                    </div>
+                                    <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
+                                    </div>
+                                `}
+                            </div>
+    
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
+                                <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
+                                <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
+                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Cancel Subscription
+                                    </button>
+                                </a>
+                                <p class="text-gray-500 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
+                            </div>
+    
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
+                                <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
+                                <a href="form.html"
+                                        id="feedback-btn"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                        Provide Feedback
+                                </a>
+    
+                                <p class="text-gray-500 text-xs mt-2">Opens a separate feedback form.</p>
+                            </div>
+    
+                            <div class="xl:col-span-1 bg-gray-800 p-6 rounded-lg shadow-xl text-center">
+                                <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
+                                <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
+                                <a href="update.html" class="inline-block">
+                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                        Request Update
+                                    </button>
+                                </a>
+                                <p class="text-gray-500 text-xs mt-2">Sends an update request to our team.</p>
+                            </div>
+                        </div>`;
+                    
+                    dataTableContainer.innerHTML = displayHTML;
+    
+                    const chartId = hasEliteOrExecutiveAccess ? 'dailyUsageChart' : 'dailyUsageChartDummy';
+                    const ctx = document.getElementById(chartId);
+    
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: chartLabels,
+                                datasets: [{
+                                    label: 'Messages Sent',
+                                    data: chartData,
+                                    borderColor: 'rgb(75, 192, 192)',
+                                    tension: 0.1,
+                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                    fill: true,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    },
+                                    x: {
+                                        ticks: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' },
+                                        grid: { color: hasEliteOrExecutiveAccess ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)' }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        labels: { color: hasEliteOrExecutiveAccess ? 'white' : 'rgba(255,255,255,0.3)' }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Unexpected data format received from analytics server. Please try again later.</p>';
+                    console.error("Received unexpected data format:", data);
+                }
+    
+            } catch (error) {
+                console.error('Error fetching or parsing data:', error);
+                dataTableContainer.innerHTML = '<p style="color: red; text-align: center;">Failed to load data. Please try again later.</p>';
+            } finally {
+                hideLoading();
+            }
+        }
+    
+        // --- Logout button ---
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            try {
+                await signOut(auth);
+                console.log("User logged out. Redirecting to login.html");
+                window.location.href = "login.html";
+            } catch (err) {
+                console.error("Logout failed:", err.message);
+                showMessage("Logout failed: " + err.message, 'error');
+            }
+        });
+    
+        const feedbackBtn = document.getElementById('feedback-btn');
+        const updateInfoBtn = document.getElementById('update-info-btn');
+        const updateInfoModal = document.getElementById('update-info-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const businessInfoForm = document.getElementById('business-info-form');
+        const formMessage = document.getElementById('form-message');
+        const updateDetailsTextArea = document.getElementById('update-details');
+    
+        if (feedbackBtn) {
+            feedbackBtn.addEventListener('click', () => {
+                window.open('https://docs.google.com/forms/d/e/1FAIpQLSde46Maqzo4AOMRIHBSRnqY5F0eeLY38JIUxF-v2_VRIUgBlw/viewform?usp=dialog', '_blank');
+            });
+        }
+    
+        if (updateInfoBtn) {
+            updateInfoBtn.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent default link behavior
+                updateInfoModal.classList.remove('hidden');
+            });
+        }
+    
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                updateInfoModal.classList.add('hidden');
+                formMessage.textContent = '';
+                businessInfoForm.reset();
+            });
+        }
+    
+        if (updateInfoModal) {
+            updateInfoModal.addEventListener('click', (event) => {
+                if (event.target === updateInfoModal) {
+                    updateInfoModal.classList.add('hidden');
+                    formMessage.textContent = '';
+                    businessInfoForm.reset();
+                }
+            });
+        }
+    
+        if (businessInfoForm) {
+            businessInfoForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+    
+                formMessage.textContent = 'Sending request...';
+                formMessage.className = 'text-sm text-gray-400';
+    
+                const requestedChanges = updateDetailsTextArea.value;
+    
+                const currentUser = auth.currentUser;
+                const submitterUserId = currentUser ? currentUser.uid : 'UNKNOWN_USER';
+    
+                if (!requestedChanges.trim()) {
+                    formMessage.textContent = 'Please describe the changes.';
+                    formMessage.className = 'text-sm text-red-400';
+                    return;
+                }
+    
+                try {
+                    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            action: 'sendBusinessInfoUpdate',
+                            userId: submitterUserId,
+                            changes: requestedChanges
+                        })
+                    });
+    
+                    const result = await response.json();
+    
+                    if (result.success) {
+                        formMessage.textContent = 'Request sent successfully! Thank you for your feedback.';
+                        formMessage.className = 'text-sm text-green-400';
+                        businessInfoForm.reset();
+                        setTimeout(() => updateInfoModal.classList.add('hidden'), 3000);
+                    } else {
+                        formMessage.textContent = `Error sending request: ${result.error || 'Unknown error'}`;
+                        formMessage.className = 'text-sm text-red-400';
+                    }
+                } catch (error) {
+                    console.error('Error submitting business info update:', error);
+                    formMessage.textContent = 'Failed to send request. Please try again later.';
+                    formMessage.className = 'text-sm text-red-400';
+                }
+            });
+        }
+    </script>
 </body>
 </html>
