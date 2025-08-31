@@ -1,249 +1,546 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark">
+<html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Aura AI Solutions</title>
-    <link rel="icon" href="data:,">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura AI Solutions - Intelligent AI Chatbots for Business</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#6366F1',
-              accent: '#8B5CF6',
-            }
-          }
-        }
-      }
-    </script>
-    <link rel="stylesheet" href="frontend/style.css">
-    <link rel="stylesheet" href="frontend/widget.css">
-
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
     <style>
-        html, body { margin: 0; padding: 0; }
-
-        @keyframes fade-in {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Define a modern, clean font stack */
+        :root {
+            --accent-color: #9f49f6; /* A vibrant purple */
         }
 
-        .animate-fade-in {
-            animation: fade-in 0.5s ease-out forwards;
+        /*
+         * This custom CSS ensures the background gradients are always visible
+         * by applying them directly to the body.
+         */
+        body {
+            /* Set the base background color */
+            background-color: #ffffff;
+            /* Add the dual gradient and grid textures using multiple background images */
+            background-image:
+                linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
+                radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
+                radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
+            /* Set the size for each background image layer */
+            background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+            color: #1f2937; /* Dark gray for readability on light background */
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         }
 
-        /* Custom styles for mobile menu slide-in/out */
-        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
-            transition: transform 0.3s ease-out;
+        /* Custom animation for the logo typing effect */
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 0;
+            animation: typing-effect 2.5s steps(20, end) forwards;
         }
-        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
-            transform: translateY(-100%);
+        
+        .typing-text-container {
+            position: relative;
         }
-        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
+
+        .typing-text-container::after {
+            content: '|';
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            animation: blink-caret 0.75s step-end infinite;
+            color: var(--accent-color);
+        }
+
+        .typing-text-container.finished::after {
+            display: none;
+        }
+
+        @keyframes typing-effect {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* Parallax effect for Section 2 */
+        .parallax-bg {
+            background-image: url('F3F4F6.png'); /* Placeholder for a light-themed image */
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        /* New Scroll Animation Styles */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        
+        .animate-on-scroll.is-visible {
+            opacity: 1;
             transform: translateY(0);
         }
 
+        /* Custom CSS for gradients and effects */
+        .essential-title {
+            background-image: linear-gradient(to right, #007bff, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .elite-title {
+            background-image: linear-gradient(to right, #8b5cf6, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .executive-title {
+            background-image: linear-gradient(to right, #ffbe0b, #fb7210);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        /* Custom hover effect for cards */
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .shimmering-text {
+          /* Set a metallic purple gradient background */
+          background: linear-gradient(
+            90deg,
+            #8e44ad 0%, /* Darker purple for depth */
+            #cd80ff 25%, /* Lighter, reflective purple */
+            #8e44ad 50%, /* Return to darker purple */
+            #cd80ff 75%, /* Another highlight */
+            #8e44ad 100% /* End with darker purple */
+          );
+          
+          /* Initial background size is wider than the text to allow movement */
+          background-size: 200% auto; 
+          
+          /* Apply the gradient to the text */
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+        
+          /* Font styling */
+          font-weight: bold;
+          font-size: 1.2em;
+          letter-spacing: 2px; /* Add a little spacing for better effect */
+        
+          /* Apply the shimmer animation */
+          animation: shimmer 6s linear infinite; /* 3 seconds, linear speed, repeats infinitely */
+        }
+        
+        @keyframes shimmer {
+          0% {
+            background-position: 0% 0; /* Start the gradient at the left */
+          }
+          100% {
+            background-position: -200% 0; /* Move the gradient completely across to the left */
+            /* Or for a right-to-left shimmer, use 200% 0 */
+          }
+        }
+        .console-container {
+          font-family: Khula;
+          font-size: 1em; /* Adjusted to fit within the existing heading */
+          display: inline-block; /* Changed from block to fit with other text */
+          position: relative;
+          color: #1f2937; /* Matches your existing body text color */
+        }
+        .console-underscore {
+          display: inline-block;
+          position: relative;
+          top: -0.14em;
+          left: 10px;
+        }
     </style>
-    <link rel="icon" href="frontend/media/favicon.png" type="image/png">
-
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-03MPB9XG9B');
-    </script>
-
 </head>
-<body class="bg-gray-900 text-gray-200">
+<body class="antialiased leading-relaxed">
 
-<header class="fixed w-full bg-[#060d1f] shadow z-50">
-    <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1"> <a href="index.html" class="flex items-center space-x-2 sm:space-x-4"> <div class="relative h-16 w-[120px] sm:h-20 sm:w-[150px]"> <img src="frontend/media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain hidden">
-                    <img src="frontend/media/logo-dark.png" alt="Aura AI Logo Dark" class="absolute inset-0 h-full w-full object-contain block">
-                </div>
-                <span class="typing-text text-sm sm:text-base text-white whitespace-nowrap">Aura AI Solutions</span> </a>
-        </div>
-
-        <nav class="hidden md:flex justify-center space-x-6 flex-1">
-            <a href="index.html" class="hover:text-primary">Home</a>
-            <a href="frontend/services.html" class="hover:text-primary">Services</a>
-            <a href="frontend/pricing.html" class="hover:text-primary">Pricing</a>
-            <a href="frontend/contact.html" class="hover:text-primary">Contact</a>
+    <header class="fixed top-0 left-0 w-full z-50 p-6 sm:p-8 bg-[#F3F4F6]/70 backdrop-blur-md border-b border-gray-200">
+        <nav class="flex justify-between items-center max-w-7xl mx-auto">
+            <a href="#" class="text-xl sm:text-2xl font-bold tracking-tight text-gray-900 flex items-center group">
+                <h2>Aura AI Solutions</h2>
+            </a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#hero" class="hover:text-purple-600 transition-colors duration-300">Home</a>
+                <a href="#services" class="hover:text-purple-600 transition-colors duration-300">Services</a>
+                <a href="#pricing" class="hover:text-purple-600 transition-colors duration-300">Pricing</a>
+                <a href="frontend/contact.html" class="hover:text-purple-600 transition-colors duration-300">Contact</a>
+            </div>
         </nav>
+    </header>
 
-        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1"> <button id="menu-btn" class="md:hidden text-3xl text-white">&#9776;</button> </div>
-    </div>
-</header>
-
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-900 p-4 z-50 shadow-lg mobile-menu-slide-leave-to"> <nav class="flex flex-col space-y-2 text-center"> <a href="index.html" class="hover:text-primary py-2 block">Home</a> <a href="frontend/services.html" class="hover:text-primary py-2 block">Services</a>
-        <a href="frontend/pricing.html" class="hover:text-primary py-2 block">Pricing</a>
-        <a href="frontend/contact.html" class="hover:text-primary py-2 block">Contact</a>
-    </nav>
-</div>
-
-<section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden text-white">
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover z-0 hidden sm:block">
-        <source src="frontend/media/background.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
-    <img src="frontend/media/fallback.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover sm:hidden" />
-    <div class="absolute inset-0 bg-black/60 z-10"></div>
-
-    <div class="container relative z-20 text-center px-4 sm:px-6 max-w-4xl pt-24 pb-12 sm:py-0"> <h1 class="text-3xl md:text-6xl font-bold mb-3 sm:mb-4 leading-tight sm:leading-normal"> Bring Your Website to Life with Smarter AI Chatbots
-        </h1>
-        <p class="text-base sm:text-xl mb-6 sm:mb-8"> Custom-integrated conversational AI for websites that engage, convert, and support in real time.
-        </p>
-
-        <div class="mt-12 sm:mt-16"> <svg class="w-6 h-6 mx-auto animate-bounce opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-            </svg>
+    <main id="hero" class="min-h-screen flex items-center justify-center p-8 text-center">
+        <div class="max-w-4xl mx-auto space-y-8 fade-in">
+            <model-viewer
+                src="token.glb"
+                alt="Aura AI token 3D model"
+                auto-rotate="0.000001rpm"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                shadow-intensity="1"
+                autoplay
+                orientation="90deg 90deg 90deg" style="width: 250px; height: 250px; margin: 0 auto; display: block;"
+            ></model-viewer>
+        
+            <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-tight text-gray-900">
+                <span class="block">Transform Your Business with</span>
+                <span class="shimmering-text">Intelligent AI Chat.</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-gray-700 max-w-2xl mx-auto">Aura AI provides bespoke chatbot solutions designed to enhance customer engagement, streamline operations, and drive growth for modern businesses.</p>
+            
+            <a href="#services" class="flex justify-center mt-8 cursor-pointer">
+                <svg class="w-6 h-6 text-purple-600 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </a>
         </div>
-    </div>
-</section>
+    </main>
 
-<footer class="bg-gray-900 text-gray-400 py-8 text-center">
-    <div class="mb-4 text-sm sm:text-base"> <a href="frontend/privacy.html" class="mx-1 sm:mx-2 hover:text-white">Privacy Policy</a> <a href="frontend/terms.html" class="mx-1 sm:mx-2 hover:text-white">Terms of Service</a> </div>
-    <div class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</div> </footer>
+    <section id="services" class="py-24 px-8 max-w-7xl mx-auto space-y-16 animate-on-scroll">
+        <div class="text-center space-y-4">
+            <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+              <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">Empower Your Operations.</h2>
+            </h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Our AI solutions are crafted to improve business quality by automating key tasks, providing instant support, and offering a personalized user experience.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div class="p-8 border border-gray-200 rounded-lg shadow-lg bg-white space-y-4 animate-on-scroll card-hover transition-all duration-300">
+                <h3 class="text-2xl font-semibold text-purple-600">Customer Support</h3>
+                <p class="text-gray-700">Reduce ticket volume and wait times with an intelligent bot that resolves common queries 24/7.</p>
+            </div>
+            <div class="p-8 border border-gray-200 rounded-lg shadow-lg bg-white space-y-4 animate-on-scroll card-hover transition-all duration-300">
+                <h3 class="text-2xl font-semibold text-purple-600">Lead Generation</h3>
+                <p class="text-gray-700">Qualify leads and collect valuable user data with conversational forms that feel natural and engaging.</p>
+            </div>
+            <div class="p-8 border border-gray-200 rounded-lg shadow-lg bg-white space-y-4 animate-on-scroll card-hover transition-all duration-300">
+                <h3 class="text-2xl font-semibold text-purple-600">Operational Efficiency</h3>
+                <p class="text-gray-700">Automate internal processes, from employee onboarding to scheduling, and free up your team's time.</p>
+            </div>
+        </div>
+        <div class="flex justify-center pt-8 animate-on-scroll">
+            <a href="#features" class="inline-block py-4 px-8 text-lg font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-500 transition-colors duration-300">Explore Features</a>
+        </div>
+    </section>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuBtn = document.getElementById('menu-btn');
-        const menu = document.getElementById('menu');
+    <section class="h-96 md:h-[600px] flex items-center justify-center text-center text-gray-900 parallax-bg animate-on-scroll">
+        <div class="p-8 bg-white/70 backdrop-blur-md rounded-lg shadow-xl max-w-3xl space-y-4">
+             <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">
+              <span class='console-container' data-text='["Redefine Customer Support.", "Improve customer engagement.", "Streamline workflows.", "Boost productivity.", "Capture more leads." ]'></span>
+              <span class='console-underscore' id='console'>&#95;</span>
+            </h2>
+            <p class="text-lg sm:text-xl text-gray-700">Our AI agents act as the first point of contact, seamlessly guiding visitors from initial query to qualified lead or resolved technical support ticket.</p>
+        </div>
+    </section>
 
-        menuBtn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
-            if (!menu.classList.contains('hidden')) {
-                // Show menu: slide in
-                menu.classList.remove('mobile-menu-slide-leave-to');
-                menu.classList.add('mobile-menu-slide-enter-active');
-                setTimeout(() => {
-                    menu.classList.remove('mobile-menu-slide-enter-active');
-                }, 300); // Should match transition duration
-            } else {
-                // Hide menu: slide out
-                menu.classList.add('mobile-menu-slide-leave-active');
-                setTimeout(() => {
-                    menu.classList.remove('mobile-menu-slide-leave-active');
-                    menu.classList.add('mobile-menu-slide-leave-to');
-                }, 300); // Should match transition duration
+    <section id="features" class="py-24 px-8 max-w-7xl mx-auto space-y-16 animate-on-scroll">
+        <div class="text-center space-y-4">
+            <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">Key Features at a Glance.</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Powerful capabilities engineered to deliver a superior conversational AI experience.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-gray-900">
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Context-Aware AI</h3>
+                        <p class="text-gray-700">Trained on your business data for highly relevant and accurate responses.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Multilingual Support</h3>
+                        <p class="text-gray-700">Engage a global audience with support for multiple languages out of the box.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Real-time Analytics</h3>
+                        <p class="text-gray-700">Gain instant insights into conversations and user behavior with our intuitive dashboard.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Seamless Integration</h3>
+                        <p class="text-gray-700">Effortlessly integrate the chatbot into any website with a single line of code.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Customizable UI & Tone</h3>
+                        <p class="text-gray-700">Match the chatbot's look and personality to your brand identity.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-8 bg-gray-50 border border-gray-200 rounded-lg shadow-md space-y-4 flex flex-col justify-start animate-on-scroll card-hover transition-all duration-300">
+                <div class="flex items-start space-x-4">
+                    <span class="text-3xl text-purple-600">&rarr;</span>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Third-Party App Integrations</h3>
+                        <p class="text-gray-700">Connect your chatbot to hundreds of business applications to automate workflows and sync data effortlessly.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-8 bg-gray-100 animate-on-scroll">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div class="space-y-6">
+                <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">The Aura AI Bespoke Analytics Suite.</h2>
+                <p class="text-lg text-gray-700">Don't just chat, understand. Our powerful analytics dashboard gives you real-time tracking of every message, question, and user interaction.</p>
+                <ul class="space-y-4 text-gray-700">
+                    <li class="flex items-center space-x-2">
+                        <span class="text-purple-600 font-bold text-xl">&rarr;</span>
+                        <span>Save countless hours by identifying common queries instantly.</span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <span class="text-3xl text-purple-600 font-bold">&rarr;</span>
+                        <span>Reduce operational costs with automated support insights.</span>
+                    </li>
+                    <li class="flex items-center space-x-2">
+                        <span class="text-3xl text-purple-600 font-bold">&rarr;</span>
+                        <span>Personalize support by understanding your users' needs at scale.</span>
+                    </li>
+                </ul>
+            </div>
+            <div>
+                <img src="analyticspreview.png" alt="Placeholder image of a modern analytics dashboard" class="rounded-lg shadow-2xl">
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing" class="py-24 px-8 max-w-7xl mx-auto space-y-16 animate-on-scroll">
+        <div class="text-center space-y-4">
+            <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">Simple & Transparent Pricing.</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Choose the plan that fits your business needs, with no hidden fees or surprises.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-stretch">
+            <div class="relative bg-gray-100 border border-gray-300 rounded-xl p-8 space-y-6 flex flex-col items-center text-center card-hover transition-all duration-300 animate-on-scroll">
+                <h3 class="text-3xl font-bold essential-title">Essential</h3>
+                <p class="text-gray-600">For small teams getting started.</p>
+                <div class="space-y-2 text-gray-700 flex-grow flex flex-col justify-center">
+                    <p>1,000 monthly messages</p>
+                    <p>1 chatbot instance</p>
+                    <p>Aura AI branding</p>
+                    <p>Basic analytics suite</p>
+                    <p>Support within 7 business days</p>
+                </div>
+                <a href="#" class="mt-8 block w-full py-3 px-6 text-center text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-500 transition-colors duration-300">Start for Free</a>
+            </div>
+
+            <div class="relative bg-gray-100 border border-gray-300 rounded-xl p-8 space-y-6 flex flex-col items-center text-center card-hover transition-all duration-300 animate-on-scroll">
+                <h3 class="text-3xl font-bold elite-title">Elite</h3>
+                <p class="text-gray-600">For growing businesses.</p>
+                <div class="space-y-2 text-gray-700 flex-grow flex flex-col justify-center">
+                    <p>5,000 monthly messages</p>
+                    <p>3 chatbot instances</p>
+                    <p>Color customization</p>
+                    <p>Unlocked analytics</p>
+                    <p>Priority support</p>
+                </div>
+                <a href="#" class="mt-8 block w-full py-3 px-6 text-center text-lg font-semibold text-white bg-purple-600 rounded-full hover:bg-purple-500 transition-colors duration-300">Choose Elite</a>
+            </div>
+
+            <div class="relative bg-gray-100 border border-gray-300 rounded-xl p-8 space-y-6 flex flex-col items-center text-center card-hover transition-all duration-300 animate-on-scroll">
+                <h3 class="text-3xl font-bold executive-title">Executive</h3>
+                <p class="text-gray-600">For large-scale operations.</p>
+                <div class="space-y-2 text-gray-700 flex-grow flex flex-col justify-center">
+                    <p>Unlimited usage</p>
+                    <p>White-label support</p>
+                    <p>Custom personalities</p>
+                    <p>Comprehensive analytics</p>
+                    <p>Dedicated 24-hour response</p>
+                </div>
+                <a href="#" class="mt-8 block w-full py-3 px-6 text-center text-lg font-semibold text-white bg-yellow-500 rounded-full hover:bg-yellow-400 transition-colors duration-300">Contact Sales</a>
+            </div>
+        </div>
+
+        <div class="py-4 px-6 bg-gray-200 border border-gray-300 rounded-xl text-center space-y-4 animate-on-scroll">
+            <h3 class="text-2xl font-bold text-gray-800">One-Time Installation Fee</h3>
+            <p class="text-gray-600">
+                All plans include a <span class="font-semibold">one-time setup fee of $299</span>. We handle all integration and initial AI training for a seamless launch.
+            </p>
+        </div>
+    </section>
+
+    <section class="py-24 px-8 max-w-7xl mx-auto space-y-16 animate-on-scroll">
+        <div class="text-center space-y-4">
+            <h2 class="text-4xl sm:text-5xl font-bold tracking-tight text-gray-900">What's Next for Aura AI?</h2>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">We are continuously innovating to bring you the next generation of conversational AI. Here's a look at what's in development.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 text-gray-900">
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">AI Training on Entire Websites</h3>
+                    <p class="text-gray-700">Scan and train the AI on all content from your site for even greater accuracy.</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">Smart Scheduling</h3>
+                    <p class="text-gray-700">Allow the chatbot to book appointments directly with your clients.</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">CRM Integrations</h3>
+                    <p class="text-gray-700">Sync data and conversations directly with your existing CRM platforms.</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">Omnichannel Support</h3>
+                    <p class="text-gray-700">Extend your AI's presence to social media, messaging apps, and more.</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">Real-Time Agents</h3>
+                    <p class="text-gray-700">Future-proof your support with conversational AI that can adapt and learn on the fly.</p>
+                </div>
+            </div>
+            <div class="flex items-start space-x-4">
+                <span class="text-3xl text-purple-600">&rarr;</span>
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-900">AI Applications</h3>
+                    <p class="text-gray-700">Explore new ways to use AI for bespoke solutions beyond traditional chatbots.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-gray-100 py-12 border-t border-gray-200 animate-on-scroll">
+        <div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center text-gray-500 space-y-4 md:space-y-0">
+            <p>&copy; 2025 Aura AI Solutions. All Rights Reserved.</p>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-purple-600 transition-colors duration-300">Privacy Policy</a>
+                <a href="#" class="hover:text-purple-600 transition-colors duration-300">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // This is your existing JavaScript for the fade-in scroll animations
+            const animateElements = document.querySelectorAll('.animate-on-scroll');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            animateElements.forEach(element => {
+                observer.observe(element);
+            });
+    
+            // --- NEW CODE FOR TYPING EFFECT ---
+            // Get the element to be observed
+            const typingElement = document.querySelector('.console-container');
+    
+            if (typingElement) {
+                // Create a new Intersection Observer
+                const typingObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // The element is now visible, so we start the effect
+                            const words = JSON.parse(entry.target.getAttribute('data-text'));
+                            const id = 'console';
+                            const colors = ['#000000']; // Your preferred color
+                            
+                            consoleText(words, id, colors);
+    
+                            // Stop observing once the animation is started
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.5 // Adjust this value as needed
+                });
+    
+                // Start observing the typing element
+                typingObserver.observe(typingElement);
             }
         });
-    });
-</script>
-
-<script>
-    const defaultTitle = document.title;
-    const awayTitle = "👋 Come back soon!";
-    const blinkTitle = "⚡ Chat with Aura AI...";
-
-    let blinkInterval;
-
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            document.title = awayTitle;
-            blinkInterval = setInterval(() => {
-                document.title = document.title === awayTitle ? blinkTitle : awayTitle;
-            }, 1000);
-        } else {
-            document.title = defaultTitle;
-            clearInterval(blinkInterval);
-        }
-    });
-</script>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const typingEl = document.querySelector('.typing-text');
-        if (typingEl) {
-            // Only apply typing effect for desktop to prevent overflow on mobile, or adjust more carefully.
-            // For now, I'll keep it as is, assuming 'finished' class prevents overflow.
-            setTimeout(() => {
-                typingEl.classList.add('finished');
-            }, 4500);
-        }
-    });
-</script>
-<iframe
-  id="aura-chatbot-iframe"
-  frameborder="0"
-  scrolling="no"
-  title="Aura AI Chatbot"
-  style="
-    border:none;
-    position:fixed;
-    bottom:2px;
-    right:2px;  
-    z-index:9999;
-    width:90px;
-    height:90px;
-    overflow:hidden;
-    pointer-events:auto;
-    transition: width 0.3s ease-out, height 0.3s ease-out;
-  "
-></iframe>
-
-<script>
-    // Configuration for the chatbot
-    const chatbotConfig = {
-        accountId: 'AUR000',
-        apiKey: 'r3m2dP9EwH8PoXANYgNZV6JCOcRiOOTGaIdKVR63',
-        apiEndpoint: 'https://uxa8aixawk.execute-api.eu-west-2.amazonaws.com/default/chat'
-    };
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const chatbotIframe = document.getElementById('aura-chatbot-iframe');
-
-        if (chatbotIframe) {
-            // Set the iframe src based on accountId
-            const widgetUrl = chatbotConfig.accountId 
-                ? `https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/${chatbotConfig.accountId}-chatbot-widget.html`
-                : 'https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/chatbot-widget.html';
-            
-            chatbotIframe.src = widgetUrl;
-
-            // Define the full and toggle button sizes.
-            const fullWidth = 420;
-            const fullHeight = 540;
-            const toggleButtonWidth = 90;
-            const toggleButtonHeight = 90;
-
-            // Send configuration to the iframe once it's loaded
-            chatbotIframe.addEventListener('load', function() {
-                chatbotIframe.contentWindow.postMessage({
-                    type: 'init',
-                    config: chatbotConfig
-                }, '*');
-            });
-
-            // Listen for messages from the iframe
-            window.addEventListener('message', function(event) {
-                // IMPORTANT: Verify the origin in a production environment for security
-                // if (event.origin !== "https://d2yqj3k2c4m8s1.cloudfront.net") {
-                //     return; // Reject messages from unknown origins
-                // }
-
-                // Check if the message is from your chatbot widget and is a state change
-                if (event.data && event.data.type === 'chatbotState') {
-                    if (event.data.isOpen) {
-                        // Chat is OPEN: expand iframe to full size
-                        chatbotIframe.style.width = `${fullWidth}px`;
-                        chatbotIframe.style.height = `${fullHeight}px`;
-                        chatbotIframe.style.transition = 'width 0.3s ease-out, height 0.3s ease-out';
-                    } else {
-                        // Chat is CLOSED: shrink iframe to button size
-                        chatbotIframe.style.width = `${toggleButtonWidth}px`;
-                        chatbotIframe.style.height = `${toggleButtonHeight}px`;
-                        chatbotIframe.style.transition = 'width 0.3s ease-in, height 0.3s ease-in';
+    
+        // Your existing consoleText function remains unchanged
+        function consoleText(words, id, colors) {
+            if (colors === undefined) colors = ['#1f2937'];
+            var visible = true;
+            var con = document.getElementById('console');
+            var letterCount = 1;
+            var x = 1;
+            var waiting = false;
+            var target = document.getElementById(id);
+            if (target) {
+                target.setAttribute('style', 'color:' + colors[0]);
+                window.setInterval(function() {
+                    if (letterCount === 0 && waiting === false) {
+                        waiting = true;
+                        target.innerHTML = words[0].substring(0, letterCount);
+                        window.setTimeout(function() {
+                            var usedColor = colors.shift();
+                            colors.push(usedColor);
+                            var usedWord = words.shift();
+                            words.push(usedWord);
+                            x = 1;
+                            target.setAttribute('style', 'color:' + colors[0]);
+                            letterCount += x;
+                            waiting = false;
+                        }, 1000);
+                    } else if (letterCount === words[0].length + 1 && waiting === false) {
+                        waiting = true;
+                        window.setTimeout(function() {
+                            x = -1;
+                            letterCount += x;
+                            waiting = false;
+                        }, 1000);
+                    } else if (waiting === false) {
+                        target.innerHTML = words[0].substring(0, letterCount);
+                        letterCount += x;
                     }
-                }
-            });
+                }, 120);
+            }
         }
-    });
-</script>
+    </script>
 </body>
 </html>
