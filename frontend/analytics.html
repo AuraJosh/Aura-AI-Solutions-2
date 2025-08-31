@@ -33,7 +33,7 @@
         right: 1rem;
         padding: 0.75rem 1.25rem;
         border-radius: 0.5rem;
-        color: white;
+        color: black;
         z-index: 1000;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
@@ -54,7 +54,7 @@
         justify-content: center;
         align-items: center;
         z-index: 9999; /* Ensure it's on top of everything */
-        color: white;
+        color: black;
         font-size: 1.2rem;
     }
 
@@ -115,12 +115,12 @@
                 <div class="relative h-20 w-[150px]">
                     <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain" />
                 </div>
-                <span class="text-white text-base">Aura AI Solutions</span>
+                <span class="text-black text-base">Aura AI Solutions</span>
             </div>
-            <h1 id="page-title" class="text-white font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
+            <h1 id="page-title" class="text-black font-semibold text-lg absolute left-1/2 -translate-x-1/2">Your Analytics Suite</h1>
             <div class="flex items-center space-x-4">
-                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-white text-sm">Bookings Page</a>
-                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-white text-sm">Logout</button>
+                <a href="booking-screening.html" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded text-black text-sm">Bookings Page</a>
+                <button id="logout-btn" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-black text-sm">Logout</button>
             </div>
         </div>
     </header>
@@ -132,8 +132,8 @@
 
     <div id="update-info-modal" class="fixed inset-0 bg-[#F3F4F6] bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-[#F3F4F6] p-8 rounded-lg shadow-xl w-full max-w-lg relative">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
-            <h2 class="text-2xl font-semibold text-white mb-6 text-center">Request Business Info Update</h2>
+            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl leading-none">&times;</button>
+            <h2 class="text-2xl font-semibold text-black mb-6 text-center">Request Business Info Update</h2>
             <form id="business-info-form">
                 <div class="mb-4">
                     <label for="update-details" class="block text-gray-300 text-sm font-bold mb-2">
@@ -144,7 +144,7 @@
                                 placeholder="e.g., 'Update our company address to 123 Main St.', 'Add new service: Product Consulting', 'Remove old contact email: old@example.com'" required></textarea>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-black font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition duration-300">
                         Send Update Request
                     </button>
                     <p id="form-message" class="text-sm text-gray-400"></p>
@@ -274,7 +274,7 @@
                 const allData = await response.json();
     
                 let adminHtml = `
-                    <h2 class="text-3xl font-bold text-white mb-6 text-center">All User Analytics</h2>
+                    <h2 class="text-3xl font-bold text-black mb-6 text-center">All User Analytics</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 `;
     
@@ -292,23 +292,23 @@
                         adminHtml += `
                             <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
                                 <div class="bg-[#F3F4F6] p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
-                                    <h3 class="text-xl font-semibold text-white mb-2">${userData.accountName}</h3>
+                                    <h3 class="text-xl font-semibold text-black mb-2">${userData.accountName}</h3>
                                     <p class="text-gray-400 text-sm mb-4">UID: ${userData.uid}</p>
                                     <div class="space-y-2">
                                         <div class="flex items-center justify-between">
                                             <p class="text-gray-300">Messages Used:</p>
-                                            <p class="text-white font-bold">${totalSent} / ${monthlyLimit}</p>
+                                            <p class="text-black font-bold">${totalSent} / ${monthlyLimit}</p>
                                         </div>
                                         <div class="w-full bg-gray-700 rounded-full h-2.5">
                                             <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <p class="text-gray-300">Current Tier:</p>
-                                            <p class="text-white font-medium">${userData.tier || 'N/A'}</p>
+                                            <p class="text-black font-medium">${userData.tier || 'N/A'}</p>
                                         </div>
                                         <div class="flex items-center justify-between">
                                             <p class="text-gray-300">Next Payment:</p>
-                                            <p class="text-white font-medium">${userData.nextPaymentDate || 'N/A'}</p>
+                                            <p class="text-black font-medium">${userData.nextPaymentDate || 'N/A'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -417,10 +417,10 @@
                     let displayHTML = `
                         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                         <div class="xl:col-span-2 bg-[#F3F4F6] p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-white mb-4">Monthly Message Usage</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
                                     <p class="text-gray-300 text-lg">Messages Used:</p>
-                                    <p class="text-white text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
+                                    <p class="text-black text-3xl font-bold">${totalSent} / ${monthlyLimit}</p>
                                 </div>
                                 <div class="w-full bg-gray-700 rounded-full h-2.5 mt-4">
                                     <div class="${progressBarColor} h-2.5 rounded-full" style="width: ${percentageUsed}%;"></div>
@@ -430,25 +430,25 @@
                             </div>
     
                             <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl">
-                                <h2 class="text-xl font-semibold text-white mb-4">Payment Information</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Payment Information</h2>
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between">
                                         <p class="text-gray-300">Current Tier:</p>
-                                        <p class="text-white font-medium">${tier}</p>
+                                        <p class="text-black font-medium">${tier}</p>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <p class="text-gray-300">Payment Term:</p>
-                                        <p class="text-white font-medium">${paymentTerm}</p>
+                                        <p class="text-black font-medium">${paymentTerm}</p>
                                     </div>
                                     <div class="flex items-center justify-between">
                                         <p class="text-gray-300">Next Payment Date:</p>
-                                        <p class="text-white font-medium">${formattedNextPaymentDate}</p>
+                                        <p class="text-black font-medium">${formattedNextPaymentDate}</p>
                                     </div>
                                 </div>
                             </div>
     
                             <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-white mb-4">Daily Message Usage</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Daily Message Usage</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="h-60">
                                         <canvas id="dailyUsageChart"></canvas>
@@ -456,9 +456,9 @@
                                 ` : `
                                     <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
                                         <div class="text-center">
-                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-black text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
                                             <p class="text-gray-300 text-sm">Unlock detailed daily usage analytics.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-black px-4 py-2 rounded inline-block">Upgrade Now</a>
                                         </div>
                                     </div>
                                     <div class="h-60 opacity-20">
@@ -468,16 +468,16 @@
                             </div>
     
                            <div class="xl:col-span-2 bg-[#F3F4F6] p-6 rounded-lg shadow-xl relative overflow-hidden">
-                                <h2 class="text-xl font-semibold text-white mb-4">Chat Logs</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Chat Logs</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="text-gray-300 chat-logs-container"> ${chatContentHTML}
                                     </div>
                                 ` : `
                                     <div class="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-10">
                                         <div class="text-center">
-                                            <p class="text-white text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
+                                            <p class="text-black text-lg font-semibold mb-2">Upgrade to Elite or Executive Tier</p>
                                             <p class="text-gray-300 text-sm">Unlock detailed chat logs.</p>
-                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-block">Upgrade Now</a>
+                                            <a href="https://auraai.uk/frontend/pricing" target="_blank" rel="noopener noreferrer" class="mt-4 bg-blue-600 hover:bg-blue-700 text-black px-4 py-2 rounded inline-block">Upgrade Now</a>
                                         </div>
                                     </div>
                                     <div class="opacity-20 text-gray-300 chat-logs-container"> ${chatContentHTML}
@@ -486,10 +486,10 @@
                             </div>
     
                             <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Manage Subscription</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Manage Subscription</h2>
                                 <p class="text-gray-400 text-sm mb-4">Need to make a change to your plan?</p>
                                 <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
-                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                    <button id="cancel-sub-btn" class="bg-red-600 hover:bg-red-700 text-black px-6 py-2 rounded-lg font-medium transition duration-300">
                                         Cancel Subscription
                                     </button>
                                 </a>
@@ -497,11 +497,11 @@
                             </div>
     
                             <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Your Feedback</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Your Feedback</h2>
                                 <p class="text-gray-400 text-sm mb-4">Help us improve Aura AI during beta!</p>
                                 <a href="form.html"
                                         id="feedback-btn"
-                                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
+                                        class="bg-blue-600 hover:bg-blue-700 text-black px-6 py-2 rounded-lg font-medium transition duration-300 inline-block">
                                         Provide Feedback
                                 </a>
     
@@ -509,10 +509,10 @@
                             </div>
     
                             <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
-                                <h2 class="text-xl font-semibold text-white mb-4">Update Business Info</h2>
+                                <h2 class="text-xl font-semibold text-black mb-4">Update Business Info</h2>
                                 <p class="text-gray-400 text-sm mb-4">Request changes to your AI's knowledge base.</p>
                                 <a href="update.html" class="inline-block">
-                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition duration-300">
+                                    <button id="update-info-btn" class="bg-green-600 hover:bg-green-700 text-black px-6 py-2 rounded-lg font-medium transition duration-300">
                                         Request Update
                                     </button>
                                 </a>
