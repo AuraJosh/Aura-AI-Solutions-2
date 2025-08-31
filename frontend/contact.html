@@ -1,246 +1,225 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Contact | Aura AI Solutions</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#6366F1',
-                        accent: '#8B5CF6',
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="widget.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Contact | Aura AI Solutions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        accent: '#8B5CF6',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="widget.css" />
 
-    <style>
-        /* New grid background styles */
-        body {
-            background-color: #ffffff; /* Light background */
-            background-image:
-                linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
-                radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
-                radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
-            background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
-            color: #1f2937; /* Dark text for contrast on light background */
-            **min-height: 100vh;**
-            **display: flex;**
-            **flex-direction: column;**
-        }
+    <style>
+        /* New grid background styles */
+        body {
+          background-color: #ffffff;
+          background-image:
+              linear-gradient(to right, rgba(229,231,235,0.8) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(229,231,235,0.8) 1px, transparent 1px),
+              radial-gradient(circle 500px at 20% 100%, rgba(139,92,246,0.15), transparent),
+              radial-gradient(circle 500px at 100% 80%, rgba(59,130,246,0.15), transparent);
+          background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+          color: #1f2937;
+          /* Add these lines below */
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+      }
 
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
 
-        .fade-out {
-            animation: fadeOut 0.4s ease-in forwards;
-        }
+        .fade-out {
+            animation: fadeOut 0.4s ease-in forwards;
+        }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
 
-        @keyframes fadeOut {
-            from { opacity: 1; transform: scale(1); }
-            to { opacity: 0; transform: scale(0.95); }
-        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
 
-        /* Custom styles for mobile menu slide-in/out */
-        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
-            transition: transform 0.3s ease-out;
-        }
-        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
-            transform: translateY(-100%);
-        }
-        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
-            transform: translateY(0);
-        }
-    </style>
-    <link rel="icon" href="media/favicon.png" type="image/png">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        /* Custom styles for mobile menu slide-in/out */
+        .mobile-menu-slide-enter-active, .mobile-menu-slide-leave-active {
+            transition: transform 0.3s ease-out;
+        }
+        .mobile-menu-slide-enter-from, .mobile-menu-slide-leave-to {
+            transform: translateY(-100%);
+        }
+        .mobile-menu-slide-enter-to, .mobile-menu-slide-leave-from {
+            transform: translateY(0);
+        }
+    </style>
+    <link rel="icon" href="media/favicon.png" type="image/png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-03MPB9XG9B"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-      gtag('config', 'G-03MPB9XG9B');
-    </script>
+      gtag('config', 'G-03MPB9XG9B');
+    </script>
 </head>
-<body class="antialiased leading-relaxed **flex flex-col min-h-screen**">
-
+<body class="antialiased leading-relaxed">
 <div id="thank-you-banner" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-    <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
-        ✅ Thank you! Your form has been submitted.<br>The Aura team will contact you shortly.
-        <div class="mt-4">
-            <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
-        </div>
-    </div>
+    <div class="bg-green-600 text-white px-8 py-6 rounded shadow-lg text-center max-w-sm mx-auto" id="thank-you-content">
+        ✅ Thank you! Your form has been submitted.<br>The Aura team will contact you shortly.
+        <div class="mt-4">
+            <button onclick="closeBanner()" class="bg-white text-green-600 px-4 py-2 rounded hover:bg-gray-200 font-semibold">Close</button>
+        </div>
+    </div>
 </div>
 
-<header class="fixed w-full bg-white shadow z-50">
-    <div class="container mx-auto flex items-center justify-between p-4">
-        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1">
-            <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4">
-                <div class="relative h-16 w-[120px] md:h-20 md:w-[150px]">
-                    <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block">
-                </div>
-                <span class="typing-text text-sm md:text-base text-gray-900 whitespace-nowrap">Aura AI Solutions</span>
-            </a>
-        </div>
+<header class="fixed w-full bg-white shadow z-50"> <div class="container mx-auto flex items-center justify-between p-4">
+        <div class="flex items-center space-x-2 sm:space-x-4 flex-grow md:flex-1">
+            <a href="../index.html" class="flex items-center space-x-2 sm:space-x-4">
+                <div class="relative h-16 w-[120px] md:h-20 md:w-[150px]">
+                    <img src="media/logo-light.png" alt="Aura AI Logo" class="absolute inset-0 h-full w-full object-contain block"> </div>
+                <span class="typing-text text-sm md:text-base text-gray-900 whitespace-nowrap">Aura AI Solutions</span> </a>
+        </div>
 
-        <nav class="hidden md:flex justify-center space-x-6 flex-1">
-            <a href="../index.html" class="hover:text-primary text-gray-700">Home</a>
-            <a href="services.html" class="hover:text-primary text-gray-700">Services</a>
-            <a href="pricing.html" class="hover:text-primary text-gray-700">Pricing</a>
-            <a href="contact.html" class="hover:text-primary text-gray-700">Contact</a>
-        </nav>
+        <nav class="hidden md:flex justify-center space-x-6 flex-1">
+            <a href="../index.html" class="hover:text-primary text-gray-700">Home</a> <a href="services.html" class="hover:text-primary text-gray-700">Services</a> <a href="pricing.html" class="hover:text-primary text-gray-700">Pricing</a> <a href="contact.html" class="hover:text-primary text-gray-700">Contact</a> </nav>
 
-        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1">
-            <button id="menu-btn" class="md:hidden text-3xl text-gray-800">&#9776;</button>
-        </div>
-    </div>
+        <div class="flex items-center justify-end space-x-4 flex-grow md:flex-1">
+            <button id="menu-btn" class="md:hidden text-3xl text-gray-800">&#9776;</button> </div>
+    </div>
 </header>
 
-<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-100 p-4 z-50 shadow-lg mobile-menu-slide-leave-to">
-    <nav class="flex flex-col space-y-2 text-center">
-        <a href="../index.html" class="hover:text-primary py-2 block text-gray-800">Home</a>
-        <a href="services.html" class="hover:text-primary py-2 block text-gray-800">Services</a>
-        <a href="pricing.html" class="hover:text-primary py-2 block text-gray-800">Pricing</a>
-        <a href="contact.html" class="hover:text-primary font-bold py-2 block text-gray-800">Contact</a>
-    </nav>
+<div id="menu" class="hidden fixed top-[88px] left-0 w-full bg-gray-100 p-4 z-50 shadow-lg mobile-menu-slide-leave-to"> <nav class="flex flex-col space-y-2 text-center">
+        <a href="../index.html" class="hover:text-primary py-2 block text-gray-800">Home</a> <a href="services.html" class="hover:text-primary py-2 block text-gray-800">Services</a> <a href="pricing.html" class="hover:text-primary py-2 block text-gray-800">Pricing</a> <a href="contact.html" class="hover:text-primary font-bold py-2 block text-gray-800">Contact</a> </nav>
 </div>
 
-<main class="pt-[88px] sm:pt-32 container mx-auto px-4 py-12 sm:py-20 relative z-10 **flex-grow**">
-    <h1 class="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center text-gray-900">Get In Touch With Our Team</h1>
-    <form id="contact-form" action="https://formspree.io/f/xnnzazpj" method="POST" class="max-w-2xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-xl space-y-6">
-        <input type="text" name="name" placeholder="Your Name" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" required>
-        <input type="email" name="email" placeholder="Your Email" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" required>
-        <textarea name="message" placeholder="Your Message" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" rows="5" required></textarea>
-        <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700 transition">Send Message</button>
-    </form>
+<main class="pt-[88px] sm:pt-32 container mx-auto px-4 py-12 sm:py-20 relative z-10 flex-grow">
+    <h1 class="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 text-center text-gray-900">Get In Touch With Our Team</h1> <form id="contact-form" action="https://formspree.io/f/xnnzazpj" method="POST" class="max-w-2xl mx-auto bg-white p-6 sm:p-10 rounded-3xl shadow-xl space-y-6"> <input type="text" name="name" placeholder="Your Name" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" required> <input type="email" name="email" placeholder="Your Email" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" required> <textarea name="message" placeholder="Your Message" class="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-900" rows="5" required></textarea> <button type="submit" class="w-full bg-primary text-white font-semibold py-3 rounded hover:bg-indigo-700 transition">Send Message</button>
+    </form>
 </main>
 
-<footer class="bg-gray-100 text-gray-600 py-8 text-center relative z-10">
-    <div class="mb-4 text-sm sm:text-base">
-        <a href="privacy.html" class="mx-1 sm:mx-2 hover:text-gray-900">Privacy Policy</a>
-        <a href="terms.html" class="mx-1 sm:mx-2 hover:text-gray-900">Terms of Service</a>
-    </div>
-    <div class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
+<footer class="bg-gray-100 text-gray-600 py-8 text-center relative z-10"> <div class="mb-4 text-sm sm:text-base">
+        <a href="privacy.html" class="mx-1 sm:mx-2 hover:text-gray-900">Privacy Policy</a> <a href="terms.html" class="mx-1 sm:mx-2 hover:text-gray-900">Terms of Service</a> </div>
+    <div class="text-xs sm:text-sm">© 2025 Aura AI Solutions. All rights reserved.</div>
 </footer>
 
 <script>
-    // Mobile menu toggle script (moved for consistency)
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuBtn = document.getElementById('menu-btn');
-        const menu = document.getElementById('menu');
+    // Mobile menu toggle script (moved for consistency)
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuBtn = document.getElementById('menu-btn');
+        const menu = document.getElementById('menu');
 
-        if (menuBtn && menu) { // Check if elements exist
-            menuBtn.addEventListener('click', () => {
-                if (menu.classList.contains('hidden')) {
-                    menu.classList.remove('hidden');
-                    menu.classList.remove('mobile-menu-slide-leave-to');
-                    menu.classList.add('mobile-menu-slide-enter-active');
-                    setTimeout(() => {
-                        menu.classList.remove('mobile-menu-slide-enter-active');
-                    }, 300); // Should match transition duration
-                } else {
-                    menu.classList.add('mobile-menu-slide-leave-active');
-                    setTimeout(() => {
-                        menu.classList.remove('mobile-menu-slide-leave-active');
-                        menu.classList.add('hidden');
-                        menu.classList.add('mobile-menu-slide-leave-to'); // Ensure it slides up before hiding
-                    }, 300); // Should match transition duration
-                }
-            });
-        }
+        if (menuBtn && menu) { // Check if elements exist
+            menuBtn.addEventListener('click', () => {
+                if (menu.classList.contains('hidden')) {
+                    menu.classList.remove('hidden');
+                    menu.classList.remove('mobile-menu-slide-leave-to');
+                    menu.classList.add('mobile-menu-slide-enter-active');
+                    setTimeout(() => {
+                        menu.classList.remove('mobile-menu-slide-enter-active');
+                    }, 300); // Should match transition duration
+                } else {
+                    menu.classList.add('mobile-menu-slide-leave-active');
+                    setTimeout(() => {
+                        menu.classList.remove('mobile-menu-slide-leave-active');
+                        menu.classList.add('hidden');
+                        menu.classList.add('mobile-menu-slide-leave-to'); // Ensure it slides up before hiding
+                    }, 300); // Should match transition duration
+                }
+            });
+        }
 
-        const form = document.getElementById('contact-form');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                const formData = new FormData(form);
+        const form = document.getElementById('contact-form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(form);
 
-                fetch(form.action, {
-                    method: "POST",
-                    body: formData,
-                    headers: { "Accept": "application/json" }
-                }).then(response => {
-                    if (response.ok) {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                        const banner = document.getElementById('thank-you-banner');
-                        const content = document.getElementById('thank-you-content');
+                fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: { "Accept": "application/json" }
+                }).then(response => {
+                    if (response.ok) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        const banner = document.getElementById('thank-you-banner');
+                        const content = document.getElementById('thank-you-content');
 
-                        banner.classList.remove('hidden');
-                        content.classList.remove('fade-out');
-                        content.classList.add('fade-in');
+                        banner.classList.remove('hidden');
+                        content.classList.remove('fade-out');
+                        content.classList.add('fade-in');
 
-                        setTimeout(() => {
-                            content.classList.remove('fade-in');
-                            content.classList.add('fade-out');
-                            setTimeout(() => {
-                                banner.classList.add('hidden');
-                            }, 400);
-                        }, 4000);
+                        setTimeout(() => {
+                            content.classList.remove('fade-in');
+                            content.classList.add('fade-out');
+                            setTimeout(() => {
+                                banner.classList.add('hidden');
+                            }, 400);
+                        }, 4000);
 
-                        form.reset();
-                    } else {
-                        alert("There was a problem submitting the form. Please try again.");
-                    }
-                }).catch(() => {
-                    alert("There was a problem sending your message.");
-                });
-            });
-        }
-    });
+                        form.reset();
+                    } else {
+                        alert("There was a problem submitting the form. Please try again.");
+                    }
+                }).catch(() => {
+                    alert("There was a problem sending your message.");
+                });
+            });
+        }
+    });
 
-    function closeBanner() {
-        const banner = document.getElementById('thank-you-banner');
-        const content = document.getElementById('thank-you-content');
+    function closeBanner() {
+        const banner = document.getElementById('thank-you-banner');
+        const content = document.getElementById('thank-you-content');
 
-        content.classList.remove('fade-in');
-        content.classList.add('fade-out');
+        content.classList.remove('fade-in');
+        content.classList.add('fade-out');
 
-        setTimeout(() => {
-            banner.classList.add('hidden');
-        }, 400);
-    }
+        setTimeout(() => {
+            banner.classList.add('hidden');
+        }, 400);
+    }
 </script>
 <script>
-    const defaultTitle = document.title;
-    const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
-    let blinkInterval;
+    const defaultTitle = document.title;
+    const awayMessages = ["👋 Come back soon!", "🤖 Chat with Aura AI"];
+    let blinkInterval;
 
-    document.addEventListener("visibilitychange", () => {
-        if (document.hidden) {
-            let i = 0;
-            blinkInterval = setInterval(() => {
-                document.title = awayMessages[i % awayMessages.length];
-                i++;
-            }, 1000);
-        } else {
-            clearInterval(blinkInterval);
-            document.title = defaultTitle;
-        }
-    });
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            let i = 0;
+            blinkInterval = setInterval(() => {
+                document.title = awayMessages[i % awayMessages.length];
+                i++;
+            }, 1000);
+        } else {
+            clearInterval(blinkInterval);
+            document.title = defaultTitle;
+        }
+    });
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const typingEl = document.querySelector('.typing-text');
-        if (typingEl) {
-            setTimeout(() => {
-                typingEl.classList.add('finished');
-            }, 4500);
-        }
-    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const typingEl = document.querySelector('.typing-text');
+        if (typingEl) {
+            setTimeout(() => {
+                typingEl.classList.add('finished');
+            }, 4500);
+        }
+    });
 </script>
 
 </body>
