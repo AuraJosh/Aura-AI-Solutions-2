@@ -463,108 +463,108 @@
         </div>
     </footer>
     <script>
-      document.addEventListener("DOMContentLoaded", () => {
-          // --- Existing JavaScript for fade-in scroll animations ---
-          const animateElements = document.querySelectorAll('.animate-on-scroll');
-          const observer = new IntersectionObserver((entries) => {
-              entries.forEach(entry => {
-                  if (entry.isIntersecting) {
-                      entry.target.classList.add('is-visible');
-                      observer.unobserve(entry.target);
-                  }
-              });
-          }, {
-              threshold: 0.1
-          });
-          animateElements.forEach(element => {
-              observer.observe(element);
-          });
-  
-          // --- Existing code for the typing effect in the parallax section ---
-          const typingElement = document.querySelector('.console-container');
-          if (typingElement) {
-              const typingObserver = new IntersectionObserver((entries, observer) => {
-                  entries.forEach(entry => {
-                      if (entry.isIntersecting) {
-                          const words = JSON.parse(entry.target.getAttribute('data-text'));
-                          const id = 'console';
-                          const colors = ['#000000'];
-                          consoleText(words, id, colors);
-                          observer.unobserve(entry.target);
-                      }
-                  });
-              }, {
-                  threshold: 0.5
-              });
-              typingObserver.observe(typingElement);
-          }
-  
-          // --- Existing code for the "Aura AI Solutions" typing effect ---
-          const typingEl = document.querySelector('.typing-text');
-          if (typingEl) {
-              setTimeout(() => {
-                  typingEl.classList.add('finished');
-              }, 4500);
-          }
-  
-          // --- NEW CODE for the 3D model hover effect ---
-          const modelViewer = document.getElementById('token-model');
-          if (modelViewer) {
-              let spinning = false;
-              modelViewer.addEventListener('mouseenter', () => {
-                  if (!spinning) {
-                      spinning = true;
-                      // A higher value like '2000rpm' might be more noticeable for a faster spin
-                      modelViewer.setAttribute('auto-rotate', '360rpm');
-                      setTimeout(() => {
-                          // Revert to original slow speed. Make sure this matches the attribute in your HTML.
-                          modelViewer.setAttribute('auto-rotate', '0.000001rpm');
-                          spinning = false;
-                      }, 1000);
-                  }
-              });
-          }
-      });
-  
-      // --- Your existing consoleText function remains unchanged outside of the event listener ---
-      function consoleText(words, id, colors) {
-          if (colors === undefined) colors = ['#1f2937'];
-          var visible = true;
-          var con = document.getElementById('console');
-          var letterCount = 1;
-          var x = 1;
-          var waiting = false;
-          var target = document.getElementById(id);
-          if (target) {
-              target.setAttribute('style', 'color:' + colors[0]);
-              window.setInterval(function() {
-                  if (letterCount === 0 && waiting === false) {
-                      waiting = true;
-                      target.innerHTML = words[0].substring(0, letterCount);
-                      window.setTimeout(function() {
-                          var usedColor = colors.shift();
-                          colors.push(usedColor);
-                          var usedWord = words.shift();
-                          words.push(usedWord);
-                          x = 1;
-                          target.setAttribute('style', 'color:' + colors[0]);
-                          letterCount += x;
-                          waiting = false;
-                      }, 1000);
-                  } else if (letterCount === words[0].length + 1 && waiting === false) {
-                      waiting = true;
-                      window.setTimeout(function() {
-                          x = -1;
-                          letterCount += x;
-                          waiting = false;
-                      }, 1000);
-                  } else if (waiting === false) {
-                      target.innerHTML = words[0].substring(0, letterCount);
-                      letterCount += x;
-                  }
-              }, 120);
-          }
-      }
-  </script>
+       document.addEventListener("DOMContentLoaded", () => {
+           // Existing JavaScript for fade-in scroll animations
+           const animateElements = document.querySelectorAll('.animate-on-scroll');
+           const observer = new IntersectionObserver((entries) => {
+               entries.forEach(entry => {
+                   if (entry.isIntersecting) {
+                       entry.target.classList.add('is-visible');
+                       observer.unobserve(entry.target);
+                   }
+               });
+           }, {
+               threshold: 0.1
+           });
+           animateElements.forEach(element => {
+               observer.observe(element);
+           });
+   
+           // Existing code for the typing effect in the parallax section
+           const typingElement = document.querySelector('.console-container');
+           if (typingElement) {
+               const typingObserver = new IntersectionObserver((entries, observer) => {
+                   entries.forEach(entry => {
+                       if (entry.isIntersecting) {
+                           const words = JSON.parse(entry.target.getAttribute('data-text'));
+                           const id = 'console';
+                           const colors = ['#000000'];
+                           consoleText(words, id, colors);
+                           observer.unobserve(entry.target);
+                       }
+                   });
+               }, {
+                   threshold: 0.5
+               });
+               typingObserver.observe(typingElement);
+           }
+   
+           // Existing code for the "Aura AI Solutions" typing effect
+           const typingEl = document.querySelector('.typing-text');
+           if (typingEl) {
+               setTimeout(() => {
+                   typingEl.classList.add('finished');
+               }, 4500);
+           }
+   
+           // --- UPDATED CODE for the 3D model hover effect ---
+           const modelViewer = document.getElementById('token-model');
+           if (modelViewer) {
+               // Set up a normal, slow rotation for when the mouse is not hovering.
+               modelViewer.setAttribute('auto-rotate', '0.000001rpm');
+   
+               modelViewer.addEventListener('mouseenter', () => {
+                   // When the mouse enters, set a fast rotation speed
+                   modelViewer.setAttribute('auto-rotate-delay', '0'); // Start immediately
+                   modelViewer.setAttribute('auto-rotate-speed', '2000'); // Fast speed
+               });
+   
+               modelViewer.addEventListener('mouseleave', () => {
+                   // When the mouse leaves, revert to the slow speed and a short delay to make the transition smooth
+                   modelViewer.setAttribute('auto-rotate-speed', '0.000001'); // Revert to a slow speed
+               });
+           }
+       });
+   
+       // Your existing consoleText function remains unchanged outside of the event listener
+       function consoleText(words, id, colors) {
+           if (colors === undefined) colors = ['#1f2937'];
+           var visible = true;
+           var con = document.getElementById('console');
+           var letterCount = 1;
+           var x = 1;
+           var waiting = false;
+           var target = document.getElementById(id);
+           if (target) {
+               target.setAttribute('style', 'color:' + colors[0]);
+               window.setInterval(function() {
+                   if (letterCount === 0 && waiting === false) {
+                       waiting = true;
+                       target.innerHTML = words[0].substring(0, letterCount);
+                       window.setTimeout(function() {
+                           var usedColor = colors.shift();
+                           colors.push(usedColor);
+                           var usedWord = words.shift();
+                           words.push(usedWord);
+                           x = 1;
+                           target.setAttribute('style', 'color:' + colors[0]);
+                           letterCount += x;
+                           waiting = false;
+                       }, 1000);
+                   } else if (letterCount === words[0].length + 1 && waiting === false) {
+                       waiting = true;
+                       window.setTimeout(function() {
+                           x = -1;
+                           letterCount += x;
+                           waiting = false;
+                       }, 1000);
+                   } else if (waiting === false) {
+                       target.innerHTML = words[0].substring(0, letterCount);
+                       letterCount += x;
+                   }
+               }, 120);
+           }
+       }
+   </script>
 </body>
 </html>
