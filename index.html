@@ -191,15 +191,17 @@
     <main id="hero" class="min-h-screen flex items-center justify-center p-8 text-center">
         <div class="max-w-4xl mx-auto space-y-8 fade-in">
             <model-viewer
-                src="frontend/media/token.glb"
-                alt="Aura AI token 3D model"
-                auto-rotate="0.000001rpm"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                shadow-intensity="1"
-                autoplay
-                orientation="90deg 90deg 90deg" style="width: 250px; height: 250px; margin: 0 auto; display: block;"
-            ></model-viewer>
+                 src="frontend/media/token.glb"
+                 alt="Aura AI token 3D model"
+                 auto-rotate="0.000001rpm"
+                 ar
+                 ar-modes="webxr scene-viewer quick-look"
+                 shadow-intensity="1"
+                 autoplay
+                 orientation="90deg 90deg 90deg"
+                 style="width: 250px; height: 250px; margin: 0 auto; display: block;"
+                 id="token-model"
+             ></model-viewer>
         
             <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-tight text-gray-900">
                 <span class="block">Transform Your Business with</span>
@@ -558,5 +560,23 @@
             }
         });
     </script>
+    <script>
+       document.addEventListener("DOMContentLoaded", () => {
+           const modelViewer = document.getElementById('token-model');
+           let spinning = false;
+   
+           modelViewer.addEventListener('mouseenter', () => {
+               if (!spinning) {
+                   spinning = true;
+                   modelViewer.setAttribute('auto-rotate', '360rpm');
+                   
+                   setTimeout(() => {
+                       modelViewer.setAttribute('auto-rotate', '0.000001rpm');
+                       spinning = false;
+                   }, 1000);
+               }
+           });
+       });
+   </script>
 </body>
 </html>
