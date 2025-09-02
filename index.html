@@ -164,6 +164,22 @@
           top: -0.14em;
           left: 10px;
         }
+
+        .animated-border {
+            border: 3px solid transparent;
+            border-radius: 0.5rem; /* Matches rounded-lg */
+            background: linear-gradient(to right, #9f49f6, #007bff, #9f49f6) padding-box,
+                        linear-gradient(to right, #9f49f6, #007bff) border-box;
+            background-size: 200% 100%;
+            background-position: 100% 0;
+            animation: border-gradient 4s linear infinite;
+            transition: background 0.3s ease;
+        }
+        
+        @keyframes border-gradient {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
     </style>
     <link rel="icon" href="frontend/media/favicon.png" type="image/png">
 </head>
@@ -341,7 +357,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="border-2 border-[#9f49f6] rounded-lg">
+            <div class="rounded-lg overflow-hidden relative animated-border">
                 <img src="frontend/media/analyticslight.png" alt="analytics picture" class="rounded-lg shadow-2xl">
             </div>
         </div>
