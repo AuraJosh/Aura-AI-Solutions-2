@@ -566,5 +566,82 @@
            }
        }
    </script>
+   <iframe
+    id="aura-chatbot-iframe"
+    frameborder="0"
+    scrolling="no"
+    title="Aura AI Chatbot"
+    style="
+      border:none;
+      position:fixed;
+      bottom:2px;
+      right:2px;  
+      z-index:9999;
+      width:90px;
+      height:90px;
+      overflow:hidden;
+      pointer-events:auto;
+      transition: width 0.3s ease-out, height 0.3s ease-out;
+    "
+  ></iframe>
+  
+  <script>
+      // Configuration for the chatbot
+      const chatbotConfig = {
+          accountId: 'AUR000',
+          apiKey: 'r3m2dP9EwH8PoXANYgNZV6JCOcRiOOTGaIdKVR63',
+          apiEndpoint: 'https://uxa8aixawk.execute-api.eu-west-2.amazonaws.com/default/chat'
+      };
+  
+      document.addEventListener('DOMContentLoaded', function() {
+          const chatbotIframe = document.getElementById('aura-chatbot-iframe');
+  
+          if (chatbotIframe) {
+              // Set the iframe src based on accountId
+              const widgetUrl = chatbotConfig.accountId 
+                  ? `https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/${chatbotConfig.accountId}-chatbot-widget.html`
+                  : 'https://d2941z6xr67omh.cloudfront.net/chatbot-frontend/chatbot-widget.html';
+              
+              chatbotIframe.src = widgetUrl;
+  
+              // Define the full and toggle button sizes.
+              const fullWidth = 420;
+              const fullHeight = 540;
+              const toggleButtonWidth = 90;
+              const toggleButtonHeight = 90;
+  
+              // Send configuration to the iframe once it's loaded
+              chatbotIframe.addEventListener('load', function() {
+                  chatbotIframe.contentWindow.postMessage({
+                      type: 'init',
+                      config: chatbotConfig
+                  }, '*');
+              });
+  
+              // Listen for messages from the iframe
+              window.addEventListener('message', function(event) {
+                  // IMPORTANT: Verify the origin in a production environment for security
+                  // if (event.origin !== "https://d2yqj3k2c4m8s1.cloudfront.net") {
+                  //     return; // Reject messages from unknown origins
+                  // }
+  
+                  // Check if the message is from your chatbot widget and is a state change
+                  if (event.data && event.data.type === 'chatbotState') {
+                      if (event.data.isOpen) {
+                          // Chat is OPEN: expand iframe to full size
+                          chatbotIframe.style.width = `${fullWidth}px`;
+                          chatbotIframe.style.height = `${fullHeight}px`;
+                          chatbotIframe.style.transition = 'width 0.3s ease-out, height 0.3s ease-out';
+                      } else {
+                          // Chat is CLOSED: shrink iframe to button size
+                          chatbotIframe.style.width = `${toggleButtonWidth}px`;
+                          chatbotIframe.style.height = `${toggleButtonHeight}px`;
+                          chatbotIframe.style.transition = 'width 0.3s ease-in, height 0.3s ease-in';
+                      }
+                  }
+              });
+          }
+      });
+  </script>
 </body>
 </html>
