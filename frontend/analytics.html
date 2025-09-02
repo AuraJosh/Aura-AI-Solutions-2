@@ -291,7 +291,7 @@
     
                         adminHtml += `
                             <a href="analytics.html?adminView=true&userId=${userData.uid}" class="block">
-                                <div class="bg-[#F3F4F6] p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
+                                <div class="bg-gray-200 p-6 rounded-lg shadow-xl border border-gray-700 hover:bg-gray-700 transition duration-200 cursor-pointer h-full">
                                     <h3 class="text-xl font-semibold text-black mb-2">${userData.accountName}</h3>
                                     <p class="text-gray-600 text-sm mb-4">UID: ${userData.uid}</p>
                                     <div class="space-y-2">
@@ -416,7 +416,7 @@
                     
                     let displayHTML = `
                         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                        <div class="xl:col-span-2 bg-[#F3F4F6] p-6 rounded-lg shadow-xl">
+                        <div class="xl:col-span-2 bg-gray-200 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-black mb-4">Monthly Message Usage</h2>
                                 <div class="flex items-center justify-between">
                                     <p class="text-gray-600 text-lg">Messages Used:</p>
@@ -429,7 +429,7 @@
                                 ${totalSent >= monthlyLimit ? '<p class="text-red-400 text-sm mt-2 text-center font-bold">You have reached your monthly message limit!</p>' : ''}
                             </div>
     
-                            <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl">
+                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl">
                                 <h2 class="text-xl font-semibold text-black mb-4">Payment Information</h2>
                                 <div class="space-y-3">
                                     <div class="flex items-center justify-between">
@@ -447,7 +447,7 @@
                                 </div>
                             </div>
     
-                            <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl relative overflow-hidden">
+                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl relative overflow-hidden">
                                 <h2 class="text-xl font-semibold text-black mb-4">Daily Message Usage</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="h-60">
@@ -467,7 +467,7 @@
                                 `}
                             </div>
     
-                           <div class="xl:col-span-2 bg-[#F3F4F6] p-6 rounded-lg shadow-xl relative overflow-hidden">
+                           <div class="xl:col-span-2 bg-gray-200 p-6 rounded-lg shadow-xl relative overflow-hidden">
                                 <h2 class="text-xl font-semibold text-black mb-4">Chat Logs</h2>
                                 ${hasEliteOrExecutiveAccess ? `
                                     <div class="text-gray-800 chat-logs-container"> ${chatContentHTML}
@@ -485,7 +485,7 @@
                                 `}
                             </div>
     
-                            <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
+                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-black mb-4">Manage Subscription</h2>
                                 <p class="text-gray-800 text-sm mb-4">Need to make a change to your plan?</p>
                                 <a href="https://billing.stripe.com/p/login/8x200i8t1eWX9374tn0VO00" style="text-decoration: none;">
@@ -496,7 +496,7 @@
                                 <p class="text-gray-800 text-xs mt-2">Cancel your subscription through stripe, we are sad to see you go.</p>
                             </div>
     
-                            <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
+                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-black mb-4">Your Feedback</h2>
                                 <p class="text-gray-800 text-sm mb-4">Help us improve Aura AI during beta!</p>
                                 <a href="form.html"
@@ -508,7 +508,7 @@
                                 <p class="text-gray-800 text-xs mt-2">Opens a separate feedback form.</p>
                             </div>
     
-                            <div class="xl:col-span-1 bg-[#F3F4F6] p-6 rounded-lg shadow-xl text-center">
+                            <div class="xl:col-span-1 bg-gray-200 p-6 rounded-lg shadow-xl text-center">
                                 <h2 class="text-xl font-semibold text-black mb-4">Update Business Info</h2>
                                 <p class="text-gray-800 text-sm mb-4">Request changes to your AI's knowledge base.</p>
                                 <a href="update.html" class="inline-block">
